@@ -1,0 +1,15 @@
+{
+  "name": "candor-backend",
+  "version": "0.1.0",
+  "description": "Candor CI backend",
+  "main": "build/index.js",
+  "dependencies": {
+    "express": "^4.18.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT"
+}
