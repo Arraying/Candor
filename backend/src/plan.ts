@@ -1,12 +1,13 @@
 export interface Plan {
-    stages: Stage[],
-    archive?: string[],
+    stages: Stage[]
+    archive?: string[]
 }
 
 export interface Stage {
-    image: string,
-    environment?: string[],
-    script?: string[],
+    name: string
+    image: string
+    environment?: string[]
+    script?: string[]
 }
 
 export function isPlanValid(plan: Plan): boolean {
@@ -14,7 +15,10 @@ export function isPlanValid(plan: Plan): boolean {
         return false;
     }
     for (const stage of plan.stages) {
-        if (stage.image == null || stage.image === '') {
+        if (stage.name == null || stage.name === '') {
+            return false;
+        }
+        else if (stage.image == null || stage.image === '') {
             return false;
         }
     }
