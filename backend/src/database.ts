@@ -40,3 +40,12 @@ export async function setup(): Promise<void> {
         );
     `);
 }
+
+/**
+ * Create a new user.
+ * @param name The name of the user.
+ * @param password The password of the user.
+ */
+export async function createUser(name: string, password: string): Promise<void> {
+    await pool.query('INSERT INTO "users" ("username", "password") VALUES ($1, $2);', [name, password]);
+}

@@ -4,6 +4,7 @@ import path from "path";
 import { setup } from "./database";
 import { run } from "./pipeline";
 import { Plan, isPlanValid } from "./plan";
+import { makeAdmin } from "./routes/admin";
 
 // Load the environment variables.
 dotenv.config({
@@ -16,6 +17,8 @@ setup().then(() => {
     const app = express();
     // Use JSON middleware to handle JSON requests in bodies.
     app.use(express.json());
+    // Route to make an admin user.
+    app.post("/makeadmin", makeAdmin);
     
     app.post('/ci/run', async (req: Request, res: Response) => {
         if (!req.is('json')) {

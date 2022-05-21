@@ -10,6 +10,11 @@ export interface Stage {
     script?: string[]
 }
 
+/**
+ * Performs validation on the plan to see if it is legal syntax and valid.
+ * @param plan The plan.
+ * @returns True if the plan is valid, false otherwise.
+ */
 export function isPlanValid(plan: Plan): boolean {
     if (plan.stages == null) {
         return false;
