@@ -18,9 +18,7 @@ app.post('/ci/run', async (req: Request, res: Response) => {
         return res.sendStatus(400);
     }
     const result = await run(plan);
-    res.send({
-        result: result
-    });
+    res.send(result);
 });
 
 app.listen(port);

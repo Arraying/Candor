@@ -3,21 +3,67 @@ import { runContainers } from "./management/container";
 import { buildImages, removeImages } from "./management/image";
 import { Plan } from "./plan";
 
-export type Status = "Passed" | "Failed" | "Error";
+/**
+ * The status of the pipeline or its individual stages.
+ * Passed -> Everything is okay.
+ * Failed -> A stage failed in the pipeline, but the pipeline is okay.
+ * Skipped -> A stage was skipped since one of its predecessors failed.
+ * Error -> The pipeline or one of its stages is malformed.
+ */
+export type Status = "Passed" | "Failed" | "Skipped" | "Error";
+
+/**
+ * Shows information on the pipeline run.
+ * Specifically, the status of the overall pipeline, as well as that of individual stages.
+ */
+export interface PipelineRun {
+    status: Status
+    stages?: StageRun[]
+}
+
+/**
+ * Shows information on a single stage.
+ * Contains the status of the stage and the exit code of its container.
+ */
+export interface StageRun {
+    status: Status
+    exitCode: number
+}
+
+/** 
+ * The Docker client.
+ */
+const client = new Docker();
+
+/** 
+ * The directory in which all the work will be performed.
+ */
 export const workingDirectory = "/home/work";
 
-export async function run(plan: Plan): Promise<Status> {
+/**
+ * Runs the entire pipeline.
+ * @param plan The pipeline plan.
+ * @returns The pipeline run result.
+ */
+export async function run(plan: Plan): Promise<PipelineRun> {
     let imageIds = null;
     try {
         // First, build the image for every stage.
         imageIds = await buildImages(client, plan);
-        // Then, run every stage, passing the result between each step.
-        const workspaceMeta = await runContainers(client, imageIds);
-        workspaceMeta.clean();
-        return "Passed";
+        // Then, run every stage, passing the result between each step. Collect results.
+        const containerRun = await runContainers(client, imageIds);
+
+        // Lastly, clean the workspace.
+        containerRun.workspaceClean();
+        return {
+            status: determineOverallStatus(containerRun.stageRuns),
+            stages: containerRun.stageRuns
+        };
     } catch (exception) {
-        console.log(exception);
-        return "Error";
+        console.error(exception);
+        return {
+            status: "Error"
+        }
     } finally {
         // Clean up images (containers get removed automatically).
         if (imageIds != null) {
@@ -26,4 +72,27 @@ export async function run(plan: Plan): Promise<Status> {
     }
 }
 
-const client = new Docker();
+/**
+ * Calculates the overall pipeline status code based off of the stage runs.
+ * @param stageRuns An array of all the stage runs if applicable.
+ * @returns The overall pipeline status code.
+ */
+function determineOverallStatus(stageRuns?: StageRun[]): Status {
+    if (stageRuns) {
+        // Go through every run.
+        for (const run of stageRuns) {
+            // If there is an error, then overall there should be an error.
+            if (run.status === "Error") {
+                return "Error";
+            }
+            // If one stage failed, the pipeline has failed.
+            else if (run.status === "Failed") {
+                return "Failed";
+            }
+        }
+        // Even if there are skips without fails, these can be ignored.
+        return "Passed";
+    }
+    // If there are no stage runs, there must have been an error.
+    return "Error";
+}

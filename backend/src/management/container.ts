@@ -1,11 +1,15 @@
 import Docker from "dockerode";
 import tmp from "tmp";
-import { workingDirectory } from "../pipeline";
+import { StageRun, workingDirectory } from "../pipeline";
 
-export type WorkspaceMeta = {
-    name: string,
-    clean: () => void,
-    exitCodes: number[]
+/**
+ * Contains relevant information on the container run.
+ * Includes the stage information, but also metadata associated to the workspace.
+ */
+export interface ContainerRun {
+    stageRuns: StageRun[]
+    workspacePath: string
+    workspaceClean: () => void
 };
 
 /**
@@ -16,13 +20,23 @@ export type WorkspaceMeta = {
  * @param volume The name of the volume to use to share data between pipeline steps.
   * @returns A promise of the workspace metadata.
  */
-export async function runContainers(client: Docker, imageIds: string[]): Promise<WorkspaceMeta> {
+export async function runContainers(client: Docker, imageIds: string[]): Promise<ContainerRun> {
     // Create a temporary directory which will be used as the working directory.
     const { name, removeCallback } = tmp.dirSync({ unsafeCleanup: true });
-    console.log(name);
-    // Keep track of the exit codes for each stage.
-    let exitCodes: number[] = [];
+    // Keep track of the stages so far.
+    let stageRuns: StageRun[] = [];
+    // When a stage fails, we want to be able to skip all stages afterwards.
+    let skip = false;
+    // Iterate through all image IDs, each image ID is one stage.
     for (const imageId of imageIds) {
+        // Check if we are skipping.
+        if (skip) {
+            stageRuns.push({
+                status: "Skipped",
+                exitCode: -1
+            });
+            continue;
+        }
         // Configure the container options.
         const options: Docker.ContainerCreateOptions = {
             Image: imageId,
@@ -37,14 +51,39 @@ export async function runContainers(client: Docker, imageIds: string[]): Promise
             await container.start();
             // Await the container's exit.
             const exit = await container.wait();
-            exitCodes.push(exit.StatusCode);
+            const exitCode = exit.StatusCode;
+            if (exitCode === 0) {
+                // Exit code 0, so everything went smoothly.
+                stageRuns.push({
+                    status: "Passed",
+                    exitCode: exitCode
+                });
+            } else {
+                // Nonzero exit code, there is a failure.
+                stageRuns.push({
+                    status: "Failed",
+                    exitCode: exitCode
+                });
+                // As such, skip subsequent stages.
+                skip = true;
+            }
         } catch (exception) {
             console.error(exception);
-            exitCodes.push(-1);
+            // Here, an exception occurred in the actual running of the container.
+            stageRuns.push({
+                status: "Error",
+                exitCode: -1
+            });
+            // Again, skip.
+            skip = true;
         } finally {
             // Clean up the container.
             await container.remove();
         }
     }
-    return { name: name, clean: removeCallback, exitCodes: exitCodes };
+    return {
+        stageRuns: stageRuns,
+        workspacePath: name,
+        workspaceClean: removeCallback
+    };
 }
