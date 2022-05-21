@@ -1,4 +1,5 @@
 import Docker from "dockerode";
+import { archiveFiles } from "./management/archive";
 import { runContainers } from "./management/container";
 import { buildImages, removeImages } from "./management/image";
 import { Plan } from "./plan";
@@ -43,16 +44,18 @@ export const workingDirectory = "/home/work";
 /**
  * Runs the entire pipeline.
  * @param plan The pipeline plan.
+ * @param archiveDir The archive directory.
  * @returns The pipeline run result.
  */
-export async function run(plan: Plan): Promise<PipelineRun> {
+export async function run(plan: Plan, archiveDir: string): Promise<PipelineRun> {
     let imageIds = null;
     try {
         // First, build the image for every stage.
         imageIds = await buildImages(client, plan);
         // Then, run every stage, passing the result between each step. Collect results.
         const containerRun = await runContainers(client, imageIds);
-
+        // Archive all the important files after the pipeline ran.
+        archiveFiles(archiveDir, containerRun.workspacePath, plan.archive);
         // Lastly, clean the workspace.
         containerRun.workspaceClean();
         return {

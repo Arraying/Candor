@@ -1,12 +1,12 @@
 export interface Plan {
     stages: Stage[],
-    archive: string[],
+    archive?: string[],
 }
 
 export interface Stage {
     image: string,
-    environment: string[],
-    script: string[],
+    environment?: string[],
+    script?: string[],
 }
 
 export function isPlanValid(plan: Plan): boolean {
