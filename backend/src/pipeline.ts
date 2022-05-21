@@ -1,5 +1,5 @@
 import Docker from "dockerode";
-import { buildRequiredImages } from "./management/image";
+import { buildImages } from "./management/image";
 import { Plan } from "./plan";
 
 export type Status = 'Passed' | 'Failed' | 'Error';
@@ -7,7 +7,7 @@ export type Status = 'Passed' | 'Failed' | 'Error';
 export async function run(plan: Plan): Promise<Status> {
     try {
         // First, build the image for every stage.
-        const imageIds = await buildRequiredImages(client, plan);
+        const imageIds = await buildImages(client, plan);
         return 'Passed';
     } catch (exception) {
         console.log(exception);
