@@ -2,6 +2,7 @@ import Docker from "dockerode";
 import fs from "fs";
 import path from "path";
 import tmp from "tmp";
+import { workingDirectory } from "../pipeline";
 import { Plan, Stage } from "../plan";
 
 type ImageMeta = {
@@ -25,7 +26,7 @@ export async function buildImages(client: Docker, plan: Plan): Promise<string[]>
     // Keep track of image IDs.
     let imageIds = [];
     // Then, create a temporary directory to write these to.
-    const { name, removeCallback } = tmp.dirSync();
+    const { name, removeCallback } = tmp.dirSync({ unsafeCleanup: true });
     // Write all the Dockerfiles.
     for (const imageMeta of dockerfiles) {
         // Write the Dockerfile related information.
@@ -61,15 +62,28 @@ export async function buildImages(client: Docker, plan: Plan): Promise<string[]>
                 result: result
             };
         }
-        // Clean up the Dockerfile and script.
-        fs.rmSync(dockerfilePath);
-        if (shell != null) {
-            fs.rmSync(shellPath);
-        }
     }
     // Remove the temporary directory.
     removeCallback();
     return imageIds;
+}
+
+/**
+ * Deletes all created images.
+ * @param client The Docker client.
+ * @param imageIds A list of image IDs to delete.
+ */
+export async function removeImages(client: Docker, imageIds: string[]): Promise<void> {
+    for (const imageId of imageIds) {
+        // Get the image.
+        const image = await client.getImage(imageId);
+        // Delete the image.
+        try {
+            await image.remove( { force: true });
+        } catch (exception) {
+            console.warn('Could not delete image: ' + exception);
+        }
+    }
 }
 
 /**
@@ -84,8 +98,8 @@ async function makeDockerfiles(stages: Stage[]): Promise<ImageMeta[]> {
     for (const stage of stages) {
         // Each stage has its own Dockerfile.
         let dockerfile = `FROM ${stage.image}\n
-            MAINTAINER Candor
-            WORKDIR /home/work/`;
+            MAINTAINER Candor\n
+            WORKDIR ${workingDirectory}\n`;
         // Iterate through the environment variables if possible.
         for (const kvPair of stage.environment || []) {
             // Attempt to parse the key value pair.

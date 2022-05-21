@@ -17,8 +17,10 @@ app.post('/ci/run', async (req: Request, res: Response) => {
         // Bad Request.
         return res.sendStatus(400);
     }
-    await run(plan);
-    res.send('aaa');
+    const result = await run(plan);
+    res.send({
+        result: result
+    });
 });
 
 app.listen(port);
