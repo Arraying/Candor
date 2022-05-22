@@ -1,39 +1,43 @@
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import path from "path";
-import { setup } from "./database";
+import { securityMiddleware } from "./middleware";
 import { run } from "./pipeline";
-import { Plan, isPlanValid } from "./plan";
-import { makeAdmin } from "./routes/admin";
+import { RunRequest, isPlanValid } from "./plan";
 
 // Load the environment variables.
-dotenv.config({
-    path: process.env.NODE_ENV === "production" ? ".env" : "../.env"
+dotenv.config();
+
+// Create the Express app.
+const app = express();
+
+// Add the authentication middleware.
+app.use(securityMiddleware);
+// Add the JSON middleware to handle bodies.
+app.use(express.json());
+
+// Add the route to run the pipeline.
+app.post("/run", async (req: Request, res: Response) => {
+    // Ensure the payload is sent as JSON.
+    if (!req.is('json')) {
+        res.sendStatus(415);
+        return;
+    }
+    // Get the request.
+    const request: RunRequest = req.body;
+    // Set the name to untagged if there is no associated name.
+    if (request.tag == null || request.tag === "") {
+        request.tag = "untagged";
+    }
+    // Check if the plan is valid.
+    if (request.plan == null || !isPlanValid(request.plan)) {
+        res.sendStatus(400);
+        return;
+    }
+    // Run the plan.
+    const result = await run(request.plan, path.join(__dirname, process.env.RUNNER_ARCHIVE || "archive"));
+    res.send(result);
 });
 
-// Setup the database.
-setup().then(() => {
-    // Create the Express app.
-    const app = express();
-    // Use JSON middleware to handle JSON requests in bodies.
-    app.use(express.json());
-    // Route to make an admin user.
-    app.post("/makeadmin", makeAdmin);
-    
-    app.post('/ci/run', async (req: Request, res: Response) => {
-        if (!req.is('json')) {
-            // Unsupported Media Type.
-            return res.sendStatus(415);
-        }
-        const plan: Plan = req.body;
-        if (!isPlanValid(plan)) {
-            // Bad Request.
-            return res.sendStatus(400);
-        }
-        const result = await run(plan, path.join(__dirname, process.env.ARCHIVE || 'archive'));
-        res.send(result);
-    });
-    
-    // Listen on the correct port.
-    app.listen(process.env.PORT);
-});
+// Listen on the correct port.
+app.listen(process.env.RUNNER_PORT);

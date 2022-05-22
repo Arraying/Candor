@@ -10,8 +10,8 @@ type ImageMeta = {
     shell: string | null
 };
 
-const dockerfileName = 'Dockerfile';
-const shellName = 'commands.sh';
+const dockerfileName = "Dockerfile";
+const shellName = "commands.sh";
 
 /**
  * Builds a Docker image for every stage, such that it can be used for containers.
@@ -58,7 +58,7 @@ export async function buildImages(client: Docker, plan: Plan): Promise<string[]>
             imageIds.push(possibleId);
         } else {
             throw {
-                reason: 'Could not find built image ID',
+                reason: "Could not find built image ID",
                 result: result
             };
         }
@@ -81,7 +81,7 @@ export async function removeImages(client: Docker, imageIds: string[]): Promise<
         try {
             await image.remove( { force: true });
         } catch (exception) {
-            console.warn('Could not delete image: ' + exception);
+            console.warn("Could not delete image: " + exception);
         }
     }
 }

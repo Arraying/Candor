@@ -1,7 +1,7 @@
 {
-  "name": "candor-runner",
+  "name": "candor-backend",
   "version": "0.1.0",
-  "description": "Candor CI runner",
+  "description": "Candor CI backend",
   "main": "build/main.js",
   "dependencies": {
     "bcrypt": "^5.0.1",
