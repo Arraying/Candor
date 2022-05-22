@@ -43,11 +43,11 @@ export const workingDirectory = "/home/work";
 
 /**
  * Runs the entire pipeline.
+ * @param tag The run tag.
  * @param plan The pipeline plan.
- * @param archiveDir The archive directory.
  * @returns The pipeline run result.
  */
-export async function run(plan: Plan, archiveDir: string): Promise<PipelineRun> {
+export async function run(tag: string, plan: Plan): Promise<PipelineRun> {
     let imageIds = null;
     try {
         // First, build the image for every stage.
@@ -55,7 +55,7 @@ export async function run(plan: Plan, archiveDir: string): Promise<PipelineRun> 
         // Then, run every stage, passing the result between each step. Collect results.
         const containerRun = await runContainers(client, imageIds);
         // Archive all the important files after the pipeline ran.
-        archiveFiles(archiveDir, containerRun.workspacePath, plan.archive);
+        await archiveFiles(tag, containerRun.workspacePath, plan.archive);
         // Lastly, clean the workspace.
         containerRun.workspaceClean();
         return {

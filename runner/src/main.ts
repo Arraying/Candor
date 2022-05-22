@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
-import path from "path";
 import { securityMiddleware } from "./middleware";
 import { run } from "./pipeline";
 import { RunRequest, isPlanValid } from "./plan";
@@ -35,7 +34,7 @@ app.post("/run", async (req: Request, res: Response) => {
         return;
     }
     // Run the plan.
-    const result = await run(request.plan, path.join(__dirname, process.env.RUNNER_ARCHIVE || "archive"));
+    const result = await run(request.tag, request.plan);
     res.send(result);
 });
 

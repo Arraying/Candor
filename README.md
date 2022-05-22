@@ -22,6 +22,7 @@ Technologies:
 - TypeScript
 - Express.js
 - Docker
+- S3
 
 ##### Frontend
 
