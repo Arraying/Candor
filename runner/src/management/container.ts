@@ -1,5 +1,6 @@
 import Docker from "dockerode";
 import tmp from "tmp";
+import { Cleaner } from "../cleaner";
 import { StageRun, workingDirectory } from "../pipeline";
 
 /**
@@ -9,7 +10,6 @@ import { StageRun, workingDirectory } from "../pipeline";
 export interface ContainerRun {
     stageRuns: StageRun[]
     workspacePath: string
-    workspaceClean: () => void
 };
 
 /**
@@ -17,12 +17,14 @@ export interface ContainerRun {
  * The result of each pipeline will be re-used for the other.
  * @param client The Docker client.
  * @param imageIds The IDs of the image, one for each stage.
- * @param volume The name of the volume to use to share data between pipeline steps.
-  * @returns A promise of the workspace metadata.
+ * @param cleaner The cleaner.
+ * @returns A promise of the workspace metadata.
  */
-export async function runContainers(client: Docker, imageIds: string[]): Promise<ContainerRun> {
+export async function runContainers(client: Docker, imageIds: string[], cleaner: Cleaner): Promise<ContainerRun> {
     // Create a temporary directory which will be used as the working directory.
     const { name, removeCallback } = tmp.dirSync({ unsafeCleanup: true });
+    // Clean it up at the end.
+    cleaner.addJob(async (): Promise<void> => removeCallback());
     // Keep track of the stages so far.
     let stageRuns: StageRun[] = [];
     // When a stage fails, we want to be able to skip all stages afterwards.
@@ -46,6 +48,8 @@ export async function runContainers(client: Docker, imageIds: string[]): Promise
         };
         // Create the container and run it.
         const container = await client.createContainer(options);
+        // Add deleting the container to the cleanup task.
+        cleaner.addJob(async (): Promise<void> => await container.remove());
         try {
             // Put the rest in a try so the container can be cleaned on error.
             await container.start();
@@ -76,14 +80,11 @@ export async function runContainers(client: Docker, imageIds: string[]): Promise
             });
             // Again, skip.
             skip = true;
-        } finally {
-            // Clean up the container.
-            await container.remove();
         }
     }
+    // Return the information of the pipeline run.
     return {
         stageRuns: stageRuns,
         workspacePath: name,
-        workspaceClean: removeCallback
     };
 }

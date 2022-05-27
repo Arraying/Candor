@@ -1,7 +1,8 @@
 import Docker from "dockerode";
+import { Cleaner } from "./cleaner";
 import { archiveFiles } from "./management/archive";
 import { runContainers } from "./management/container";
-import { buildImages, removeImages } from "./management/image";
+import { buildImages } from "./management/image";
 import { Plan } from "./plan";
 
 /**
@@ -48,16 +49,15 @@ export const workingDirectory = "/home/work";
  * @returns The pipeline run result.
  */
 export async function run(tag: string, plan: Plan): Promise<PipelineRun> {
-    let imageIds = null;
+    const cleaner = new Cleaner();
     try {
         // First, build the image for every stage.
-        imageIds = await buildImages(client, plan);
+        const imageIds = await buildImages(client, plan, cleaner);
         // Then, run every stage, passing the result between each step. Collect results.
-        const containerRun = await runContainers(client, imageIds);
+        const containerRun = await runContainers(client, imageIds, cleaner);
         // Archive all the important files after the pipeline ran.
         await archiveFiles(tag, containerRun.workspacePath, plan.archive);
-        // Lastly, clean the workspace.
-        containerRun.workspaceClean();
+        // Return the relevant information of the run.
         return {
             status: determineOverallStatus(containerRun.stageRuns),
             stages: containerRun.stageRuns
@@ -65,13 +65,11 @@ export async function run(tag: string, plan: Plan): Promise<PipelineRun> {
     } catch (exception) {
         console.error(exception);
         return {
-            status: "Error"
+            status: "Error",
         }
     } finally {
-        // Clean up images (containers get removed automatically).
-        if (imageIds != null) {
-            await removeImages(client, imageIds);
-        }
+        // Clean up everything.
+        await cleaner.clean();
     }
 }
 

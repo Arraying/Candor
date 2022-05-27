@@ -2,6 +2,7 @@ import Docker from "dockerode";
 import fs from "fs";
 import path from "path";
 import tmp from "tmp";
+import { Cleaner } from "../cleaner";
 import { workingDirectory } from "../pipeline";
 import { Plan, Stage } from "../plan";
 
@@ -18,15 +19,18 @@ const shellName = "commands.sh";
  * The image IDs then get returned as a promise.
  * @param client The Docker client.
  * @param plan The pipeline plan.
+ * @param cleaner The cleaner.
  * @returns A promise of an array of image IDs, one per stage.
  */
-export async function buildImages(client: Docker, plan: Plan): Promise<string[]> {
+export async function buildImages(client: Docker, plan: Plan, cleaner: Cleaner): Promise<string[]> {
     // First, create all the Dockerfiles as strings.
     const dockerfiles = await makeDockerfiles(plan.stages);
     // Keep track of image IDs.
     let imageIds = [];
     // Then, create a temporary directory to write these to.
     const { name, removeCallback } = tmp.dirSync({ unsafeCleanup: true });
+    // Make sure to clean up this directory.
+    cleaner.addJob(async (): Promise<void> => removeCallback());
     // Write all the Dockerfiles.
     for (const imageMeta of dockerfiles) {
         // Write the Dockerfile related information.
@@ -56,6 +60,12 @@ export async function buildImages(client: Docker, plan: Plan): Promise<string[]>
         // Only write the image ID if it succeeded.
         if (possibleId != null) {
             imageIds.push(possibleId);
+            cleaner.addJob(async (): Promise<void> => {
+                // Get the image by ID.
+                const image = await client.getImage(possibleId);
+                // Remove the image, forcefully if applicable.
+                await image.remove({ force: true });
+            });
         } else {
             throw {
                 reason: "Could not find built image ID",
@@ -63,27 +73,7 @@ export async function buildImages(client: Docker, plan: Plan): Promise<string[]>
             };
         }
     }
-    // Remove the temporary directory.
-    removeCallback();
     return imageIds;
-}
-
-/**
- * Deletes all created images.
- * @param client The Docker client.
- * @param imageIds A list of image IDs to delete.
- */
-export async function removeImages(client: Docker, imageIds: string[]): Promise<void> {
-    for (const imageId of imageIds) {
-        // Get the image.
-        const image = await client.getImage(imageId);
-        // Delete the image.
-        try {
-            await image.remove( { force: true });
-        } catch (exception) {
-            console.warn("Could not delete image: " + exception);
-        }
-    }
 }
 
 /**
