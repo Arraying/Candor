@@ -4,7 +4,7 @@ import { archiveFiles } from "./management/archive";
 import { runContainers } from "./management/container";
 import { buildImages } from "./management/image";
 import { createVolume } from "./management/volume";
-import { Plan, RunRequest } from "./plan";
+import { RunRequest } from "./plan";
 
 /**
  * The status of the pipeline or its individual stages.
@@ -34,11 +34,6 @@ export interface StageRun {
 }
 
 /** 
- * The Docker client.
- */
-const client = new Docker();
-
-/** 
  * The directory in which all the work will be performed.
  */
 export const workingDirectory = "/home/work";
@@ -49,6 +44,8 @@ export const workingDirectory = "/home/work";
  * @returns The pipeline run result.
  */
 export async function run(request: RunRequest): Promise<PipelineRun> {
+    // Create the client.
+    const client = new Docker();
     // Declare variables.
     const runId = request.runId!;
     const tag = request.tag!;

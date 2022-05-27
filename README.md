@@ -5,6 +5,7 @@
 
 ### Philosophy
 
+0. The runner and associated dashboard should run in containers.
 1. Each pipeline should run in complete isolation from the host.
 2. A pipeline may have multiple stages, which will be executed one after another.
 3. Pipeline stages all perform work in a single directory, which gets passed from one stage to the next.
@@ -39,6 +40,14 @@ Technologies:
 - TypeScript
 - Express.js
 - PostgreSQL
+
+#### Bootstrap
+
+Provides a super simple way to spin up a fully functioning Candor CI stack. This create the following.
+- A locally hosted S3 server to handle archives.
+- A single pipeline runner.
+- A web server to serve the dashboard.
+- A database server for the dashboard.
 
 ### Runner
 

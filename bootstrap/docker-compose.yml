@@ -1,0 +1,21 @@
+services:
+  # The S3 server (currently runs an in-memory database)
+  sss:
+    image: zenko/cloudserver
+    env_file: .env
+    environment:
+    - S3DATA=multiple
+    - S3BACKEND=mem
+  # The pipeline runner.
+  runner:
+    build: ../runner
+    env_file: .env
+    environment:
+    - RUNNER_PORT=3001
+    - S3_BUCKET=candor
+    - S3_ENDPOINT=sss
+    - S3_PORT=8000
+    - S3_SSL=false
+    ports:
+    - 3001:3001
+  

@@ -7,6 +7,10 @@ import { RunRequest, isPlanValid } from "./plan";
 
 // Load the environment variables.
 dotenv.config();
+// Manually copy over environment variable to avoid conflict with compose.
+if (!process.env.DOCKER_HOST) {
+    process.env.DOCKER_HOST = process.env.RUNNER_DOCKER_HOST;
+}
 
 // Create the Express app.
 const app = express();
