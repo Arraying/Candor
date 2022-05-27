@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import { securityMiddleware } from "./middleware";
@@ -24,8 +25,12 @@ app.post("/run", async (req: Request, res: Response) => {
     }
     // Get the request.
     const request: RunRequest = req.body;
+    // Generate a run ID if not specified.
+    if (!request.runId) {
+        request.runId = crypto.randomBytes(6).toString("hex");
+    }
     // Set the name to untagged if there is no associated name.
-    if (request.tag == null || request.tag === "") {
+    if (!request.tag) {
         request.tag = "untagged";
     }
     // Check if the plan is valid.
@@ -34,7 +39,7 @@ app.post("/run", async (req: Request, res: Response) => {
         return;
     }
     // Run the plan.
-    const result = await run(request.tag, request.plan);
+    const result = await run(request);
     res.send(result);
 });
 

@@ -1,9 +1,11 @@
 /**
  * Represents a request to run the pipeline.
+ * The run ID is an optional ID so the same ID can be used for the runner and scheduler.
  * The tag refers to the tag in accordance to the object storage.
  */
 export interface RunRequest {
-    tag: string
+    runId?: string
+    tag?: string
     plan: Plan
 }
 

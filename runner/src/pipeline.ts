@@ -1,9 +1,10 @@
+import crypto from "crypto";
 import Docker from "dockerode";
 import { Cleaner } from "./cleaner";
 import { archiveFiles } from "./management/archive";
 import { runContainers } from "./management/container";
 import { buildImages } from "./management/image";
-import { Plan } from "./plan";
+import { Plan, RunRequest } from "./plan";
 
 /**
  * The status of the pipeline or its individual stages.
@@ -44,25 +45,35 @@ export const workingDirectory = "/home/work";
 
 /**
  * Runs the entire pipeline.
- * @param tag The run tag.
- * @param plan The pipeline plan.
+ * @param request The run request.
  * @returns The pipeline run result.
  */
-export async function run(tag: string, plan: Plan): Promise<PipelineRun> {
+export async function run(request: RunRequest): Promise<PipelineRun> {
+    // Declare variables.
+    const runId = request.runId!;
+    const tag = request.tag!;
+    const plan = request.plan;
+    // Start running the pipeline!
+    log(runId, `Starting pipeline with tag ${tag}`);
     const cleaner = new Cleaner();
     try {
+        log(runId, "Building images");
         // First, build the image for every stage.
         const imageIds = await buildImages(client, plan, cleaner);
         // Then, run every stage, passing the result between each step. Collect results.
+        log(runId, "Running containers");
         const containerRun = await runContainers(client, imageIds, cleaner);
         // Archive all the important files after the pipeline ran.
+        log(runId, "Archiving files");
         await archiveFiles(tag, containerRun.workspacePath, plan.archive);
         // Return the relevant information of the run.
+        log(runId, "Run complete");
         return {
             status: determineOverallStatus(containerRun.stageRuns),
             stages: containerRun.stageRuns
         };
     } catch (exception) {
+        log(runId, "Pipeline encountered internal error:")
         console.error(exception);
         return {
             status: "Error",
@@ -70,6 +81,7 @@ export async function run(tag: string, plan: Plan): Promise<PipelineRun> {
     } finally {
         // Clean up everything.
         await cleaner.clean();
+        log(runId, "Pipeline concluded");
     }
 }
 
@@ -96,4 +108,13 @@ function determineOverallStatus(stageRuns?: StageRun[]): Status {
     }
     // If there are no stage runs, there must have been an error.
     return "Error";
+}
+
+/**
+ * Logs a message.
+ * @param run The run ID.
+ * @param message The message to log.
+ */
+function log(run: string, message: string): void {
+    console.log(`[${run}] ${message}`);
 }
