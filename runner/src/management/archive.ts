@@ -1,13 +1,30 @@
+import Dockerode from "dockerode";
 import { Client } from "minio";
+import fs from "fs";
 import path from "path";
+import tar from "tar";
+import tmp from "tmp";
+import { Cleaner } from "../cleaner";
+import { workingDirectory } from "../pipeline";
 
 /**
- * Archives files from a pipeline run.
- * @param tag The pipeline run's tag.
- * @param workingDirectory The path of the workspace on the host, not container.
- * @param toArchive Null or a list of file names to archive.
+ * Archives all the required files to S3 storage.
+ * @param client The Docker client.
+ * @param lastSuccessfulContainer The ID of the last successfully exited contianer.
+ * @param tag The tag for the pipeline run.
+ * @param toArchive A non-null array of file paths to archive.
+ * @param cleaner The cleaner.
+ * @returns A promise of void.
  */
-export async function archiveFiles(tag: string, workingDirectory: string, toArchive?: string[]): Promise<void> {
+export async function archiveFiles(client: Dockerode, lastSuccessfulContainer: string, tag: string, toArchive: string[], cleaner: Cleaner): Promise<void> {
+    // Create a temporary directory which will be used to copy the files from the container.
+    const { name, removeCallback } = tmp.dirSync({ unsafeCleanup: true });
+    // Clean it up at the end.
+    cleaner.addJob(async (): Promise<void> => removeCallback());
+    // Check if there even is anything to archive.
+    if (!toArchive) {
+        return;
+    }
     // Create the S3 client. This can't be done earlier because the environment variables won't be there.
     const s3 = new Client({
         endPoint: process.env.S3_ENDPOINT!,
@@ -23,10 +40,49 @@ export async function archiveFiles(tag: string, workingDirectory: string, toArch
         // Create it so it can be written to.
         await s3.makeBucket(bucket, "");
     }
-    // Iterate through every archived file (if applicable).
-    for (const fileName of toArchive || []) {
-        const fromPath = path.join(workingDirectory, fileName);
-        const toPath = path.join(tag, fileName);
-        await s3.fPutObject(bucket, toPath, fromPath);
+    // Resovle the container.
+    const container = await client.getContainer(lastSuccessfulContainer);
+    // For every artifact, copy it into the temporary working directory.
+    for (const fileName of toArchive) {
+        // The base name of the file, everything gets flattened.
+        const baseName = path.basename(fileName);
+        // Location on the temporary file.
+        const temporaryFilePathTar = path.join(name, `${baseName}.tar`);
+        // Create a raw writeable stream to write the file archive.
+        const writeStream = fs.createWriteStream(temporaryFilePathTar);
+        // Get a raw readable stream of the file archive.
+        const readStream = await container.getArchive({
+            // Using path.join here will not work if the host is Windows, we must always use Unix separators.
+            path: `${workingDirectory}/${fileName}`,
+        });
+        // Create a promise of the writing process.
+        const fileTransfer = new Promise((resolve, reject) => {
+            readStream
+                // Write the readable stream directly into the file.
+                .pipe(writeStream)
+                // Reject the promise if there is some sort of error.
+                .on("error", reject)
+                // Resolve the promise once writing is done.
+                .on("finish", resolve);
+        });
+        // Wait for the file transfer to be finished.
+        await fileTransfer;
+        // Untar the file.
+        await tar.x({
+            // Extract in the temporary directory.
+            cwd: name,
+            // Use fully qualified name here, this won't affect extraction.
+            file: temporaryFilePathTar,
+        });
+        // The name of the file in the temporary filesystem.
+        const realFileName = path.join(name, baseName);
+        // If file is a directory, skip it.
+        if (await (await fs.promises.lstat(realFileName)).isDirectory) {
+            continue;
+        }
+        // The path of the file in S3 storage.
+        const archivedPath = `${tag}/${baseName}`;
+        // Write the file to S3.
+        await s3.fPutObject(bucket, archivedPath, realFileName);
     }
 }

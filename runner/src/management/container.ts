@@ -1,5 +1,4 @@
 import Docker from "dockerode";
-import tmp from "tmp";
 import { Cleaner } from "../cleaner";
 import { StageRun, workingDirectory } from "../pipeline";
 
@@ -9,24 +8,22 @@ import { StageRun, workingDirectory } from "../pipeline";
  */
 export interface ContainerRun {
     stageRuns: StageRun[]
-    workspacePath: string
+    lastSuccessfulContainer?: string
 };
 
 /**
  * Runs the pipeline containers. 
  * The result of each pipeline will be re-used for the other.
  * @param client The Docker client.
+ * @param volumeName The name of the volume.
  * @param imageIds The IDs of the image, one for each stage.
  * @param cleaner The cleaner.
  * @returns A promise of the workspace metadata.
  */
-export async function runContainers(client: Docker, imageIds: string[], cleaner: Cleaner): Promise<ContainerRun> {
-    // Create a temporary directory which will be used as the working directory.
-    const { name, removeCallback } = tmp.dirSync({ unsafeCleanup: true });
-    // Clean it up at the end.
-    cleaner.addJob(async (): Promise<void> => removeCallback());
+export async function runContainers(client: Docker, volumeName: string, imageIds: string[], cleaner: Cleaner): Promise<ContainerRun> {
     // Keep track of the stages so far.
     let stageRuns: StageRun[] = [];
+    let lastSuccessfulContainer = undefined;
     // When a stage fails, we want to be able to skip all stages afterwards.
     let skip = false;
     // Iterate through all image IDs, each image ID is one stage.
@@ -43,7 +40,14 @@ export async function runContainers(client: Docker, imageIds: string[], cleaner:
         const options: Docker.ContainerCreateOptions = {
             Image: imageId,
             HostConfig: {
-                Binds: [`${name}:${workingDirectory}`]
+                Mounts: [
+                    {
+                        Target: workingDirectory,
+                        Source: volumeName,
+                        Type: "volume",
+                        ReadOnly: false,
+                    },
+                ]
             }
         };
         // Create the container and run it.
@@ -62,6 +66,8 @@ export async function runContainers(client: Docker, imageIds: string[], cleaner:
                     status: "Passed",
                     exitCode: exitCode
                 });
+                // Only write successful containers.
+                lastSuccessfulContainer = container.id;
             } else {
                 // Nonzero exit code, there is a failure.
                 stageRuns.push({
@@ -85,6 +91,6 @@ export async function runContainers(client: Docker, imageIds: string[], cleaner:
     // Return the information of the pipeline run.
     return {
         stageRuns: stageRuns,
-        workspacePath: name,
+        lastSuccessfulContainer: lastSuccessfulContainer
     };
 }

@@ -14,7 +14,7 @@
 
 ### Components
 
-##### Runner
+#### Runner
 
 The runner that executes a pipeline according to a pipeline plan.
 
@@ -24,14 +24,14 @@ Technologies:
 - Docker
 - S3
 
-##### Frontend
+#### Frontend
 
 The frontend of the CI web dashboard.
 
 Technologies:
 - Svelte
 
-##### Backend
+#### Backend
 
 The backend of the CI web dashboard.
 
@@ -40,7 +40,11 @@ Technologies:
 - Express.js
 - PostgreSQL
 
-### Plans
+### Runner
+
+The runner executes a pipeline plan and, if applicable, archives artifacts.
+
+#### Plans
 
 A plan describes how the pipeline should function.
 Plans are at their core written in JSON.
@@ -48,8 +52,9 @@ Plans are at their core written in JSON.
 When sending a pipeline request to a runner, the following format is required:
 ```json
 {
+    "runId": "12345", // optional, will default to random hex string
     "tag": "veryrandomtaghere", // optional, will default to "untagged"
-    "plan": // pipeline plan
+    "plan": {} // pipeline plan
 }
 ```
 
@@ -68,3 +73,9 @@ name | string | No | The name of the stage.
 image | string | No | The name of the Docker image to use for the stage.
 environment | string[] | Yes | A possibly empty array of `KEY=VALUE` environment variables.
 script | string[] | Yes | A possibly empty array of shell commands to execute in the container.
+
+#### Archiving
+
+At the end of the pipeline, any file can be archived from the working directory and uploaded to S3 storage.
+
+Archived files will be uploaded to `tag/filename` in S3, where `tag` is the pipeline run's tag and `filename` is the base file name of the file to be archived. Note that when archiving, everything will be flattened: path structures in the working directory are disregarded. For example, `foo/bar.txt` and `baz/bar.txt` both resolve to `bar.txt` and will overwrite eachother. As a workaround, archived files should be renamed before achiving. Furthermore, if folders are specified, these will be skipped and not uploaded to S3.

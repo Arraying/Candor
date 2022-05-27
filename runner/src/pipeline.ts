@@ -1,9 +1,9 @@
-import crypto from "crypto";
 import Docker from "dockerode";
 import { Cleaner } from "./cleaner";
 import { archiveFiles } from "./management/archive";
 import { runContainers } from "./management/container";
 import { buildImages } from "./management/image";
+import { createVolume } from "./management/volume";
 import { Plan, RunRequest } from "./plan";
 
 /**
@@ -57,15 +57,22 @@ export async function run(request: RunRequest): Promise<PipelineRun> {
     log(runId, `Starting pipeline with tag ${tag}`);
     const cleaner = new Cleaner();
     try {
+        log(runId, "Creating volume");
+        const volumeName = await createVolume(client, cleaner);
         log(runId, "Building images");
         // First, build the image for every stage.
         const imageIds = await buildImages(client, plan, cleaner);
         // Then, run every stage, passing the result between each step. Collect results.
         log(runId, "Running containers");
-        const containerRun = await runContainers(client, imageIds, cleaner);
-        // Archive all the important files after the pipeline ran.
-        log(runId, "Archiving files");
-        await archiveFiles(tag, containerRun.workspacePath, plan.archive);
+        const containerRun = await runContainers(client, volumeName, imageIds, cleaner);
+        // Determine the overall status.
+        const status = determineOverallStatus(containerRun.stageRuns);
+        // Archive all the important files after the pipeline ran, if successful.
+        if (status === "Passed" && containerRun.lastSuccessfulContainer) {
+            log(runId, "Archiving files");
+            //await archiveFiles(tag, containerRun.workspacePath, plan.archive);
+            await archiveFiles(client, containerRun.lastSuccessfulContainer!, tag, plan.archive || [], cleaner);
+        }
         // Return the relevant information of the run.
         log(runId, "Run complete");
         return {
