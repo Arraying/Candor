@@ -2,8 +2,7 @@
 	// Import the different pages that can be rendered.
 	import Overview from "./pages/Overview.svelte";
 	import About from "./pages/About.svelte";
-	import Terms from "./pages/Terms.svelte";
-	import Privacy from "./pages/Privacy.svelte";
+	import Login from "./pages/Login.svelte";
 	import Footer from "./component/Footer.svelte";
 
 	// Keep track of the current page.
@@ -49,11 +48,8 @@
 				</a>
 			</div>
 		  	<div class="navbar-end">
-				<a href="/" class="navbar-item" on:click|preventDefault={() => setPage("privacy")}>
-					Privacy
-				</a>
-				<a href="/" class="navbar-item" on:click|preventDefault={() => setPage("terms")}>
-					Terms
+				<a href="/" class="navbar-item" on:click|preventDefault={() => setPage("login")}>
+					Login
 				</a>
 				<div class="navbar-item">
 					<a href="https://github.com/Arraying/Candor" class="button" target="_blank">
@@ -70,10 +66,8 @@
 		<Overview />
 	{:else if page === "about"}
 		<About />
-	{:else if page === "terms"}
-		<Terms />
-	{:else if page === "privacy"}
-		<Privacy />
+	{:else if page === "login"}
+		<Login />
 	{/if}
 	<Footer />
 </main>
