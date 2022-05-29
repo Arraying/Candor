@@ -18,5 +18,4 @@ RUN npm i --only=production
 FROM node:16-alpine
 WORKDIR /opt/runner
 COPY --from=cleaner /opt/runner ./
-EXPOSE 3001
 CMD [ "node", "build/main.js" ]

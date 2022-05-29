@@ -1,21 +1,32 @@
 services:
   # The S3 server (currently runs an in-memory database)
-  sss:
+  s3:
+    # Use Cloudserver.
     image: zenko/cloudserver
+    # Load environment variables from file and the ones below.
     env_file: .env
     environment:
     - S3DATA=multiple
     - S3BACKEND=mem
+    # Specify a custom config file.
+    volumes:
+    - ./cloudserver_config.json:/usr/src/app/config.json
   # The pipeline runner.
   runner:
+    # Build image from Dockerfile.
     build: ../runner
+    # Load environment variables from file and the ones below.
     env_file: .env
     environment:
     - RUNNER_PORT=3001
     - S3_BUCKET=candor
-    - S3_ENDPOINT=sss
+    - S3_ENDPOINT=s3
     - S3_PORT=8000
     - S3_SSL=false
+    # Make sure to expose the same port as specified in the environment variable.
+    expose:
+    - 3001
+    # Expose the runner port for testing locally (again, same environment variable).
     ports:
     - 3001:3001
   

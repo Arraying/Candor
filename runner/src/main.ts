@@ -8,8 +8,17 @@ import { RunRequest, isPlanValid } from "./plan";
 // Load the environment variables.
 dotenv.config();
 // Manually copy over environment variable to avoid conflict with compose.
-if (!process.env.DOCKER_HOST) {
+if (process.env.RUNNER_DOCKER_HOST) {
     process.env.DOCKER_HOST = process.env.RUNNER_DOCKER_HOST;
+}
+if (process.env.RUNNER_DOCKER_TLS_VERIFY) {
+    process.env.DOCKER_TLS_VERIFY = process.env.RUNNER_DOCKER_TLS_VERIFY;
+}
+if (process.env.RUNNER_DOCKER_CERT_PATH) {
+    process.env.DOCKER_CERT_PATH = process.env.RUNNER_DOCKER_CERT_PATH;
+}
+if (process.env.RUNNER_DOCKER_CLIENT_TIMEOUT) {
+    process.env.DOCKER_CLIENT_TIMEOUT = process.env.RUNNER_DOCKER_CLIENT_TIMEOUT;
 }
 
 // Create the Express app.
@@ -48,4 +57,13 @@ app.post("/run", async (req: Request, res: Response) => {
 });
 
 // Listen on the correct port.
-app.listen(process.env.RUNNER_PORT);
+const server = app.listen(process.env.RUNNER_PORT);
+
+// Handle ^C and SIGTERM properly.
+const shutdown = () => {
+    console.log("Shutting down.");
+    server.close();
+    process.exit(0);
+}
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);

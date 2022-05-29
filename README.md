@@ -49,6 +49,9 @@ Provides a super simple way to spin up a fully functioning Candor CI stack. This
 - A web server to serve the dashboard.
 - A database server for the dashboard.
 
+**Warning:** This exposes the Docker socket to the runner's container. 
+If you believe this is not worth the risk, please run the runner on baremetal instead.
+
 ### Runner
 
 The runner executes a pipeline plan and, if applicable, archives artifacts.
