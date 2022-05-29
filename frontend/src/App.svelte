@@ -4,6 +4,7 @@
 	import About from "./pages/About.svelte";
 	import Terms from "./pages/Terms.svelte";
 	import Privacy from "./pages/Privacy.svelte";
+	import Footer from "./component/Footer.svelte";
 
 	// Keep track of the current page.
 	let page = "overview";
@@ -74,4 +75,5 @@
 	{:else if page === "privacy"}
 		<Privacy />
 	{/if}
+	<Footer />
 </main>
