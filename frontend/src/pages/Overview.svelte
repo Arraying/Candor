@@ -1,3 +1,13 @@
+<script>
+    // Import all the pipeline overviews.
+    import { PipelineOverviewStore } from "../store";
+
+    // Attempt to click on the pipeline.
+    const selectPipeline = (pipelineId) => {
+        console.log("Selected " + pipelineId);
+    };
+</script>
+
 <section class="section">
     <div class="container">
         <h1 class="title">Pipelines</h1>
@@ -13,34 +23,35 @@
                 </tr>
             </thead>
             <tbody>
-                <tr class="is-clickable">
-                    <td>Foo</td>
-                    <td>Passed</td>
-                    <td>
-                        <span class="icon has-text-success">
-                        <i class="fas fa-check-circle"></i>
-                        </span>
-                        <span class="icon has-text-success">
-                        <i class="fas fa-check-circle"></i>
-                        </span>
-                    </td>
-                    <td>28.03.02 10:00</td>
-                    <td>-</td>
-                </tr>
-                <tr class="is-clickable">
-                    <td>Bar</td>
-                    <td>Failed</td>
-                    <td>
-                        <span class="icon has-text-success">
-                        <i class="fas fa-check-circle"></i>
-                        </span>
-                        <span class="icon has-text-danger">
-                        <i class="fas fa-times-circle"></i>
-                        </span>
-                    </td>
-                    <td>28.03.02 10:00</td>
-                    <td>28.03.03 10:00</td>
-                </tr>
+                {#each $PipelineOverviewStore as pipelineOverview (pipelineOverview.id)}
+                   <tr class="is-clickable" on:click={() => selectPipeline(pipelineOverview.id)}>
+                        <td>{pipelineOverview.name}</td>
+                        <td>{pipelineOverview.status}</td>
+                        <td>
+                            {#each pipelineOverview.stages as stage}
+                                {#if stage === "Passed"}
+                                    <span class="icon has-text-success">
+                                        <i class="fas fa-check-circle"></i>
+                                    </span>
+                                {:else if stage === "Failed"}
+                                    <span class="icon has-text-danger">
+                                        <i class="fas fa-times-circle"></i>
+                                    </span>
+                                {:else if stage === "Skipped"}
+                                    <span class="icon has-text-grey-light">
+                                        <i class="fas fa-minus-circle"></i>
+                                    </span>
+                                {:else if stage === "Error"}
+                                    <span class="icon has-text-danger">
+                                        <i class="fas fa-bug"></i>
+                                    </span>
+                                {/if}
+                            {/each}
+                        </td>
+                        <td>{pipelineOverview.lastSuccess}</td>
+                        <td>{pipelineOverview.lastFailure}</td>
+                   </tr>
+                {/each}
             </tbody>
         </table>
     </div>
