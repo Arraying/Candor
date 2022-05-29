@@ -64,11 +64,15 @@ Plans are at their core written in JSON.
 When sending a pipeline request to a runner, the following format is required:
 ```json
 {
-    "runId": "12345", // optional, will default to random hex string
-    "tag": "veryrandomtaghere", // optional, will default to "untagged"
-    "plan": {} // pipeline plan
+    "runId": "12345",
+    "tag": "veryrandomtaghere",
+    "plan": {}
 }
 ```
+The `runId` is optional (defaults to a random hex string).
+If the pipeline is being triggered by a panel or something that has a run ID, this will force the runner to use this ID to make debugging easier.
+The `tag` is also optional (defaults to "untagged"), and specifies some grouping of pipelines.
+Multiple pipeline plans can have the same tag, or they can each have their own.
 
 The following describes the current pipeline plan.
 
