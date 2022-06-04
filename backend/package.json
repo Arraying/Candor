@@ -24,7 +24,10 @@
     "@types/tmp": "^0.2.3"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "typeorm": "./node_modules/.bin/typeorm-ts-node-esm",
+    "migrate": "npm run typeorm migration:run -- -d ./src/data-source.ts",
+    "migrate:revert": "npm run typeorm migration:revert -- -d ./src/data-source.ts"
   },
   "author": "",
   "license": "MIT"
