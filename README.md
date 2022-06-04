@@ -39,6 +39,7 @@ The backend of the CI web dashboard.
 Technologies:
 - TypeScript
 - Express.js
+- TypeORM
 - PostgreSQL
 
 #### Bootstrap
