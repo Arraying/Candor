@@ -2,6 +2,10 @@ import dotenv from "dotenv";
 import path from "path";
 import "reflect-metadata";
 import { DataSource } from "typeorm";
+import { Assignments } from "./entities/Assignments";
+import { Pipeline } from "./entities/Pipeline";
+import { Runner } from "./entities/Runner";
+import { User } from "./entities/User";
 
 // Load the environment variables.
 dotenv.config();
@@ -23,7 +27,7 @@ export const AppDataSource = new DataSource({
     // Other settings.
     synchronize: true,
     logging: false,
-    entities: [],
+    entities: [Runner, Pipeline, User, Assignments],
     migrations: [migrations],
     subscribers: [],
 })
