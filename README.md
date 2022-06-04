@@ -38,7 +38,7 @@ Although Candor is in an encosystem, **it is entirely possible to pick and choos
 For example, a single pipeline runner can be used without its corresponding controller.
 Or, custom runners can be used in place of the provided one with the same CI controller.
 
-## CI Controller 
+# CI Controller 
 
 **The CI controller is both a web panel and API.**
 Under the hood, it is a command line tool, capable of modifying the state of the ecosystem.
@@ -47,15 +47,13 @@ Very minimal information is reflected on the dashboard, in order to keep everyth
 The controller's backend is written in *TypeScript*, using *Express.js*, *TypeORM* and a *PostgreSQL* database.
 The controller's frontend is written in *Svelte*.
 
-## Runner
+# Runner
 
 **The runner is at the heart of the ecossytem.**
 It exposes a single endpoint that contains a pipeline plan, and the runner's job is to execute this plan.
 Everything the runner does is containerized.
 
 The runner is written in *TypeScript* using *Express.js*.
-
-# Runner
 
 ## Plans
 
