@@ -15,12 +15,12 @@ export class User {
     /**
      * The name of the user, unique.
      */
-    @Column()
+    @Column({nullable: false, unique: true})
     name!: string;
 
     /**
      * The token (encrypted with bcrypt).
      */
-    @Column()
+    @Column({nullable: false})
     token!: string;
 }

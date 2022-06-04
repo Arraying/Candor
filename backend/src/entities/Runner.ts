@@ -15,18 +15,18 @@ export class Runner {
     /**
      * The name of the runner, unique.
      */
-    @Column()
+    @Column({nullable: false})
     name!: string;
 
     /**
      * The hostname (excl. port).
      */
-    @Column()
+    @Column({nullable: false})
     hostname!: string;
 
     /**
      * The port.
      */
-    @Column()
+    @Column({nullable: false})
     port!: number;   
 }

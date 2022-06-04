@@ -15,12 +15,12 @@ export class Assignments {
     /**
      * The ID of the user.
      */
-    @Column()
+    @Column({nullable: false})
     user!: number;
 
     /**
      * The ID of the pipeline.
      */
-    @Column()
+    @Column({nullable: false})
     pipeline!: number;
 }

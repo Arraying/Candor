@@ -15,7 +15,7 @@ export class Pipeline {
     /**
      * The name of the pipeline, unique.
      */
-    @Column()
+    @Column({nullable: false, unique: true})
     name!: string;
 
     /**
@@ -27,6 +27,6 @@ export class Pipeline {
     /**
      * If the pipeline is public.
      */
-    @Column()
+    @Column({nullable: false, default: false})
     public!: boolean;   
 }
