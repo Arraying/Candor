@@ -9,6 +9,7 @@ import { Runner } from "../entities/Runner";
 export async function runnerList(_: string[]): Promise<boolean> {
     const repository = AppDataSource.manager.getRepository(Runner);
     const runners = await repository.find();
+    console.log("Here is a list of pipeline runners:");
     for (const runner of runners) {
         runnerPrint(runner);
     }
@@ -31,7 +32,7 @@ export async function runnerInfo(args: string[]): Promise<boolean> {
     if (runner) {
         runnerPrint(runner);
     } else {
-        console.log("A runner with that name does not exist");
+        console.log("A runner with that name does not exist!");
     }
     return true;
 }
@@ -49,7 +50,7 @@ export async function runnerAdd(args: string[]): Promise<boolean> {
     if (await repository.findOneBy({
         name: args[0],
     })) {
-        console.log("A runner with that name already exists");
+        console.log("A runner with that name already exists!");
         return true;
     }
     try {
@@ -63,10 +64,10 @@ export async function runnerAdd(args: string[]): Promise<boolean> {
         runner.name = args[0];
         runner.hostname = host;
         runner.port = port;
-        repository.insert(runner);
-        console.log("The runner has been added");
+        await repository.insert(runner);
+        console.log("The runner has been added!");
     } catch (exception) {
-        console.log("Malformed host and port");
+        console.log("Malformed host and port!");
     }
     return true;
 }
@@ -85,10 +86,10 @@ export async function runnerDel(args: string[]): Promise<boolean> {
         name: args[0],
     });
     if (runner) {
-        repository.delete(runner);
-        console.log("The runner has been deleted");
+        await repository.remove(runner);
+        console.log("The runner has been deleted!");
     } else {
-        console.log("A runner with that name does not exist");
+        console.log("A runner with that name does not exist!");
     }
     return true;
 }
@@ -98,5 +99,5 @@ export async function runnerDel(args: string[]): Promise<boolean> {
  * @param runner The runner.
  */
 function runnerPrint(runner: Runner) {
-    console.log(`${runner.name} (${runner.id})\n  - ${runner.hostname}\n  - ${runner.port}`);
+    console.log(`==> ${runner.name} (#${runner.id}) listening on ${runner.hostname}:${runner.port}`);
 }

@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 /**
  * Represents a pipeline runner.
  */
-@Entity()
+@Entity("runners")
 export class Runner {
 
     /**

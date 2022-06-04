@@ -22,6 +22,8 @@ export async function cli() {
         // Find the command for which the input starts with said command name.
         const command = Array.from(commands.entries())
             .find((entry: [string, Command]): boolean => input.toLowerCase().startsWith(entry[0]));
+        // Add the padding.
+        console.log("");
         // If the command is not found, let the user know.
         if (!command) {
             console.log('Unknown command, Type "help" for a list of commands');
@@ -78,7 +80,7 @@ const commands = new Map<string, Command>([
         executor: runnerInfo,
     }],
     ["runner add", {
-        description: "Registers a new pipeline runner and prints its token.",
+        description: "Registers a new pipeline runner.",
         usage: "<name> <host:port>",
         executor: runnerAdd,
     }],
@@ -99,7 +101,7 @@ const commands = new Map<string, Command>([
     }],
     ["pipeline add", {
         description: "Creates a new pipeline.",
-        usage: "<name> <host:port>",
+        usage: "<name>",
         executor: pipelineAdd,
     }],
     ["pipeline del", {

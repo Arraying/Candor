@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 /**
  * Represents a user.
  */
-@Entity()
+@Entity("users")
 export class User {
 
     /**

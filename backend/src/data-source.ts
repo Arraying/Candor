@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import path from "path";
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import { Assignments } from "./entities/Assignments";
+import { Assignment } from "./entities/Assignment";
 import { Pipeline } from "./entities/Pipeline";
 import { Runner } from "./entities/Runner";
 import { User } from "./entities/User";
@@ -25,9 +25,9 @@ export const AppDataSource = new DataSource({
     password: process.env.PGPASSWORD,
     database: process.env.PGDATABASE,
     // Other settings.
-    synchronize: true,
+    synchronize: false,
     logging: false,
-    entities: [Runner, Pipeline, User, Assignments],
+    entities: [Runner, Pipeline, User, Assignment],
     migrations: [migrations],
     subscribers: [],
 })

@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 /**
  * Represents a pipeline.
  */
-@Entity()
+@Entity("pipelines")
 export class Pipeline {
 
     /**
@@ -27,6 +27,6 @@ export class Pipeline {
     /**
      * If the pipeline is public.
      */
-    @Column({nullable: false, default: false})
+    @Column({nullable: false})
     public!: boolean;   
 }
