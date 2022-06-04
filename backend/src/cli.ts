@@ -1,5 +1,5 @@
 import * as readline from "readline";
-import { runnerList, runnerInfo, runnerAdd, runnerDel, runnerReset} from "./commands/runner";
+import { runnerList, runnerInfo, runnerAdd, runnerDel } from "./commands/runner";
 import { pipelineList, pipelineInfo, pipelineAdd, pipelineDel, pipelinePublic, run } from "./commands/pipeline";
 import { userList, userInfo, userAdd, userDel, userReset } from "./commands/user";
 import { assign, unassign } from "./commands/permission";
@@ -28,7 +28,7 @@ export async function cli() {
             continue;
         }
         // Get the arguments.
-        const argsString = input.substring(command.length).trim();
+        const argsString = input.substring(command[0].length).trim();
         const args = argsString.split(" ");
         // Attempt to execute the command.
         const result = await command[1].executor(args);
@@ -87,11 +87,6 @@ const commands = new Map<string, Command>([
         usage: "<name>",
         executor: runnerDel,
     }],
-    ["runner reset", {
-        description: "Resets a pipeline runner's token and prints the new one.",
-        usage: "<name>",
-        executor: runnerReset,
-    }],
     ["pipeline ls", {
         description: "Lists all pipelines.",
         usage: "",
@@ -116,6 +111,11 @@ const commands = new Map<string, Command>([
         description: "Sets the pipeline public visibility",
         usage: "<name> true|false",
         executor: pipelinePublic,
+    }],
+    ["pipeline run", {
+        description: "Runs a pipeline (optionally on a specified runner).",
+        usage: "<name> [runner]",
+        executor: run,
     }],
     ["user ls", {
         description: "Lists all users.",
@@ -151,11 +151,6 @@ const commands = new Map<string, Command>([
         description: "Revokes a user's access from a pipleine.",
         usage: "<user> <pipeline>",
         executor: unassign,
-    }],
-    ["run", {
-        description: "Runs a pipeline (optionally on a specified runner).",
-        usage: "<pipeline> [runner]",
-        executor: run,
     }],
     ["exit", {
         description: "Shuts down the server.",
