@@ -1,5 +1,3 @@
-import path from "path";
-
 /**
  * An extension is a mapping from the stage JSON to the extension stage format.
  * The stage is any because the pipeline schema is volatile and this will allow it to be dynamic.
@@ -35,16 +33,21 @@ type ExtensionKV = {
  */
 export async function useExtension(name: string, stage: any): Promise<ExtensionStage | null> {
     // Attempt to load the extension.
-    const extensionDirectory = process.env.EXTENSION_PATH;
+    let extensionDirectory = process.env.EXTENSION_PATH;
     // Make sure the path exists.
     if (!extensionDirectory) {
         return null;
     }
+    // Give it a trailing slash.
+    if (!extensionDirectory.endsWith("/")) {
+        extensionDirectory += "/";
+    }
     // Load the extension.
     try {
-        const extension: Extension = await import(path.join(extensionDirectory, `${name}.js`));
+        const extension: Extension = (await import(`../${extensionDirectory}${name}.js`)).default;
         return extension(stage);
     } catch (exception) {
+        console.error(exception);
         // Malformed module.
         return null;
     }
