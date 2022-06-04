@@ -13,10 +13,10 @@ type Extension = (stage: any) => ExtensionStage;
  * The image and runtime will be overrided if provided in the stage.
  */
 type ExtensionStage = {
-    image: string
-    runtime: string
-    environment: ExtensionKV[]
-    script: string[]
+    image?: string
+    runtime?: string
+    environment?: ExtensionKV[]
+    script?: string[]
 }
 
 /**
