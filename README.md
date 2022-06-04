@@ -1,4 +1,5 @@
-![Candor](https://i.imgur.com/p4sM3iM.png)
+![Candor](assets/candor_black.png#gh-dark-mode-only)
+![Candor](assets/candor_white.png#gh-light-mode-only)
 
 
 > **An extremely simple containerized CI server.**
