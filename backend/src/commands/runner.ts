@@ -11,7 +11,6 @@ export async function runnerList(_: string[]): Promise<boolean> {
     const runners = await repository.find();
     for (const runner of runners) {
         runnerPrint(runner);
-        console.log("\n");
     }
     return true;
 }
