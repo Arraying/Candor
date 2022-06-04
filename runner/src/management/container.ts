@@ -20,14 +20,17 @@ export interface ContainerRun {
  * @param cleaner The cleaner.
  * @returns A promise of the workspace metadata.
  */
-export async function runContainers(client: Docker, volumeName: string, imageIds: string[], cleaner: Cleaner): Promise<ContainerRun> {
+export async function runContainers(client: Docker, volumeName: string, imageIds: string[], runtimes: string[], cleaner: Cleaner): Promise<ContainerRun> {
     // Keep track of the stages so far.
     let stageRuns: StageRun[] = [];
     let lastSuccessfulContainer = undefined;
     // When a stage fails, we want to be able to skip all stages afterwards.
     let skip = false;
+    // First gather system info to avoid doing it repetitively.
+    const systemInfo = await client.info();
+    const runtimesAvailable = Object.keys(systemInfo.Runtimes);
     // Iterate through all image IDs, each image ID is one stage.
-    for (const imageId of imageIds) {
+    for (const [index, imageId] of imageIds.entries()) {
         // Check if we are skipping.
         if (skip) {
             stageRuns.push({
@@ -35,6 +38,21 @@ export async function runContainers(client: Docker, volumeName: string, imageIds
                 exitCode: -1
             });
             continue;
+        }
+        // Determine runtime information.
+        const runtimeName = runtimes[index];
+        if (runtimeName) {
+            // Validate the runtime to make sure it is actually supported.
+            if (!runtimesAvailable.includes(runtimeName)) {
+                // Write the error and skip all subsequent runs.
+                stageRuns.push({
+                    status: "Error",
+                    exitCode: -2
+                });
+                // Again, skip.
+                skip = true;
+                continue;
+            }
         }
         // Configure the container options.
         const options: Docker.ContainerCreateOptions = {
@@ -47,7 +65,8 @@ export async function runContainers(client: Docker, volumeName: string, imageIds
                         Type: "volume",
                         ReadOnly: false,
                     },
-                ]
+                ],
+                Runtime: runtimeName,
             }
         };
         // Create the container and run it.

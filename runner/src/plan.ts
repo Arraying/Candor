@@ -22,11 +22,12 @@ export interface Plan {
 /**
  * Represents a pipeline stage.
  * Each stage must have a name and an image.
- * Optionally, environment variables and scripts can be provided.
+ * Optionally, a runtime, environment variables and scripts can be provided.
  */
 export interface Stage {
     name: string
     image: string
+    runtime: string
     environment?: string[]
     script?: string[]
 }

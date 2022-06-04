@@ -61,7 +61,8 @@ export async function run(request: RunRequest): Promise<PipelineRun> {
         const imageIds = await buildImages(client, plan, cleaner);
         // Then, run every stage, passing the result between each step. Collect results.
         log(runId, "Running containers");
-        const containerRun = await runContainers(client, volumeName, imageIds, cleaner);
+        const runtimes = plan.stages.map(stage => stage.runtime);
+        const containerRun = await runContainers(client, volumeName, imageIds, runtimes, cleaner);
         // Determine the overall status.
         const status = determineOverallStatus(containerRun.stageRuns);
         // Archive all the important files after the pipeline ran, if successful.
