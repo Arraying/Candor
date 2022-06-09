@@ -1,5 +1,3 @@
-
-
 module.exports = class CreateKeyColumn1654789884301 {
     async up(queryRunner) {
         queryRunner.query(`
