@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 /**
  * Represents a user assignment to a pipeline.
  */
-@Entity("assignment")
+@Entity("assignments")
 export class Assignment {
 
     /**
