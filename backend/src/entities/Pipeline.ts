@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, AfterLoad } from "typeorm";
+import { User } from "./User";
 
 /**
  * Represents a pipeline.
@@ -28,5 +29,26 @@ export class Pipeline {
      * If the pipeline is public.
      */
     @Column({nullable: false})
-    public!: boolean;   
+    public!: boolean;
+
+    /**
+     * The users assigned to this pipeline.
+     */
+    @ManyToMany(() => User)
+    @JoinTable({
+        name: "assignments", 
+        joinColumn: {name: "pipeline", referencedColumnName: "id"}, 
+        inverseJoinColumn: {name: "user", referencedColumnName: "id"}
+    })
+    assignees!: User[];
+
+    /**
+     * Set the list of pipelines to empty if not found.
+     */
+    @AfterLoad()
+    async nullChecks() {
+      if (!this.assignees) {
+        this.assignees = []
+      }
+    }
 }

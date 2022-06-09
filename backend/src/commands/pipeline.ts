@@ -1,12 +1,13 @@
 import { AppDataSource } from "../data-source";
 import { Pipeline } from "../entities/Pipeline";
+import { User } from "../entities/User";
 
 /**
  * Lists all pipelines.
  * @param _ Ignored.
  * @returns Always true.
  */
-export async function pipelineList(args: string[]): Promise<boolean> {
+export async function pipelineList(_: string[]): Promise<boolean> {
     const repository = AppDataSource.manager.getRepository(Pipeline);
     const pipelines = await repository.find();
     console.log("Here is a list of pipelines:")
@@ -26,8 +27,11 @@ export async function pipelineInfo(args: string[]): Promise<boolean> {
         return false;
     }
     const repository = AppDataSource.manager.getRepository(Pipeline);
-    const pipeline = await repository.findOneBy({
-        name: args[0],
+    const pipeline = await repository.findOne({
+        where: {
+            name: args[0],
+        },
+        relations: ["assignees"],
     });
     if (pipeline) {
         pipelinePrint(pipeline);
@@ -75,7 +79,7 @@ export async function pipelineDel(args: string[]): Promise<boolean> {
     });
     if (pipeline) {
         await repository.remove(pipeline);
-        console.log("The pipeline has been deleted!");
+        console.log("The pipeline has been deleted");
     } else {
         console.log("A pipeline with that name does not exist");
     }
@@ -111,11 +115,13 @@ export async function run(args: string[]): Promise<boolean> {
 
 /**
  * Pretty prints a pipeline.
- * @param runner The pipeline.
+ * @param pipeline The pipeline.
  */
 function pipelinePrint(pipeline: Pipeline) {
     const label = pipeline.public ? "Public" : "Private";
+    // Get assignee names.
+    const names = pipeline.assignees.map((assignee: User): string => assignee.name).join(", ");
     // Stringify and hack due to lack of replaceAll.
     let stringPlan = JSON.stringify(pipeline.plan, null, 2).split("\n").join("\n    ");
-    console.log(`==> ${label} ${pipeline.name} (${pipeline.id})\n    ${stringPlan}`);
+    console.log(`==> ${label} ${pipeline.name} (#${pipeline.id})\n    <${names}>\n    ${stringPlan}`);
 }

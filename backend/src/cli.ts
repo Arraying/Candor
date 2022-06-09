@@ -130,7 +130,7 @@ const commands = new Map<string, Command>([
         executor: userInfo,
     }],
     ["user add", {
-        description: "Creates a new user and prints their token.",
+        description: "Creates a new user.",
         usage: "<name>",
         executor: userAdd,
     }],
@@ -140,8 +140,8 @@ const commands = new Map<string, Command>([
         executor: userDel,
     }],
     ["user reset", {
-        description: "Resets a users's token and prints the new one.",
-        usage: "<name>",
+        description: "Resets a users's token.",
+        usage: "<name> <token>",
         executor: userReset,
     }],
     ["assign", {
