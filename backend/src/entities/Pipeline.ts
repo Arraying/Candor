@@ -43,6 +43,12 @@ export class Pipeline {
     assignees!: User[];
 
     /**
+     * The random token of the pipeline.
+     */
+    @Column({nullable: false})
+    token!: string
+
+    /**
      * Set the list of pipelines to empty if not found.
      */
     @AfterLoad()

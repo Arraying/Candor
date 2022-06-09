@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { AppDataSource } from "../data-source";
 import { Pipeline } from "../entities/Pipeline";
 import { User } from "../entities/User";
@@ -59,6 +60,7 @@ export async function pipelineAdd(args: string[]): Promise<boolean> {
     }
     const pipeline = new Pipeline();
     pipeline.name = args[0];
+    pipeline.token = await crypto.randomBytes(16).toString('hex');
     await repository.insert(pipeline);
     console.log("The pipeline has been added");
     return true;
@@ -123,5 +125,5 @@ function pipelinePrint(pipeline: Pipeline) {
     const names = pipeline.assignees.map((assignee: User): string => assignee.name).join(", ");
     // Stringify and hack due to lack of replaceAll.
     let stringPlan = JSON.stringify(pipeline.plan, null, 2).split("\n").join("\n    ");
-    console.log(`==> ID: ${pipeline.id}\n    Name: ${pipeline.name}\n    Status: ${label}\n    Assignees: ${names}\n    Plan:\n    ${stringPlan}`);
+    console.log(`==> ID: ${pipeline.id}\n    Name: ${pipeline.name}\n    Status: ${label}\n    Assignees: ${names}\n    Token: ${pipeline.token}\n    Plan:\n    ${stringPlan}`);
 }
