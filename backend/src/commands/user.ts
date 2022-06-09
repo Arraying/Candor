@@ -119,5 +119,5 @@ export async function userReset(args: string[]): Promise<boolean> {
 function userPrint(user: User) {
     // Get pipeline names.
     const names = user.pipelines.map((pipeline: Pipeline): string => pipeline.name).join(", ");
-    console.log(`==> ${user.name} (${user.id})\n    <${names}>`);
+    console.log(`==> ID: ${user.id}\n    Name: ${user.name}\n    Assigned: ${names}`);
 }

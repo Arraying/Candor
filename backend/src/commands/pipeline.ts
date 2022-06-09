@@ -123,5 +123,5 @@ function pipelinePrint(pipeline: Pipeline) {
     const names = pipeline.assignees.map((assignee: User): string => assignee.name).join(", ");
     // Stringify and hack due to lack of replaceAll.
     let stringPlan = JSON.stringify(pipeline.plan, null, 2).split("\n").join("\n    ");
-    console.log(`==> ${label} ${pipeline.name} (#${pipeline.id})\n    <${names}>\n    ${stringPlan}`);
+    console.log(`==> ID: ${pipeline.id}\n    Name: ${pipeline.name}\n    Status: ${label}\n    Assignees: ${names}\n    Plan:\n    ${stringPlan}`);
 }

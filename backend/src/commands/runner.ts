@@ -99,5 +99,5 @@ export async function runnerDel(args: string[]): Promise<boolean> {
  * @param runner The runner.
  */
 function runnerPrint(runner: Runner) {
-    console.log(`==> ${runner.name} (#${runner.id}) listening on ${runner.hostname}:${runner.port}`);
+    console.log(`==> ID: ${runner.id}\n    Name: ${runner.name}\n    Host: ${runner.hostname}\n    Port: ${runner.port}`);
 }
