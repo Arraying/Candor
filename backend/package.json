@@ -8,6 +8,7 @@
     "dockerode": "^3.3.1",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "express-session": "^1.17.3",
     "pg": "^8.7.3",
     "readline": "^1.3.0",
     "reflect-metadata": "^0.1.13",
@@ -16,12 +17,15 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
+    "@types/connect-pg-simple": "^7.0.0",
     "@types/dockerode": "^3.3.9",
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.13",
+    "@types/express-session": "^1.17.5",
     "@types/node": "^17.0.39",
     "@types/pg": "^8.6.5",
     "@types/tmp": "^0.2.3",
+    "connect-pg-simple": "^7.0.0",
     "ts-node": "^10.8.1",
     "typescript": "^4.7.3"
   },
