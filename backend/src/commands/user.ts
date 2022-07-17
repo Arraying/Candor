@@ -60,6 +60,10 @@ export async function userAdd(args: string[]): Promise<boolean> {
     }
     const user = new User();
     user.name = args[0];
+    if (user.name.toLowerCase() === "anonymous") {
+        console.log("This name is reserved and may not be used");
+        return true;
+    }
     user.token = "token"; // The token is hashed and a hash will not be this value.
     await repository.insert(user);
     console.log("The user has been added, please reset their password");

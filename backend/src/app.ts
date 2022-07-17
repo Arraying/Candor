@@ -4,6 +4,7 @@ import connectPgSimple from "connect-pg-simple";
 import security from "./middleware/security";
 import { login, logout } from "./routes/auth";
 import { User } from "./entities/User";
+import { listPipelines } from "./routes/pipelines";
 
 // Import the correct type definitions.
 declare module 'express-session' {
@@ -49,5 +50,8 @@ if (process.env.NODE_ENV === "production") {
 // Authentication routes.
 app.post("/login", login);
 app.post("/logout", logout);
+
+// Pipeline routes.
+app.get("/api/pipelines", listPipelines);
 
 export default app;
