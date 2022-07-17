@@ -49,6 +49,7 @@
 			</div>
 		  	<div class="navbar-end">
 				<a href="/" class="navbar-item" on:click|preventDefault={() => setPage("login")}>
+					<!-- If logged in, set this to logout -->
 					Login
 				</a>
 				<div class="navbar-item">
