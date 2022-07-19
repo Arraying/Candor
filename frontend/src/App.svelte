@@ -10,8 +10,8 @@
 	import { User } from "./store"
 
 	// Keep track of whether to show the different modals.
-	let showModalLogin = false;
-	let showModalAbout = false;
+	let showModalLogin = true;
+	let showModalAbout = true;
 
 	const viewDefault = () => {
 		showModalLogin = false;
@@ -23,7 +23,7 @@
 	User.subscribe(value => user = value);
 </script>
 
-<main>
+<main class="app">
 	<nav class="navbar is-black" aria-label="main navigation">
 		<div class="navbar-brand">
 			<a href="/" class="navbar-item is-size-4" on:click|preventDefault={viewDefault}>
@@ -65,10 +65,6 @@
 		  	</div>
 		</div>
 	</nav>
-	<!-- Login modal last so that it overrides them all. -->
-	<Modal active={showModalLogin} on:closeModal={() => showModalLogin = false}>
-		<LoginBox on:loginSuccess={() => showModalLogin = false}/>
-	</Modal>
 	<Modal active={showModalAbout} on:closeModal={() => showModalAbout = false}>
 		<section class="section box">
 			<div class="container">
@@ -118,6 +114,10 @@
 				</p>
 			</div>
 		</section>
+	</Modal>
+	<!-- Login modal last so that it overrides them all. -->
+	<Modal active={showModalLogin} on:closeModal={() => showModalLogin = false}>
+		<LoginBox on:loginSuccess={() => showModalLogin = false}/>
 	</Modal>
 	<PipelineList />
 	<Footer />
