@@ -67,7 +67,7 @@
 	</nav>
 	<!-- Login modal last so that it overrides them all. -->
 	<Modal active={showModalLogin} on:closeModal={() => showModalLogin = false}>
-		<LoginBox />
+		<LoginBox on:loginSuccess={() => showModalLogin = false}/>
 	</Modal>
 	<Modal active={showModalAbout} on:closeModal={() => showModalAbout = false}>
 		<section class="section box">
