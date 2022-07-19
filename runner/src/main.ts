@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
+import { makeLogDirectory } from "./logging";
 import { securityMiddleware } from "./middleware";
 import { run } from "./pipeline";
 import { RunRequest, isPlanValid } from "./plan";
@@ -20,6 +21,9 @@ if (process.env.RUNNER_DOCKER_CERT_PATH) {
 if (process.env.RUNNER_DOCKER_CLIENT_TIMEOUT) {
     process.env.DOCKER_CLIENT_TIMEOUT = process.env.RUNNER_DOCKER_CLIENT_TIMEOUT;
 }
+
+// Setup logging.
+makeLogDirectory();
 
 // Create the Express app.
 const app = express();

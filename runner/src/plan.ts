@@ -27,7 +27,7 @@ export interface Plan {
 export interface Stage {
     name: string
     image: string
-    runtime: string
+    runtime?: string
     environment?: string[]
     script?: string[]
 }

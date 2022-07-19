@@ -1,5 +1,6 @@
 import Docker from "dockerode";
 import { Cleaner } from "../cleaner";
+import { logCreate, logHeader, logInfo } from "../logging";
 import { StageRun, workingDirectory } from "../pipeline";
 
 /**
@@ -15,12 +16,13 @@ export interface ContainerRun {
  * Runs the pipeline containers. 
  * The result of each pipeline will be re-used for the other.
  * @param client The Docker client.
+ * @param runId The run ID.
  * @param volumeName The name of the volume.
  * @param imageIds The IDs of the image, one for each stage.
  * @param cleaner The cleaner.
  * @returns A promise of the workspace metadata.
  */
-export async function runContainers(client: Docker, volumeName: string, imageIds: string[], runtimes: string[], cleaner: Cleaner): Promise<ContainerRun> {
+export async function runContainers(client: Docker, runId: string, volumeName: string, imageIds: string[], runtimes: (string | undefined)[], cleaner: Cleaner): Promise<ContainerRun> {
     // Keep track of the stages so far.
     let stageRuns: StageRun[] = [];
     let lastSuccessfulContainer = undefined;
@@ -29,14 +31,21 @@ export async function runContainers(client: Docker, volumeName: string, imageIds
     // First gather system info to avoid doing it repetitively.
     const systemInfo = await client.info();
     const runtimesAvailable = Object.keys(systemInfo.Runtimes);
+    // Setup logging.
+    const log = logCreate(runId);
+    // The stream can be closed.
+    cleaner.addJob(async (): Promise<void> => log.close());
     // Iterate through all image IDs, each image ID is one stage.
     for (const [index, imageId] of imageIds.entries()) {
+        // Log the stage, even if it gets skipped.
+        await logHeader(log, index, imageIds.length);
         // Check if we are skipping.
         if (skip) {
             stageRuns.push({
                 status: "Skipped",
                 exitCode: -1
             });
+            await logInfo(log, "Skipped");
             continue;
         }
         // Determine runtime information.
@@ -51,6 +60,7 @@ export async function runContainers(client: Docker, volumeName: string, imageIds
                 });
                 // Again, skip.
                 skip = true;
+                await logInfo(log, "Runtime unavailable");
                 continue;
             }
         }
@@ -74,6 +84,9 @@ export async function runContainers(client: Docker, volumeName: string, imageIds
         // Add deleting the container to the cleanup task.
         cleaner.addJob(async (): Promise<void> => await container.remove());
         try {
+            // Write logs.
+            const logStream = await container.attach({stream: true, stdout: true, stderr: true});
+            container.modem.demuxStream(logStream, log, log);
             // Put the rest in a try so the container can be cleaned on error.
             await container.start();
             // Await the container's exit.
@@ -96,6 +109,7 @@ export async function runContainers(client: Docker, volumeName: string, imageIds
                 // As such, skip subsequent stages.
                 skip = true;
             }
+
         } catch (exception) {
             console.error(exception);
             // Here, an exception occurred in the actual running of the container.
