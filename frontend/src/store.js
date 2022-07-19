@@ -5,7 +5,7 @@ export const User = writable(undefined);
 /**
  * Represents the store keeping all of the pipeline overviews.
  */
-export const PipelineOverviewStore = writable([
+export const Pipelines = writable([
     {
         id: 1,
         name: "Foo",

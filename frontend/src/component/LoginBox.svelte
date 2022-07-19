@@ -45,10 +45,10 @@
 </form>
 
 <style>
-    .box {
+    /* .box {
         border-radius: 0;
         box-shadow: none;
-    }
+    } */
 
     .error-text {
         color: red;
