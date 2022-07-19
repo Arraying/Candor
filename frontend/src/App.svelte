@@ -3,20 +3,37 @@
 	import Footer from "./component/Footer.svelte";
 	import LoginBox from "./component/LoginBox.svelte";
 	import Modal from "./component/Modal.svelte";
+	import Pipeline from "./component/Pipeline.svelte";
 	import PipelineList from "./component/PipelineList.svelte";
 
 	// Import stateful information.
 	import { logout } from "./session";
 	import { User } from "./store"
 
-	// Keep track of whether to show the different modals.
-	let showModalLogin = true;
-	let showModalAbout = true;
+	// Keep track of whether to show the different page modals.
+	let showModalLogin = false;
+	let showModalAbout = false;
+	
+	// Keep track of the currently selected pipeline.
+	let pipelineId;
+	let pipelineName;
 
+	/**
+	 * Shows the default modals.
+	 */
 	const viewDefault = () => {
 		showModalLogin = false;
 		showModalAbout = false;
 	};
+
+	/**
+	 * Triggered when a pipeline is selected, updates the variables.
+	 * @param data The selection data.
+	 */
+	const selectPipeline = (data) => {
+		pipelineId = data.detail.id;
+		pipelineName = data.detail.name;
+	}
 
 	// Keep track of the current user.
 	let user;
@@ -119,7 +136,8 @@
 	<Modal active={showModalLogin} on:closeModal={() => showModalLogin = false}>
 		<LoginBox on:loginSuccess={() => showModalLogin = false}/>
 	</Modal>
-	<PipelineList />
+	<Pipeline {pipelineId} {pipelineName} on:closeModal={() => pipelineId = undefined}/>
+	<PipelineList on:pipelineSelect={(event) => selectPipeline(event)}/>
 	<Footer />
 </main>
 
