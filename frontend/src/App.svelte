@@ -4,9 +4,15 @@
 	import About from "./pages/About.svelte";
 	import Login from "./pages/Login.svelte";
 	import Footer from "./component/Footer.svelte";
+	import { logout } from "./session";
+	import { User } from "./store"
 
 	// Keep track of the current page.
 	let page = "overview";
+
+	// Keep track of the current user.
+	let user;
+	User.subscribe(value => user = value);
 
 	/**
 	 * Transition to another page.
@@ -48,10 +54,16 @@
 				</a>
 			</div>
 		  	<div class="navbar-end">
-				<a href="/" class="navbar-item" on:click|preventDefault={() => setPage("login")}>
-					<!-- If logged in, set this to logout -->
-					Login
-				</a>
+				{#if user}
+					<a href="/" class="navbar-item" on:click|preventDefault={logout}>
+						Logout
+					</a>
+				{:else}
+					<a href="/" class="navbar-item" on:click|preventDefault={() => setPage("login")}>
+						Login
+					</a>
+				{/if}
+
 				<div class="navbar-item">
 					<a href="https://github.com/Arraying/Candor" class="button" target="_blank">
 						<span class="icon">

@@ -1,5 +1,7 @@
 import { writable } from "svelte/store";
 
+export const User = writable(undefined);
+
 /**
  * Represents the store keeping all of the pipeline overviews.
  */
