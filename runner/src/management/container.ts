@@ -2,6 +2,7 @@ import Docker from "dockerode";
 import { Cleaner } from "../cleaner";
 import { logCreate, logHeader, logInfo } from "../logging";
 import { StageRun, workingDirectory } from "../pipeline";
+import { RunRequest, Stage } from "../plan";
 
 /**
  * Contains relevant information on the container run.
@@ -16,15 +17,16 @@ export interface ContainerRun {
  * Runs the pipeline containers. 
  * The result of each pipeline will be re-used for the other.
  * @param client The Docker client.
- * @param runId The run ID.
+ * @param request The run request.
  * @param volumeName The name of the volume.
  * @param imageIds The IDs of the image, one for each stage.
  * @param cleaner The cleaner.
  * @returns A promise of the workspace metadata.
  */
-export async function runContainers(client: Docker, runId: string, volumeName: string, imageIds: string[], runtimes: (string | undefined)[], cleaner: Cleaner): Promise<ContainerRun> {
+export async function runContainers(client: Docker, request: RunRequest, volumeName: string, imageIds: string[], runtimes: (string | undefined)[], cleaner: Cleaner): Promise<ContainerRun> {
     // Keep track of the stages so far.
     let stageRuns: StageRun[] = [];
+    let stageNames = request.plan.stages.map((stage: Stage): string => stage.name);
     let lastSuccessfulContainer = undefined;
     // When a stage fails, we want to be able to skip all stages afterwards.
     let skip = false;
@@ -32,7 +34,7 @@ export async function runContainers(client: Docker, runId: string, volumeName: s
     const systemInfo = await client.info();
     const runtimesAvailable = Object.keys(systemInfo.Runtimes);
     // Setup logging.
-    const log = logCreate(runId);
+    const log = logCreate(request.runId!);
     // The stream can be closed.
     cleaner.addJob(async (): Promise<void> => log.close());
     // Iterate through all image IDs, each image ID is one stage.
@@ -42,8 +44,9 @@ export async function runContainers(client: Docker, runId: string, volumeName: s
         // Check if we are skipping.
         if (skip) {
             stageRuns.push({
+                name: stageNames[index],
                 status: "Skipped",
-                exitCode: -1
+                exitCode: -1,
             });
             await logInfo(log, "Skipped");
             continue;
@@ -55,8 +58,9 @@ export async function runContainers(client: Docker, runId: string, volumeName: s
             if (!runtimesAvailable.includes(runtimeName)) {
                 // Write the error and skip all subsequent runs.
                 stageRuns.push({
+                    name: stageNames[index],
                     status: "Error",
-                    exitCode: -2
+                    exitCode: -2,
                 });
                 // Again, skip.
                 skip = true;
@@ -95,16 +99,18 @@ export async function runContainers(client: Docker, runId: string, volumeName: s
             if (exitCode === 0) {
                 // Exit code 0, so everything went smoothly.
                 stageRuns.push({
+                    name: stageNames[index],
                     status: "Passed",
-                    exitCode: exitCode
+                    exitCode: exitCode,
                 });
                 // Only write successful containers.
                 lastSuccessfulContainer = container.id;
             } else {
                 // Nonzero exit code, there is a failure.
                 stageRuns.push({
+                    name: stageNames[index],
                     status: "Failed",
-                    exitCode: exitCode
+                    exitCode: exitCode,
                 });
                 // As such, skip subsequent stages.
                 skip = true;
@@ -114,8 +120,9 @@ export async function runContainers(client: Docker, runId: string, volumeName: s
             console.error(exception);
             // Here, an exception occurred in the actual running of the container.
             stageRuns.push({
+                name: stageNames[index],
                 status: "Error",
-                exitCode: -1
+                exitCode: -1,
             });
             // Again, skip.
             skip = true;
