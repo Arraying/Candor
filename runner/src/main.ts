@@ -1,8 +1,8 @@
 import crypto from "crypto";
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
-import { makeLogDirectory } from "./logging";
-import { securityMiddleware } from "./middleware";
+import { getPath, makeLogDirectory, verifyPath } from "./logging";
+import { authorizationMiddleware } from "./middleware";
 import { run } from "./pipeline";
 import { RunRequest, isPlanValid } from "./plan";
 
@@ -29,14 +29,14 @@ makeLogDirectory();
 const app = express();
 
 // Add the authentication middleware.
-app.use(securityMiddleware);
+app.use(authorizationMiddleware);
 // Add the JSON middleware to handle bodies.
 app.use(express.json());
 
 // Add the route to run the pipeline.
 app.post("/run", async (req: Request, res: Response) => {
     // Ensure the payload is sent as JSON.
-    if (!req.is('json')) {
+    if (!req.is("json")) {
         res.sendStatus(415);
         return;
     }
@@ -58,6 +58,20 @@ app.post("/run", async (req: Request, res: Response) => {
     // Run the plan.
     const result = await run(request);
     res.send(result);
+});
+
+// Add the route to get a log of a pipeline run.
+app.get("/logs/:runId", async (req: Request, res: Response) => {
+    // Extract the run parameter, and determine the path.
+    const path = getPath(req.params.runId);
+    // Verify legitimacy.
+    if (!verifyPath(path)) {
+        // Probably someone malicious.
+        res.sendStatus(400);
+        console.warn(`Malicious log attempt: ${path}`);
+        return;
+    }
+    res.sendFile(path);
 });
 
 // Listen on the correct port.

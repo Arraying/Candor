@@ -6,7 +6,7 @@ import { Request, Response } from "express";
  * @param res The response.
  * @param next The next handler in the middleware chain.
  */
-export function securityMiddleware(req: Request, res: Response, next: () => void): void {
+export function authorizationMiddleware(req: Request, res: Response, next: () => void): void {
     // Ensure the authorization header is set.
     if (!req.headers.authorization) {
         res.sendStatus(400);

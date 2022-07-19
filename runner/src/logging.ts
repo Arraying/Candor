@@ -47,20 +47,30 @@ export function makeLogDirectory() {
 }
 
 /**
+ * Creates the log path from the run ID.
+ * @param runId The run ID.
+ * @returns The path of the log.
+ */
+export function getPath(runId: string): string {
+    return path.join(getLogDirectory(), `${runId}.log`);
+}
+
+/**
+ * Verifies if the provided candidate path is a child of the log path.
+ * @param candidate The candidate path.
+ * @returns True if it is legitimate, false if not.
+ */
+export function verifyPath(candidate: string): boolean {
+    const normalized = path.normalize(candidate);
+    return normalized.startsWith(getLogDirectory());
+}
+
+/**
  * Gets the log base directory.
  * @returns The log directory as defined in the config or the current working directory.
  */
 function getLogDirectory(): string {
     return process.env.RUNNER_LOGS || process.cwd();
-}
-
-/**
- * Creates the log path from the run ID.
- * @param runId The run ID.
- * @returns The path of the log.
- */
- function getPath(runId: string): string {
-    return path.join(getLogDirectory(), `${runId}.log`);
 }
 
 /**
