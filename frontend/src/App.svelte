@@ -122,3 +122,9 @@
 	<PipelineList />
 	<Footer />
 </main>
+
+<style>
+	 .box {
+        border-radius: 0;
+    }
+</style>

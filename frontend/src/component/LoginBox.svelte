@@ -90,3 +90,9 @@
         </button>
     </div>
 </form>
+
+<style>
+    .box {
+        border-radius: 0;
+    }
+</style>
