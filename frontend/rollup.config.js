@@ -4,6 +4,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import css from 'rollup-plugin-css-only';
+import replace from '@rollup/plugin-replace';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -57,6 +58,9 @@ export default {
 			dedupe: ['svelte']
 		}),
 		commonjs(),
+		replace({
+			'CANDOR_BASE_URL': production ? '' : 'http://localhost:3001',
+		}),
 
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated

@@ -2,7 +2,8 @@
     // Import required components.
     import Loading from "./Loading.svelte";
     import Modal from "./Modal.svelte";
-    import Status from "./Status.svelte";
+    import PipelineBlock from "./PipelineBlock.svelte";
+    import PipelineRuns from "./PipelineRuns.svelte";
 
     // Which pipeline to show.
     export let pipelineId;
@@ -20,7 +21,6 @@
                 clearTimeout(timeout);
                 resolve({
                     public: true,
-                    status: "Passed",
                     lastRuns: [
                         {
                             id: "3421fa3a",
@@ -29,6 +29,7 @@
                                 "server.jar",
                                 "client.jar",
                             ],
+                            status: "Passed",
                             stages: [
                                 {
                                     name: "Test",
@@ -52,6 +53,7 @@
                                 "client.jar",
                                 "instructions.md",
                             ],
+                            status: "Passed",
                             stages: [
                                 {
                                     name: "Test",
@@ -74,6 +76,7 @@
                                 "server.jar",
                                 "client.jar",
                             ],
+                            status: "Passed",
                             stages: [
                                 {
                                     name: "Test",
@@ -91,6 +94,7 @@
                             artifacts: [
                                 "server.jar",
                             ],
+                            status: "Passed",
                             stages: [
                                 {
                                     name: "Test",
@@ -108,6 +112,7 @@
                             artifacts: [
                                 "server.jar",
                             ],
+                            status: "Passed",
                             stages: [
                                 {
                                     name: "Test",
@@ -142,64 +147,29 @@
                 {#await promise}
                     <Loading />
                 {:then pipeline}
-                    <h1 class="title is-size-5">Recent Runs</h1>
-                    <h2 class="subtitle is-size-6 has-text-weight-light mb-2">The last 5 are shown</h2>
-                    <table class="table is-fullwidth">
-                        <tbody>
-                            {#each pipeline.lastRuns as run}
-                                <tr>
-                                    <td class="table-run">
-                                        <Status status={pipeline.status}/>
-                                        <span>
-                                            <strong>#{run.id}</strong>
-                                        </span>
-                                    </td>
-                                    <td class="table-stages">
-                                        <div class="tags">
-                                            {#each run.stages as stage}
-                                                <span class="tag">
-                                                    <span>{stage.name}</span>
-                                                    <Status status={stage.status}/>
-                                                </span>
-                                            {/each}
-                                        </div>
-                                    </td>
-                                    <td class="table-time"><em>{run.time}</em></td>
-                                    <td>
-                                        <div class="tags">
-                                            {#each run.artifacts as artifact}
-                                                <span class="tag is-link is-light">{artifact}</span>
-                                            {/each}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <!-- svelte-ignore a11y-missing-attribute -->
-                                        <a>Log</a>
-                                    </td>
-                                </tr>
+                    <PipelineBlock title={"Recent Runs"} subtitle={"The last 5 are shown"}>
+                        <PipelineRuns runs={pipeline.lastRuns}/>
+                    </PipelineBlock>
+                    <PipelineBlock title={"Trigger URL"} subtitle={"Runs this pipeline"}>
+                        <blockquote>
+                            https://candor-is-cool.xyz/trigger/h32g432rgh32vj23fgk2gf2k3hfgk
+                        </blockquote>
+                    </PipelineBlock>
+                    <PipelineBlock title={"Visibility"} subtitle="Who can see and modify the pipeline">
+                        <div class="tags">
+                            <span class="tag icon-text">
+                                <span class="icon">
+                                    <i class="fa fa-eye"></i>
+                                </span>
+                                <span>
+                                    {pipeline.public ? "Public" : "Private"}
+                                </span>
+                            </span>
+                            {#each pipeline.assignees as assignee}
+                                <span class="tag">{assignee}</span>
                             {/each}
-                        </tbody>
-                    </table>
-                    <h1 class="title is-size-5">Trigger URL</h1>
-                    <h2 class="subtitle is-size-6 has-text-weight-light mb-2">Runs this pipeline</h2>
-                    <blockquote>
-                        https://candor-is-cool.xyz/trigger/h32g432rgh32vj23fgk2gf2k3hfgk
-                    </blockquote>
-                    <h1 class="title is-size-5">Visibility</h1>
-                    <h2 class="subtitle is-size-6 has-text-weight-light mb-2">Who can see and modify this pipeline</h2>
-                    <div class="tags">
-                        <span class="tag icon-text">
-                            <span class="icon">
-                                <i class="fa fa-eye"></i>
-                            </span>
-                            <span>
-                                {pipeline.public ? "Public" : "Private"}
-                            </span>
-                        </span>
-                        {#each pipeline.assignees as assignee}
-                            <span class="tag">{assignee}</span>
-                        {/each}
-                    </div>
+                        </div>
+                    </PipelineBlock>
                 {/await}
                 <div class="field is-grouped mt-5">
                     <p class="control">
@@ -217,17 +187,5 @@
 <style>
     .card {
         border-radius: 0;
-    }
-
-    .table-run {
-        width: 30%;
-    }
-
-    .table-stages {
-        width: 20%;
-    }
-
-    .table-time {
-        width: 15%;
     }
 </style>
