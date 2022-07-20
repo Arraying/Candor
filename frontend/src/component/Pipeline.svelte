@@ -3,6 +3,7 @@
     import Loading from "./Loading.svelte";
     import Modal from "./Modal.svelte";
     import PipelineBlock from "./PipelineBlock.svelte";
+    import PipelineRun from "./PipelineRun.svelte";
     import PipelineRuns from "./PipelineRuns.svelte";
 
     // Which pipeline to show.
@@ -14,6 +15,10 @@
 
     // The promise that loads the actual pipeline.
     $: promise = loadPipeline(pipelineId);
+
+    // Keep track of the modals.
+    let showRun = false;
+    let showConfig = false;
 
     async function loadPipeline(id) {
         return new Promise((resolve, _) => {
@@ -130,9 +135,14 @@
                             ],
                         },
                     ],
+                    trigger: "324j32gjfg3gjhgf2jf",
                     assignees: [
                         "phubner",
                         "jsmith",
+                    ],
+                    required_parameters: [
+                        "test",
+                        "hello"
                     ],
                 });
             }, 200);
@@ -157,7 +167,7 @@
                     </PipelineBlock>
                     <PipelineBlock title={"Trigger URL"} subtitle={"Runs this pipeline"}>
                         <blockquote>
-                            https://candor-is-cool.xyz/trigger/h32g432rgh32vj23fgk2gf2k3hfgk
+                            {window.location.origin}/trigger/{pipeline.trigger}
                         </blockquote>
                     </PipelineBlock>
                     <PipelineBlock title={"Visibility"} subtitle="Who can see and modify the pipeline">
@@ -175,13 +185,14 @@
                             {/each}
                         </div>
                     </PipelineBlock>
+                    <PipelineRun active={showRun} requiredParameters={pipeline.required_parameters} on:closeModal={() => showRun = false}/>
                 {/await}
                 <div class="field is-grouped mt-5">
                     <p class="control">
-                        <button class="button is-black">Run</button>
+                        <button class="button is-black" on:click|preventDefault={() => showRun = true}>Run</button>
                     </p>
                     <p class="control">
-                        <button class="button is-light">Edit Configuration</button>
+                        <button class="button is-light" on:click|preventDefault={() => showConfig = true}>Edit Configuration</button>
                     </p>
                 </div>
             </div>
