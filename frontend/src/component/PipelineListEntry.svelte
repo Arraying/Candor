@@ -1,4 +1,7 @@
 <script>
+    // Import the status component.
+    import Status from "./Status.svelte";
+
     // Import the event dispatcher such that we can change the selected pipeline when the row is clicked.
     import { createEventDispatcher } from 'svelte';
 
@@ -24,23 +27,7 @@
     <td>{pipeline.status}</td>
     <td>
         {#each pipeline.stages as stage}
-            {#if stage === "Passed"}
-                <span class="icon has-text-success">
-                    <i class="fas fa-check-circle"></i>
-                </span>
-            {:else if stage === "Failed"}
-                <span class="icon has-text-danger">
-                    <i class="fas fa-times-circle"></i>
-                </span>
-            {:else if stage === "Skipped"}
-                <span class="icon has-text-grey-light">
-                    <i class="fas fa-minus-circle"></i>
-                </span>
-            {:else if stage === "Error"}
-                <span class="icon has-text-danger">
-                    <i class="fas fa-bug"></i>
-                </span>
-            {/if}
+            <Status status={stage}/>
         {/each}
     </td>
     <td>{pipeline.lastSuccess}</td>

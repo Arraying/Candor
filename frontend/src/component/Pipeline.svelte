@@ -2,6 +2,7 @@
     // Import required components.
     import Loading from "./Loading.svelte";
     import Modal from "./Modal.svelte";
+    import Status from "./Status.svelte";
 
     // Which pipeline to show.
     export let pipelineId;
@@ -148,19 +149,7 @@
                             {#each pipeline.lastRuns as run}
                                 <tr>
                                     <td class="table-run">
-                                        {#if pipeline.status === "Passed"}
-                                            <span class="icon has-text-success">
-                                                <i class="fas fa-check-circle"></i>
-                                            </span>
-                                        {:else if pipeline.status === "Failed"}
-                                            <span class="icon has-text-danger">
-                                                <i class="fas fa-times-circle"></i>
-                                            </span>
-                                        {:else if pipeline.status === "Error"}
-                                            <span class="icon has-text-danger">
-                                                <i class="fas fa-bug"></i>
-                                            </span>
-                                        {/if}
+                                        <Status status={pipeline.status}/>
                                         <span>
                                             <strong>#{run.id}</strong>
                                         </span>
@@ -170,23 +159,7 @@
                                             {#each run.stages as stage}
                                                 <span class="tag">
                                                     <span>{stage.name}</span>
-                                                    {#if stage.status === "Success"}
-                                                        <span class="icon has-text-success">
-                                                            <i class="fas fa-check-circle"></i>
-                                                        </span>
-                                                    {:else if stage.status === "Failed"}
-                                                        <span class="icon has-text-danger">
-                                                            <i class="fas fa-times-circle"></i>
-                                                        </span>
-                                                    {:else if stage.status === "Skipped"}
-                                                        <span class="icon has-text-grey-light">
-                                                            <i class="fas fa-minus-circle"></i>
-                                                        </span>
-                                                    {:else if stage.status === "Error"}
-                                                        <span class="icon has-text-danger">
-                                                            <i class="fas fa-bug"></i>
-                                                        </span>
-                                                    {/if}
+                                                    <Status status={stage.status}/>
                                                 </span>
                                             {/each}
                                         </div>
