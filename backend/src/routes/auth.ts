@@ -4,6 +4,20 @@ import { AppDataSource } from "../data-source";
 import { User } from "../entities/User";
 
 /**
+ * Gets the self user, if logged in.
+ * @param req The request.
+ * @param res The response.
+ * @returns Nothing.
+ */
+export async function me(req: Request, res: Response) {
+    if (!req.session.user) {
+        res.sendStatus(401);
+        return;
+    }
+    res.send(getUserInfo(req.session.user));
+}
+
+/**
  * Attempts to create a session and log in with the credentials.
  * @param req The request.
  * @param res The response.
@@ -11,7 +25,7 @@ import { User } from "../entities/User";
  */
 export async function login(req: Request, res: Response) {
     if (req.session.user) {
-        res.sendStatus(400);
+        res.sendStatus(200);
         return;
     }
     const username = req.body.username;
@@ -48,4 +62,16 @@ export function logout(req: Request, res: Response) {
     req.session.destroy(() => {
         res.sendStatus(200);
     });
+}
+
+/**
+ * Gets stripped down user info for the user.
+ * @param user The user.
+ * @returns A stripped down user info.
+ */
+function getUserInfo(user: User): any {
+    return {
+        id: user.id,
+        name: user.name,
+    };
 }

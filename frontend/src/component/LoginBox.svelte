@@ -31,7 +31,7 @@
                 loginError = "Incorrect username or password!"
             } else {
                 // Unknown.
-                loginError = `Internal error ${code}!`;
+                loginError = `Internal error: ${response}!`;
             }
             // Reset password prompt, but keep username.
             password = undefined;
@@ -39,7 +39,6 @@
         // Reset login state.
         loginPromise.finally(() => {
             loginProgress = false;
-            loginText = "Login";
         });
     }
 </script>

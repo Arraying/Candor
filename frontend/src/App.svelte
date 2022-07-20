@@ -6,8 +6,11 @@
 	import Pipeline from "./component/Pipeline.svelte";
 	import PipelineList from "./component/PipelineList.svelte";
 
+	// Svelte hooks.
+	import { onMount } from "svelte";
+
 	// Import stateful information.
-	import { logout } from "./session";
+	import { logout, me } from "./session";
 	import { User } from "./store"
 
 	// Keep track of whether to show the different page modals.
@@ -17,6 +20,11 @@
 	// Keep track of the currently selected pipeline.
 	let pipelineId;
 	let pipelineName;
+
+	// Try to log in when the app starts.
+	onMount(async () => {
+		await me();
+	});
 
 	/**
 	 * Shows the default modals.

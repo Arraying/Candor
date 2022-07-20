@@ -59,7 +59,7 @@ export default {
 		}),
 		commonjs(),
 		replace({
-			'CANDOR_BASE_URL': production ? '' : 'http://localhost:3001',
+			'CANDOR_BASE_URL': production ? '' : 'http://localhost:3000',
 		}),
 
 		// In dev mode, call `npm run start` once

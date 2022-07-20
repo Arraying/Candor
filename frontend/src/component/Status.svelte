@@ -1,7 +1,6 @@
 <script>
     // The actual status.
     export let status;
-    console.log(status);
 </script>
 
 <span 

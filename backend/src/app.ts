@@ -1,8 +1,9 @@
+import cors from "cors";
 import express from "express";
 import expressSession from "express-session";
 import connectPgSimple from "connect-pg-simple";
 import security from "./middleware/security";
-import { login, logout } from "./routes/auth";
+import { login, logout, me } from "./routes/auth";
 import { User } from "./entities/User";
 import { listPipelines } from "./routes/pipelines";
 
@@ -28,6 +29,11 @@ const pgSessionStore = connectPgSimple(expressSession);
 app.use(express.static(PUBLIC));
 // Use JSON for API.
 app.use(express.json());
+// Allow CORS.
+app.use(cors({
+    credentials: true,
+    origin: process.env.ORIGIN
+}))
 // Use sessions.
 app.use(expressSession({
     store: new pgSessionStore({
@@ -48,6 +54,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 // Authentication routes.
+app.get("/me", me);
 app.post("/login", login);
 app.post("/logout", logout);
 
