@@ -24,7 +24,8 @@
                     lastRuns: [
                         {
                             id: "3421fa3a",
-                            time: "2 days ago",
+                            start: 1017309600000,
+                            finish: 1017309900000,
                             artifacts: [
                                 "server.jar",
                                 "client.jar",
@@ -47,7 +48,8 @@
                         },
                         {
                             id: "3bc0969a",
-                            time: "2 days ago",
+                            start: 1017309600000,
+                            finish: 1017309900000,
                             artifacts: [
                                 "server.jar",
                                 "client.jar",
@@ -71,7 +73,8 @@
                         },
                         {
                             id: "b21152cc",
-                            time: "2 days ago",
+                            start: 1017309600000,
+                            finish: 1017309900000,
                             artifacts: [
                                 "server.jar",
                                 "client.jar",
@@ -90,7 +93,8 @@
                         },
                         {
                             id: "60bc7afa",
-                            time: "2 days ago",
+                            start: 1017309600000,
+                            finish: 1017309900000,
                             artifacts: [
                                 "server.jar",
                             ],
@@ -108,7 +112,8 @@
                         },
                         {
                             id: "a93675a2",
-                            time: "2 days ago",
+                            start: 1017309600000,
+                            finish: 1017309900000,
                             artifacts: [
                                 "server.jar",
                             ],

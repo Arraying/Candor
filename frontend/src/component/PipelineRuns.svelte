@@ -1,8 +1,16 @@
 <script>
     // Import various components to help abstract.
     import Status from "./Status.svelte";
+    import { relativeTimeDifference } from "../utils";
+
     // Keep track of the runs.
     export let runs;
+
+    // Calculate all of the runs.
+    runs.forEach(run => {
+        run.started = new Date(run.start).toString();
+        run.duration = relativeTimeDifference(run.finish, run.start);
+    });
 </script>
 
 <table class="table is-fullwidth">
@@ -25,7 +33,11 @@
                         {/each}
                     </div>
                 </td>
-                <td class="table-time"><em>{run.time}</em></td>
+                <td class="table-time">
+                    <abbr title={run.started}>
+                        <em>{run.duration}</em>
+                    </abbr>
+                </td>
                 <td>
                     <div class="tags">
                         {#each run.artifacts as artifact}
