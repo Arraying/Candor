@@ -1,38 +1,23 @@
 <script>
+    // Import helper to throw an event when the log is opened.
+    import { createEventDispatcher } from "svelte";
+
     // Import various components to help abstract.
-    import Loading from "./Loading.svelte";
-    import Modal from "./Modal.svelte";
     import Status from "./Status.svelte";
 
     // Keep track of the runs.
     export let pipelineId, runs;
 
-    // Keep track of the logs modal.
-    let showLog;
-    let logRunId;
-    $: logPromise = loadLog(logRunId);
+    // Keep track of the logs dispatcher.
+    const dispatch = createEventDispatcher();
 
     /**
      * Opens the log.
      * @param runId The run ID.
      */
     const log = (runId) => {
-        showLog = true;
-        logRunId = runId;
+        dispatch("showLog", { runId: runId });
     };
-
-    /**
-     * Loads a log by run ID.
-     * @param runId The run ID.
-     */
-    async function loadLog(runId) {
-        return new Promise((resolve, _) => {
-            let timeout = setTimeout(() => {
-                clearTimeout(timeout);
-                resolve(("abcdefgh".repeat(20) + "\n").repeat(120));
-            }, 1000);
-        });
-    }
 </script>
 
 <table class="table is-fullwidth">
@@ -75,36 +60,9 @@
         {/each}
     </tbody>
 </table>
-<Modal active={showLog} on:closeModal={() => showLog = false}>
-    <div class="card">
-        <header class="card-header">
-            <p class="card-header-title">
-                Logs (Run: {logRunId})
-            </p>
-        </header>
-        
-    </div>
-    <div class="box logs">
-        {#await logPromise}
-            <Loading />
-        {:then log} 
-            {log}
-        {/await}
-    </div>
-</Modal>
+
 
 <style>
-    .card {
-        border-radius: 0;
-    }
-
-    .logs {
-        border-radius: 0;
-        overflow: scroll;
-        scroll-padding: 1.25rem;
-        white-space: pre-wrap;
-    }
-
     .table-run {
         width: 30%;
     }

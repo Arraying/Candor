@@ -2,8 +2,9 @@
     // Import required components.
     import Loading from "./Loading.svelte";
     import Modal from "./Modal.svelte";
-    import PipelineEdit from "./PipelineEdit.svelte";
     import PipelineBlock from "./PipelineBlock.svelte";
+    import PipelineEdit from "./PipelineEdit.svelte";
+    import PipelineLog from "./PipelineLog.svelte";
     import PipelineRun from "./PipelineRun.svelte";
     import PipelineRuns from "./PipelineRuns.svelte";
     import WorkButton from "./WorkButton.svelte";
@@ -22,7 +23,8 @@
     $: promise = loadPipeline(pipelineId);
 
     // Keep track of the modals.
-    let showRun = false, showConfig = false;
+    let showRun = false, showConfig = false, showLog = false;
+    let showLogRun;
 
     // Refresh task to run in the background.
     let refreshTask = undefined;
@@ -33,14 +35,24 @@
         // - The modal is active, so a pipeline is open.
         // - showRun is false, so it is not being executed right now.
         // - showConfig is false, so it is not being modified right now.
-        // The latter two will cause issues with the UI since the variables get cleared for a short time on the refresh.
+        // - showLog is false, so it is not being observed right now.
+        // The latter will cause issues with the UI since the variables get cleared for a short time on the refresh.
         // It's probably possible to run these in the background but that is not worth the workaround.
-        if (active && !showRun && !showConfig) {
+        if (active && !showRun && !showConfig && !showLog) {
             refreshTask = createRefresher();
         } else {
             clearInterval(refreshTask);
             refreshTask = undefined;
         }
+    }
+
+    /**
+     * When a log is requested to be shown.
+     * @param event The event.
+     */
+    const logRequest = (event) => {
+        showLog = true;
+        showLogRun = event.detail.runId;
     }
 
     /**
@@ -121,7 +133,7 @@
                     <Loading />
                 {:then pipeline}
                     <PipelineBlock title={"Recent Runs"} subtitle={"The last 5 completed runs are shown"}>
-                        <PipelineRuns {pipelineId} runs={pipeline.lastRuns}/>
+                        <PipelineRuns {pipelineId} runs={pipeline.lastRuns} on:showLog={logRequest}/>
                     </PipelineBlock>
                     {#if pipeline.assigned}
                         <PipelineBlock title={"Trigger URL"} subtitle={"Runs this pipeline"}>
@@ -145,6 +157,7 @@
                             {/each}
                         </div>
                     </PipelineBlock>
+                    <PipelineLog active={showLog} {pipelineId} runId={showLogRun} on:closeModal={() => showLog = false}/>
                     {#if pipeline.assigned}
                         <PipelineRun active={showRun} trigger={pipeline.trigger} requiredParameters={pipeline.requiredParameters} on:closeModal={() => showRun = false} on:pipelineRun={executePipelineRefresh}/>
                         <PipelineEdit active={showConfig} {pipelineId} on:closeModal={() => {showConfig = false}}/>
