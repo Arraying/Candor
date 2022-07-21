@@ -2,18 +2,26 @@ import cors from "cors";
 import express from "express";
 import expressSession from "express-session";
 import connectPgSimple from "connect-pg-simple";
-import security from "./middleware/security";
+import { pipelineInteract } from "./middleware/security";
 import { login, logout, me } from "./routes/auth";
-import { User } from "./entities/User";
 import { listPipelines, getPipeline, getPipelineConfig, setPipelineConfig, getPipelineLog, getPipelineArchive } from "./routes/pipelines";
 import { trigger, triggerWithGitHub } from "./routes/trigger";
+import { User } from "./entities/User";
+import { Pipeline } from "./entities/Pipeline";
 
 // Import the correct type definitions.
-declare module 'express-session' {
+declare module "express-session" {
     interface SessionData {
-      user: User;
+        user: User
     }
 }
+
+// 
+declare module "express" {
+    export interface Request {
+       pipeline?: Pipeline
+    }
+ }
 
 // The path where all the static material is rendered.
 // This is where Svelte should compile to.
@@ -35,6 +43,7 @@ app.use(cors({
     credentials: true,
     origin: process.env.ORIGIN
 }))
+
 // Use sessions.
 app.use(expressSession({
     store: new pgSessionStore({
@@ -48,6 +57,10 @@ app.use(expressSession({
         maxAge: 30 * 24 * 3600 * 1000, // 30 days.
     },
 }));
+
+// Protect and simplify routes that interact modify the pipeline.
+app.use("/api/pipelines/:pipelineId/*", pipelineInteract);
+app.use("/trigger/:token", pipelineInteract);
 
 // Allow reverse proxy in production.
 if (process.env.NODE_ENV === "production") {

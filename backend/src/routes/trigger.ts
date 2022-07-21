@@ -1,7 +1,4 @@
 import { Request, Response } from "express";
-import { AppDataSource } from "../data-source";
-import { Pipeline } from "../entities/Pipeline";
-import { User } from "../entities/User";
 import { running } from "../running";
 
 // TODO: Guarantees and thread safety.
@@ -14,27 +11,7 @@ import { running } from "../running";
  */
  export async function trigger(req: Request, res: Response) {
    // Get the pipeline.
-   const repository = AppDataSource.manager.getRepository(Pipeline);
-   const queriedPipeline = await repository.findOne({
-      where: {
-         token: req.params.token,
-      },
-      relations: ["assignees"],
-   });
-   // If the pipeline does not exist, error.
-   if (!queriedPipeline) {
-      res.sendStatus(404);
-      return;
-   }
-   // See if the user is assigned.
-   const isUserAssigned = queriedPipeline.assignees.some((user: User): boolean => {
-      return user.id === req.session.user?.id;
-   });
-   // Reject if the user is not assigned.
-   if (!isUserAssigned) {
-      res.sendStatus(403);
-      return;
-   }
+   const queriedPipeline = req.pipeline!;
    // Reject if the pipeline is already running.
    if (running.has(queriedPipeline.id)) {
       res.sendStatus(400);
