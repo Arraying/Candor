@@ -5,7 +5,7 @@ import connectPgSimple from "connect-pg-simple";
 import security from "./middleware/security";
 import { login, logout, me } from "./routes/auth";
 import { User } from "./entities/User";
-import { listPipelines } from "./routes/pipelines";
+import { listPipelines, getPipeline, getPipelineConfig, setPipelineConfig } from "./routes/pipelines";
 import { trigger, triggerWithGitHub } from "./routes/trigger";
 
 // Import the correct type definitions.
@@ -61,6 +61,9 @@ app.post("/logout", logout);
 
 // Pipeline routes.
 app.get("/api/pipelines", listPipelines);
+app.get("/api/pipelines/:pipelineId", getPipeline);
+app.get("/api/pipelines/:pipelineId/config", getPipelineConfig);
+app.post("/api/pipelines/:pipelineId/config", setPipelineConfig);
 
 // Trigger routes.
 app.post("/trigger/:token", trigger);

@@ -64,3 +64,20 @@ export async function listPipelines(req: Request, res: Response) {
     });
     res.send(result);
 }
+
+export async function getPipeline(req: Request, res: Response) {
+    res.send({});
+}
+
+export async function getPipelineConfig(req: Request, res: Response) {
+    // TODO: Permissions.
+    res.send({
+        a: "hello",
+        b: "world",
+    });
+}
+
+export async function setPipelineConfig(req: Request, res: Response) {
+    // TODO: Permissions.
+    res.sendStatus(200);
+}

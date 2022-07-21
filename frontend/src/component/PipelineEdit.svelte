@@ -1,64 +1,90 @@
 <script>
     // Import the required components.
-    import Loading from "./Loading.svelte";
     import Modal from "./Modal.svelte";
     import WorkButton from "./WorkButton.svelte";
+
+    // Import requests.
+    import { call } from "../requests";
 
     // The required variables.
     export let active, pipelineId;
     
     // Whether or not the edit is in progress.
-    let editProgress, modal, binding;
+    let editProgress, modal, binding = "Loading...", disabled = true, errorText;
 
-    // The promise for loading.
-    $: promise = load(pipelineId);
+    $: {
+        // Re-load every time this gets activated.
+        if (active) {
+            load(pipelineId);
+        }
+    }
 
     /**
      * Loads the config.
      */
     async function load(pipelineId) {
-        binding = await new Promise((resolve, _) => {
-            let timeout = setTimeout(() => {
-                clearTimeout(timeout);
-                resolve(JSON.stringify({
-                    a: "a",
-                    b: "b",
-                }, null, 2));
-            }, 500);
-        });
+        const response = await call("GET", `/api/pipelines/${pipelineId}/config`);
+        if (response.status === 200) {
+            binding = JSON.stringify(await response.json(), null, 2);
+            disabled = false;
+        } else {
+            errorText = `Internal error: ${response.status}`;
+        }
     };
 
     /**
      * Saves the config.
      */
     const save = () => {
-
+        if (!binding) {
+            errorText = "The config may not be empty!";
+            return;
+        }
+        let config;
+        try {
+            config = JSON.parse(binding);
+        } catch (_) {
+            errorText = "The config is not valid JSON!";
+            return;
+        }
+        editProgress = true;
+        call("POST", `/api/pipelines/${pipelineId}/config`, config)
+            .then(_ => {
+                modal.closeModal();
+            })
+            .catch(error => {
+                console.log(error);
+            })
+            .finally(() => {
+                editProgress = false;
+            });
     };
 </script>
 
-<Modal {active} on:closeModal bind:this={modal}>
+<Modal {active} closeable={false} on:closeModal bind:this={modal}>
     <form on:submit|preventDefault={save} class="box">
-        {#await promise}
-            <Loading />
-        {:then} 
-            <div class="field">
-                <label for="" class="label">
-                    Configuration
-                </label>
-                <div class="control">
-                    <input type="textarea" class="input" bind:value={binding}>
-                </div>
+        <div class="field">
+            <label for="" class="label">
+                Configuration
+            </label>
+            <div class="control">
+                <textarea class="textarea is-small" bind:value={binding} rows="20" {disabled}/>
             </div>
-            <div class="field is-grouped">
-                <div class="control">
-                    <WorkButton inProgress={editProgress} titleInProgress={"Saving..."} titleNormal={"Save"}/>
-                </div>
-                <div class="control">
-                    <button class="button is-light" on:click|preventDefault={modal.closeModal()}>
-                        Cancel
-                    </button>
-                </div>
+            {#if errorText}
+                <p class="help is-danger">
+                    {errorText}
+                </p>
+            {/if}
+        </div>
+        <div class="field is-grouped">
+            <div class="control">
+                <WorkButton inProgress={editProgress} titleInProgress={"Saving..."} titleNormal={"Save"}/>
             </div>
-        {/await}
+            <div class="control">
+                <button class="button is-light" on:click|preventDefault={modal.closeModal()}>
+                    Cancel
+                </button>
+            </div>
+        </div>
     </form>
 </Modal>
