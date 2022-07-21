@@ -20,7 +20,30 @@
     // Keep track of the modals.
     let showRun = false, showConfig = false;
 
+    // Refresh task to run in the background.
+    let refreshTask = undefined;
+
+    // Create the refresher reactively.
+    $: {
+        // Only refresh when the following conditions are met:
+        // - The modal is active, so a pipeline is open.
+        // - showRun is false, so it is not being executed right now.
+        // - showConfig is false, so it is not being modified right now.
+        // The latter two will cause issues with the UI since the variables get cleared for a short time on the refresh.
+        // It's probably possible to run these in the background but that is not worth the workaround.
+        if (active && !showRun && !showConfig) {
+            refreshTask = createRefresher();
+        } else {
+            clearInterval(refreshTask);
+            refreshTask = undefined;
+        }
+    }
+
     async function loadPipeline(id) {
+        // At this point no pipeline is selected, just reject the promise
+        if (!id) {
+            return new Promise((_, reject) => reject());
+        }
         return new Promise((resolve, _) => {
             let timeout = setTimeout(() => {
                 clearTimeout(timeout);
@@ -151,6 +174,30 @@
             }, 200);
         });
     }
+
+    /**
+     * Creates a task that will refresh the pipeline periodically.
+     */
+    function createRefresher() {
+        return setInterval(() => {
+            executePipelineRefresh();
+        }, 5000);
+    }
+
+    /**
+     * Refresh the pipeline right now.
+     */
+    function executePipelineRefresh() {
+        // Get a new promise that refreshes the data.
+        const refreshedPromise = loadPipeline(pipelineId);
+        // Wait for the promise to complete, and then use it as a drop-in replacement.
+        // This will make it so the old information is still displayed while everything is being loaded.
+        refreshedPromise
+            .catch(() => {}) // Ignore this.
+            .finally(() => {
+                promise = refreshedPromise;
+            });
+    }
 </script>
 
 <Modal {active} on:closeModal>
@@ -170,6 +217,8 @@
                         </span>
                     </p>
                 {/if}
+            {:catch}
+                <span>???</span>
             {/await}
         </header>
         <div class="card-content">
@@ -200,7 +249,7 @@
                             {/each}
                         </div>
                     </PipelineBlock>
-                    <PipelineRun active={showRun} trigger={pipeline.trigger} requiredParameters={pipeline.required_parameters} on:closeModal={() => showRun = false}/>
+                    <PipelineRun active={showRun} trigger={pipeline.trigger} requiredParameters={pipeline.required_parameters} on:closeModal={() => showRun = false} on:pipelineRun={executePipelineRefresh}/>
                     <PipelineEdit active={showConfig} {pipelineId} on:closeModal={() => {showConfig = false}}/>
                     <div class="field is-grouped mt-5">
                         <p class="control">
@@ -210,6 +259,8 @@
                             <button class="button is-light" on:click|preventDefault={() => showConfig = true}>Edit Configuration</button>
                         </p>
                     </div>
+                {:catch}
+                    <span>Pipeline ID not selected!</span>
                 {/await}
             </div>
         </div>
