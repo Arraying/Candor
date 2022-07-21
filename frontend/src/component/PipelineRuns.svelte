@@ -3,9 +3,6 @@
     import Loading from "./Loading.svelte";
     import Modal from "./Modal.svelte";
     import Status from "./Status.svelte";
-    import { relativeTimeDifference } from "../utils";
-
-
 
     // Keep track of the runs.
     export let pipelineId, runs;
@@ -14,12 +11,6 @@
     let showLog;
     let logRunId;
     $: logPromise = loadLog(logRunId);
-
-    // Calculate all of the runs.
-    runs.forEach(run => {
-        run.started = new Date(run.start).toString();
-        run.duration = relativeTimeDifference(run.finish, run.start);
-    });
 
     /**
      * Opens the log.

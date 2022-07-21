@@ -8,6 +8,10 @@
     import PipelineRuns from "./PipelineRuns.svelte";
     import WorkButton from "./WorkButton.svelte";
 
+    // Import utility functions.
+    import { call } from "../requests";
+    import { relativeTimeDifference } from "../utils";
+
     // Which pipeline to show.
     export let pipelineId, pipelineName;
     
@@ -39,140 +43,30 @@
         }
     }
 
+    /**
+     * Loads the pipeline by ID.
+     * @param id The pipeline ID.
+     */
     async function loadPipeline(id) {
         // At this point no pipeline is selected, just reject the promise
         if (!id) {
             return new Promise((_, reject) => reject());
         }
-        return new Promise((resolve, _) => {
-            let timeout = setTimeout(() => {
-                clearTimeout(timeout);
-                resolve({
-                    id: 1, // Ignored
-                    name: "Foo", // Ignored
-                    public: true,
-                    running: false,
-                    lastRuns: [
-                        {
-                            id: "3421fa3a",
-                            start: 1017309600000,
-                            finish: 1017309900000,
-                            archived: [
-                                "server.jar",
-                                "client.jar",
-                            ],
-                            status: "Passed",
-                            stages: [
-                                {
-                                    name: "Test",
-                                    status: "Success",
-                                },
-                                {
-                                    name: "Compile",
-                                    status: "Success",
-                                },
-                                {
-                                    name: "Publish",
-                                    status: "Success",
-                                },
-                            ],
-                        },
-                        {
-                            id: "3bc0969a",
-                            start: 1017309600000,
-                            finish: 1017309900000,
-                            archived: [
-                                "server.jar",
-                                "client.jar",
-                                "instructions.md",
-                            ],
-                            status: "Passed",
-                            stages: [
-                                {
-                                    name: "Test",
-                                    status: "Success",
-                                },
-                                {
-                                    name: "Compile",
-                                    status: "Success",
-                                },
-                                {
-                                    name: "Publish",
-                                    status: "Success",
-                                },
-                            ],
-                        },
-                        {
-                            id: "b21152cc",
-                            start: 1017309600000,
-                            finish: 1017309900000,
-                            archived: [
-                                "server.jar",
-                                "client.jar",
-                            ],
-                            status: "Passed",
-                            stages: [
-                                {
-                                    name: "Test",
-                                    status: "Success",
-                                },
-                                {
-                                    name: "Compile",
-                                    status: "Success",
-                                },
-                            ],
-                        },
-                        {
-                            id: "60bc7afa",
-                            start: 1017309600000,
-                            finish: 1017309900000,
-                            archived: [
-                                "server.jar",
-                            ],
-                            status: "Passed",
-                            stages: [
-                                {
-                                    name: "Test",
-                                    status: "Success",
-                                },
-                                {
-                                    name: "Compile",
-                                    status: "Success",
-                                },
-                            ],
-                        },
-                        {
-                            id: "a93675a2",
-                            start: 1017309600000,
-                            finish: 1017309900000,
-                            archived: [
-                                "server.jar",
-                            ],
-                            status: "Passed",
-                            stages: [
-                                {
-                                    name: "Test",
-                                    status: "Success",
-                                },
-                                {
-                                    name: "Compile",
-                                    status: "Success",
-                                },
-                            ],
-                        },
-                    ],
-                    trigger: "324j32gjfg3gjhgf2jf",
-                    assignees: [
-                        "phubner",
-                        "jsmith",
-                    ],
-                    required_parameters: [
-                        "test",
-                        "hello"
-                    ],
-                });
-            }, 200);
-        });
+        // Fetch it.
+        const response = await call("GET", `/api/pipelines/${pipelineId}`);
+        // Handle non 200.
+        if (response.status !== 200) {
+            console.error(`Received status ${response.status} loading pipeline`);
+            throw new Error(`Get pipeline response status ${response.status}`);
+        }
+        // Here, it is a valid pipeline.
+        const pipeline = await response.json();
+        // Quickly compute durations.
+        pipeline.lastRuns.forEach(run => {
+            run.started = new Date(run.start).toString();
+            run.duration = relativeTimeDifference(run.finish, run.start);
+        })
+        return pipeline;
     }
 
     /**
@@ -218,7 +112,7 @@
                     </p>
                 {/if}
             {:catch}
-                <span>???</span>
+                <span />
             {/await}
         </header>
         <div class="card-content">
@@ -229,11 +123,13 @@
                     <PipelineBlock title={"Recent Runs"} subtitle={"The last 5 completed runs are shown"}>
                         <PipelineRuns {pipelineId} runs={pipeline.lastRuns}/>
                     </PipelineBlock>
-                    <PipelineBlock title={"Trigger URL"} subtitle={"Runs this pipeline"}>
-                        <blockquote>
-                            {window.location.origin}/trigger/{pipeline.trigger}
-                        </blockquote>
-                    </PipelineBlock>
+                    {#if pipeline.assigned}
+                        <PipelineBlock title={"Trigger URL"} subtitle={"Runs this pipeline"}>
+                            <blockquote>
+                                {window.location.origin}/trigger/{pipeline.trigger}
+                            </blockquote>
+                        </PipelineBlock>
+                    {/if}
                     <PipelineBlock title={"Visibility"} subtitle="Who can see and modify the pipeline">
                         <div class="tags">
                             <span class="tag icon-text">
@@ -249,18 +145,20 @@
                             {/each}
                         </div>
                     </PipelineBlock>
-                    <PipelineRun active={showRun} trigger={pipeline.trigger} requiredParameters={pipeline.required_parameters} on:closeModal={() => showRun = false} on:pipelineRun={executePipelineRefresh}/>
-                    <PipelineEdit active={showConfig} {pipelineId} on:closeModal={() => {showConfig = false}}/>
-                    <div class="field is-grouped mt-5">
-                        <p class="control">
-                            <WorkButton inProgress={pipeline.running} titleInProgress={"Run in progress..."} titleNormal={"Run"} on:click={() => showRun = true}/>
-                        </p>
-                        <p class="control">
-                            <button class="button is-light" on:click|preventDefault={() => showConfig = true}>Edit Configuration</button>
-                        </p>
-                    </div>
+                    {#if pipeline.assigned}
+                        <PipelineRun active={showRun} trigger={pipeline.trigger} requiredParameters={pipeline.requiredParameters} on:closeModal={() => showRun = false} on:pipelineRun={executePipelineRefresh}/>
+                        <PipelineEdit active={showConfig} {pipelineId} on:closeModal={() => {showConfig = false}}/>
+                        <div class="field is-grouped mt-5">
+                            <p class="control">
+                                <WorkButton inProgress={pipeline.running} titleInProgress={"Run in progress..."} titleNormal={"Run"} on:click={() => showRun = true}/>
+                            </p>
+                            <p class="control">
+                                <button class="button is-light" on:click|preventDefault={() => showConfig = true}>Edit Configuration</button>
+                            </p>
+                        </div>
+                    {/if}
                 {:catch}
-                    <span>Pipeline ID not selected!</span>
+                    <span>Could not load pipeline!</span>
                 {/await}
             </div>
         </div>
