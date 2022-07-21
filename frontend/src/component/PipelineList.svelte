@@ -6,24 +6,34 @@
     import Loading from "./Loading.svelte";
     import PipelineListEntry from "./PipelineListEntry.svelte";
 
-    // Keep track of state variables.
-    import { User, Pipelines } from "../store";
+    // Keep track of state variables and requests.
+    import { User } from "../store";
+    import { call } from "../requests";
+
+    // Keep track of the pipeline loading.
+    let promise = loadPipelines();
 
     // Keep track of the username.
     let username;
-    User.subscribe(value => username = (value ? value.name : "anonymous"));
+    User.subscribe(newUser => {
+        // Update the new username.
+        username = newUser ? newUser.name : "anonymous";
+        // Also fetch new pipelines.
+        // The short loading flash is okay here.
+        promise = loadPipelines();
+    });
 
     /**
      * Loads all pipelines.
      * Currently has a fake timeout to mock latency.
      */
-    function loadPipelines() {
-        return new Promise((resolve, _) => {
-            let timeout = setTimeout(() => {
-                clearTimeout(timeout);
-                resolve($Pipelines);
-            }, 500);
-        });
+    async function loadPipelines() {
+        const response = await call("GET", "/api/pipelines");
+        if (response.status !== 200) {
+            console.error(`Received status ${response.status} loading pipelines`);
+            return [];
+        }
+        return await response.json();
     }
 </script>
 
@@ -31,7 +41,7 @@
     <div class="container">
         <h1 class="title">Pipelines</h1>
         <h2 class="subtitle has-text-weight-light">All pipelines visible to <span class="has-text-weight-semibold">@{username}</span></h2>
-        {#await loadPipelines()}
+        {#await promise}
             <Loading />
         {:then overviews}
             <div class="overflow-container">
@@ -52,6 +62,8 @@
                     </tbody>
                 </table>
             </div>
+        {:catch}
+            No pipelines could be loaded!
         {/await}
     </div>
 </section>

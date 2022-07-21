@@ -2,6 +2,7 @@
 	// Import the different components that can be shown.
 	import About from "./component/About.svelte";
 	import Footer from "./component/Footer.svelte";
+	import Loading from "./component/Loading.svelte";
 	import LoginBox from "./component/LoginBox.svelte";
 	import Modal from "./component/Modal.svelte";
 	import Navbar from "./component/Navbar.svelte";
@@ -12,8 +13,7 @@
 	import { onMount } from "svelte";
 
 	// Import stateful information.
-	import { logout, me } from "./session";
-	import { User } from "./store"
+	import { me } from "./session";
 
 	// Keep track of whether to show the different page modals.
 	let showModalLogin = false;
@@ -23,10 +23,8 @@
 	let pipelineId;
 	let pipelineName;
 
-	// Try to log in when the app starts.
-	onMount(async () => {
-		await me();
-	});
+	// Keep track of the login process.
+	let mePromise = me();
 
 	/**
 	 * Shows the default modals.
@@ -44,10 +42,6 @@
 		pipelineId = data.detail.id;
 		pipelineName = data.detail.name;
 	}
-
-	// Keep track of the current user.
-	let user;
-	User.subscribe(value => user = value);
 </script>
 
 <main class="app">
@@ -59,7 +53,13 @@
 	<Modal active={showModalLogin} on:closeModal={() => showModalLogin = false}>
 		<LoginBox on:loginSuccess={() => showModalLogin = false}/>
 	</Modal>
-	<Pipeline {pipelineId} {pipelineName} on:closeModal={() => pipelineId = undefined}/>
-	<PipelineList on:pipelineSelect={(event) => selectPipeline(event)}/>
+	{#await mePromise}
+		<Loading />
+	{:then}
+		<Pipeline {pipelineId} {pipelineName} on:closeModal={() => pipelineId = undefined}/>
+		<PipelineList on:pipelineSelect={(event) => selectPipeline(event)}/>
+	{:catch}
+		Could not load self, is the server down?
+	{/await}
 	<Footer />
 </main>

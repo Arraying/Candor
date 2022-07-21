@@ -6,10 +6,6 @@
     import { logout } from "../session";
     import { User } from "../store";
 
-    // Keep track of the user object.
-    let user;
-    User.subscribe(newUser => user = newUser);
-
     // Create the event dispatcher.
     const dispatch = createEventDispatcher();
 </script>
@@ -35,7 +31,7 @@
             </a>
         </div>
           <div class="navbar-end">
-            {#if user}
+            {#if $User}
                 <a href="/" class="navbar-item" on:click|preventDefault={logout}>
                     Logout
                 </a>
