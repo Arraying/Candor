@@ -6,6 +6,7 @@ import security from "./middleware/security";
 import { login, logout, me } from "./routes/auth";
 import { User } from "./entities/User";
 import { listPipelines } from "./routes/pipelines";
+import { trigger, triggerWithGitHub } from "./routes/trigger";
 
 // Import the correct type definitions.
 declare module 'express-session' {
@@ -60,5 +61,9 @@ app.post("/logout", logout);
 
 // Pipeline routes.
 app.get("/api/pipelines", listPipelines);
+
+// Trigger routes.
+app.post("/trigger/:token", trigger);
+app.post("/trigger/:token/github", triggerWithGitHub);
 
 export default app;

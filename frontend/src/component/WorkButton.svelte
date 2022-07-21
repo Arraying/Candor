@@ -2,7 +2,7 @@
     export let inProgress, titleNormal, titleInProgress;
 </script>
 
-<button class="button" class:is-black={!inProgress} class:is-light={inProgress} disabled={inProgress}>
+<button class="button" class:is-black={!inProgress} class:is-light={inProgress} disabled={inProgress} on:click>
     {#if inProgress}
         <span class="icon">
             <i class="fas fa-spinner fa-pulse"></i>

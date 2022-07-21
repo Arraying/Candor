@@ -23,7 +23,16 @@
 </script>
 
 <tr class="is-clickable" on:click={selectPipeline}>
-    <td>{pipeline.name}</td>
+    <td>
+        <span>
+            {#if pipeline.running}
+                <span class="icon">
+                    <i class="fas fa-circle-notch fa-spin"></i>
+                </span>
+            {/if}
+            <span>{pipeline.name}</span>
+        </span>
+    </td>
     <td>{pipeline.status}</td>
     <td>
         {#each pipeline.stages as stage}

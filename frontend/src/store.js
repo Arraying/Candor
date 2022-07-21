@@ -17,6 +17,7 @@ export const Pipelines = writable([
     {
         id: 2,
         name: "Bar",
+        running: true,
         status: "Failed",
         stages: ["Success", "Failed"],
         lastSuccess: "28.03.02 10:00",

@@ -6,6 +6,7 @@
     import PipelineBlock from "./PipelineBlock.svelte";
     import PipelineRun from "./PipelineRun.svelte";
     import PipelineRuns from "./PipelineRuns.svelte";
+    import WorkButton from "./WorkButton.svelte";
 
     // Which pipeline to show.
     export let pipelineId, pipelineName;
@@ -24,7 +25,10 @@
             let timeout = setTimeout(() => {
                 clearTimeout(timeout);
                 resolve({
+                    id: 1, // Ignored
+                    name: "Foo", // Ignored
                     public: true,
+                    running: false,
                     lastRuns: [
                         {
                             id: "3421fa3a",
@@ -153,15 +157,27 @@
     <div class="card">
         <header class="card-header">
             <p class="card-header-title">
-                {pipelineName} (ID: {pipelineId})
+                <span>{pipelineName} (ID: {pipelineId})</span>
             </p>
+            {#await promise then pipeline}
+                {#if pipeline.running}
+                    <p class="card-header-icon">
+                        <span class="tag is-link">
+                            <span class="icon">
+                                <i class="fas fa-circle-notch fa-spin"></i>
+                            </span>
+                            <span>Running</span>
+                        </span>
+                    </p>
+                {/if}
+            {/await}
         </header>
         <div class="card-content">
             <div class="content">
                 {#await promise}
                     <Loading />
                 {:then pipeline}
-                    <PipelineBlock title={"Recent Runs"} subtitle={"The last 5 are shown"}>
+                    <PipelineBlock title={"Recent Runs"} subtitle={"The last 5 completed runs are shown"}>
                         <PipelineRuns {pipelineId} runs={pipeline.lastRuns}/>
                     </PipelineBlock>
                     <PipelineBlock title={"Trigger URL"} subtitle={"Runs this pipeline"}>
@@ -184,11 +200,11 @@
                             {/each}
                         </div>
                     </PipelineBlock>
-                    <PipelineRun active={showRun} requiredParameters={pipeline.required_parameters} on:closeModal={() => showRun = false}/>
+                    <PipelineRun active={showRun} trigger={pipeline.trigger} requiredParameters={pipeline.required_parameters} on:closeModal={() => showRun = false}/>
                     <PipelineEdit active={showConfig} {pipelineId} on:closeModal={() => {showConfig = false}}/>
                     <div class="field is-grouped mt-5">
                         <p class="control">
-                            <button class="button is-black" on:click|preventDefault={() => showRun = true}>Run</button>
+                            <WorkButton inProgress={pipeline.running} titleInProgress={"Run in progress..."} titleNormal={"Run"} on:click={() => showRun = true}/>
                         </p>
                         <p class="control">
                             <button class="button is-light" on:click|preventDefault={() => showConfig = true}>Edit Configuration</button>
