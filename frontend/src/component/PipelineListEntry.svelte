@@ -24,21 +24,20 @@
 
 <tr class="is-clickable" on:click={selectPipeline}>
     <td>
-        <span>
-            {#if pipeline.running}
-                <span class="icon">
-                    <i class="fas fa-circle-notch fa-spin"></i>
-                </span>
-            {/if}
-            <span>{pipeline.name}</span>
-        </span>
+        {pipeline.name}
     </td>
-    <td>{pipeline.status}</td>
+    <td>
+        {pipeline.status}
+    </td>
     <td>
         {#each pipeline.stages as stage}
             <Status status={stage}/>
         {/each}
     </td>
-    <td>{pipeline.lastSuccess}</td>
-    <td>{pipeline.lastFailure}</td>
+    <td>
+        {pipeline.lastSuccess}
+    </td>
+    <td>
+        {pipeline.lastFailure}
+    </td>
 </tr>

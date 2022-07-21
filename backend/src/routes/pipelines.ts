@@ -6,6 +6,7 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { Pipeline } from "../entities/Pipeline";
 import { User } from "../entities/User";
+import { running } from "../running";
 
 // TODO: Remove.
 const dummyLastBuild = {
@@ -43,7 +44,6 @@ const dummyLastBuild = {
 interface PipelineListEntry {
     id: number
     name: string
-    running: boolean
     status: "Passed" | "Failed" | "Error"
     stages: ("Success" | "Failed" | "Error" | "Skipped")[]
     lastSuccess: number
@@ -139,7 +139,6 @@ export async function listPipelines(req: Request, res: Response) {
             return {
                 id: pipeline.id,
                 name: pipeline.name,
-                running: false, // TODO
                 status: <"Passed"> lastBuild.status,
                 stages: lastBuild.stages.map((stage: any) => stage.status),
                 lastSuccess: -1,
@@ -176,7 +175,7 @@ export async function getPipeline(req: Request, res: Response) {
     // See if the user is assigned.
     const isUserAssigned = queriedPipeline.assignees.some((user: User): boolean => {
         return user.id === req.session.user?.id;
-    })
+    });
     // Ensure the user has access, if need be.
     if (!queriedPipeline.public && !isUserAssigned) {
         res.sendStatus(403);
@@ -190,8 +189,20 @@ export async function getPipeline(req: Request, res: Response) {
         assigned: isUserAssigned,
         id: queriedPipeline.id,
         name: queriedPipeline.name,
-        running: false, // TODO
-        lastRuns: [], // TODO
+        running: running.has(queriedPipeline.id),
+        lastRuns: [
+            {
+                id: "123abc",
+                start: 1658417618000,
+                finish: 1658417738000,
+                status: "Passed",
+                stages: [{
+                    name: "Compile",
+                    status: "Success",
+                }],
+                archived: ["Foo.js"],
+            },
+        ], // TODO
         trigger: isUserAssigned ? queriedPipeline.token : "hidden",
         assignees: queriedPipeline.assignees.map((user: User): string => user.name),
         requiredParameters: parameters,
