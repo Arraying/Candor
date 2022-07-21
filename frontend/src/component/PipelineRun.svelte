@@ -1,6 +1,7 @@
 <script>
     // Import the required modal component.
     import Modal from "./Modal.svelte";
+    import WorkButton from "./WorkButton.svelte";
 
     // The required variables.
     export let active;
@@ -34,20 +35,7 @@
             </div>
         {/each}
         <div class="field">
-            <button class="button" class:is-black={!runProgress} class:is-light={runProgress} disabled={runProgress}>
-            {#if runProgress}
-                <span class="icon">
-                    <i class="fas fa-spinner fa-pulse"></i>
-                </span>
-            {/if}
-            <span>
-                {#if runProgress}
-                    Staring...
-                {:else}
-                    Run
-                {/if}
-            </span>
-            </button>
+            <WorkButton inProgress={runProgress} titleInProgress={"Starting..."} titleNormal={"Run"}/>
         </div>
     </form>
 </Modal>

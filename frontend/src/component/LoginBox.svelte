@@ -1,6 +1,9 @@
 <script>
     // Import the event dispatcher such that we can close the modal when the login is successful.
     import { createEventDispatcher } from 'svelte';
+
+    // Import a generic loading button.
+    import WorkButton from './WorkButton.svelte';
     
     // Import stateful information.
 	import { login } from "../session";
@@ -73,20 +76,7 @@
         {/if}
     </div>
     <div class="field">
-        <button class="button" class:is-black={!loginProgress} class:is-light={loginProgress} disabled={loginProgress}>
-        {#if loginProgress}
-            <span class="icon">
-                <i class="fas fa-spinner fa-pulse"></i>
-            </span>
-        {/if}
-        <span>
-            {#if loginProgress}
-                Logging in...
-            {:else}
-                Login
-            {/if}
-        </span>
-        </button>
+        <WorkButton inProgress={loginProgress} titleInProgress={"Logging in..."} titleNormal={"Login"}/>
     </div>
 </form>
 

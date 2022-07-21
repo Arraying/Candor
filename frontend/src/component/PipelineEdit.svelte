@@ -2,6 +2,7 @@
     // Import the required components.
     import Loading from "./Loading.svelte";
     import Modal from "./Modal.svelte";
+    import WorkButton from "./WorkButton.svelte";
 
     // The required variables.
     export let active;
@@ -36,23 +37,13 @@
     const save = () => {
 
     };
-
-    /**
-     * Runs the pipeline with the provided parameters.
-     */
-    const run = () => {
-        // TODO: Actually run.
-        // Reset everything.
-        active = false;
-        parameterBindings = {};
-    };
 </script>
 
 <Modal {active} on:closeModal bind:this={modal}>
     <form on:submit|preventDefault={save} class="box">
         {#await promise}
             <Loading />
-        {:then config} 
+        {:then} 
             <div class="field">
                 <label for="" class="label">
                     Configuration
@@ -63,20 +54,7 @@
             </div>
             <div class="field is-grouped">
                 <div class="control">
-                    <button class="button" class:is-black={!editProgress} class:is-light={editProgress} disabled={editProgress}>
-                        {#if editProgress}
-                            <span class="icon">
-                                <i class="fas fa-spinner fa-pulse"></i>
-                            </span>
-                        {/if}
-                        <span>
-                            {#if editProgress}
-                                Saving...
-                            {:else}
-                                Save
-                            {/if}
-                        </span>
-                    </button>
+                    <WorkButton inProgress={editProgress} titleInProgress={"Saving..."} titleNormal={"Save"}/>
                 </div>
                 <div class="control">
                     <button class="button is-light" on:click|preventDefault={modal.closeModal()}>
