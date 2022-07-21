@@ -1,6 +1,7 @@
 <script>
-    // Import the status component.
+    // Import useful components.
     import Status from "./Status.svelte";
+    import Timestamp from "./Timestamp.svelte";
 
     // Import the event dispatcher such that we can change the selected pipeline when the row is clicked.
     import { createEventDispatcher } from 'svelte';
@@ -35,9 +36,9 @@
         {/each}
     </td>
     <td>
-        {pipeline.lastSuccess}
+        <Timestamp millis={pipeline.lastSuccess}/>
     </td>
     <td>
-        {pipeline.lastFailure}
+        <Timestamp millis={pipeline.lastFailure}/>
     </td>
 </tr>
