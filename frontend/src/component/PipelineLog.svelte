@@ -3,6 +3,9 @@
     import Loading from "./Loading.svelte";
     import Modal from "./Modal.svelte";
 
+    // Utility for requests.
+    import { call } from "../requests";
+
     // Export the required variables.
     export let active, pipelineId, runId;
 
@@ -21,7 +24,14 @@
      * @param runId The run ID.
      */
     async function loadLog(pipelineId, runId) {
-        return Promise.resolve("Log");
+        const response = await call("GET", `/api/runs/${pipelineId}/${runId}/log`);
+        // Handle non 200.
+        if (response.status !== 200) {
+            console.error(`Received status ${response.status} loading pipeline ${pipelineId} build ${buildId} logs`);
+            throw new Error(`Get pipeline response status ${response.status}`);
+        }
+        // Return it as plain text
+        return response.text();
     }
 </script>
 

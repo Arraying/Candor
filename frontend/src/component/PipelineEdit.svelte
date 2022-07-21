@@ -1,4 +1,7 @@
 <script>
+    // Import the event dispatcher such that we can update the pipeline parameters.
+    import { createEventDispatcher } from 'svelte';
+
     // Import the required components.
     import Modal from "./Modal.svelte";
     import WorkButton from "./WorkButton.svelte";
@@ -8,6 +11,9 @@
 
     // The required variables.
     export let active, pipelineId;
+
+    // Dispatcher to notify parents that the pipeline config has changed.
+    const dispatch = createEventDispatcher();
     
     // Whether or not the edit is in progress.
     let editProgress, modal, binding = "Loading...", disabled = true, errorText;
@@ -18,7 +24,7 @@
             load(pipelineId);
         }
     }
-
+    
     /**
      * Loads the config.
      */
@@ -50,6 +56,7 @@
         editProgress = true;
         call("POST", `/api/pipelines/${pipelineId}/config`, config)
             .then(_ => {
+                dispatch("pipelineEdit");
                 modal.closeModal();
             })
             .catch(error => {
@@ -57,6 +64,9 @@
             })
             .finally(() => {
                 editProgress = false;
+                binding = "Loading...";
+                disabled = true;
+                errorText = undefined;
             });
     };
 </script>

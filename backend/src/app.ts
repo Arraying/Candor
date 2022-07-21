@@ -66,8 +66,8 @@ app.get("/api/pipelines/:pipelineId/config", getPipelineConfig);
 app.post("/api/pipelines/:pipelineId/config", setPipelineConfig);
 
 // Build routes.
-app.get("/api/builds/:pipelineId/:buildId/log", getPipelineLog);
-app.get("/api/builds/:pipelineId/:buildId/archived", getPipelineArchive);
+app.get("/api/runs/:pipelineId/:buildId/log", getPipelineLog);
+app.get("/api/runs/:pipelineId/:buildId/archived", getPipelineArchive);
 
 // Trigger routes.
 app.post("/trigger/:token", trigger);

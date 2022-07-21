@@ -68,7 +68,7 @@
         const response = await call("GET", `/api/pipelines/${pipelineId}`);
         // Handle non 200.
         if (response.status !== 200) {
-            console.error(`Received status ${response.status} loading pipeline`);
+            console.error(`Received status ${response.status} loading pipeline ${pipelineId}`);
             throw new Error(`Get pipeline response status ${response.status}`);
         }
         // Here, it is a valid pipeline.
@@ -160,7 +160,7 @@
                     <PipelineLog active={showLog} {pipelineId} runId={showLogRun} on:closeModal={() => showLog = false}/>
                     {#if pipeline.assigned}
                         <PipelineRun active={showRun} trigger={pipeline.trigger} requiredParameters={pipeline.requiredParameters} on:closeModal={() => showRun = false} on:pipelineRun={executePipelineRefresh}/>
-                        <PipelineEdit active={showConfig} {pipelineId} on:closeModal={() => {showConfig = false}}/>
+                        <PipelineEdit active={showConfig} {pipelineId} on:closeModal={() => {showConfig = false}} on:pipelineEdit={executePipelineRefresh}/>
                         <div class="field is-grouped mt-5">
                             <p class="control">
                                 <WorkButton inProgress={pipeline.running} titleInProgress={"Run in progress..."} titleNormal={"Run"} on:click={() => showRun = true}/>
