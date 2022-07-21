@@ -12,7 +12,7 @@
     /**
      * Closes the modal.
      */
-    const closeModal = () => {
+    export const closeModal = () => {
         active = false;
         dispatch("closeModal");
     };
@@ -26,19 +26,7 @@
         }
     }
 
-    /**
-     * Only closes the modal if the key is escape and it is closeable.
-     * @param event The keyboard event.
-     */
-    const closeModalKeyboard = (event) => {
-        if (event.key === 'Escape' && closeable) {
-            closeModal();
-        }
-    }
-
 </script>
-
-<svelte:window on:keydown={closeModalKeyboard} />
 
 <div class="modal is-clipped" class:is-active={active}>
     <div class="modal-background" on:click={closeModalSoft} on:keydown={closeModalSoft}/>

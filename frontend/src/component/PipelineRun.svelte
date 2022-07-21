@@ -19,10 +19,9 @@
         active = false;
         parameterBindings = {};
     };
-
 </script>
 
-<Modal {active} closeable={false}>
+<Modal {active} on:closeModal>
     <form on:submit|preventDefault={run} class="box">
         {#each requiredParameters as requiredParameter}
             <div class="field">

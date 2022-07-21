@@ -2,6 +2,7 @@
     // Import required components.
     import Loading from "./Loading.svelte";
     import Modal from "./Modal.svelte";
+    import PipelineEdit from "./PipelineEdit.svelte";
     import PipelineBlock from "./PipelineBlock.svelte";
     import PipelineRun from "./PipelineRun.svelte";
     import PipelineRuns from "./PipelineRuns.svelte";
@@ -186,15 +187,16 @@
                         </div>
                     </PipelineBlock>
                     <PipelineRun active={showRun} requiredParameters={pipeline.required_parameters} on:closeModal={() => showRun = false}/>
+                    <PipelineEdit active={showConfig} {pipelineId} on:closeModal={() => {showConfig = false}}/>
+                    <div class="field is-grouped mt-5">
+                        <p class="control">
+                            <button class="button is-black" on:click|preventDefault={() => showRun = true}>Run</button>
+                        </p>
+                        <p class="control">
+                            <button class="button is-light" on:click|preventDefault={() => showConfig = true}>Edit Configuration</button>
+                        </p>
+                    </div>
                 {/await}
-                <div class="field is-grouped mt-5">
-                    <p class="control">
-                        <button class="button is-black" on:click|preventDefault={() => showRun = true}>Run</button>
-                    </p>
-                    <p class="control">
-                        <button class="button is-light" on:click|preventDefault={() => showConfig = true}>Edit Configuration</button>
-                    </p>
-                </div>
             </div>
         </div>
     </div>
