@@ -5,13 +5,10 @@
     import WorkButton from "./WorkButton.svelte";
 
     // The required variables.
-    export let active;
-    export let pipelineId;
+    export let active, pipelineId;
     
     // Whether or not the edit is in progress.
-    let editProgress;
-    let modal;
-    let binding;
+    let editProgress, modal, binding;
 
     // The promise for loading.
     $: promise = load(pipelineId);

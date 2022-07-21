@@ -13,6 +13,7 @@
     // Create the event dispatcher.
     const dispatch = createEventDispatcher();
 </script>
+
 <nav class="navbar is-black" aria-label="main navigation">
     <div class="navbar-brand">
         <a href="/" class="navbar-item is-size-4" on:click|preventDefault={() => dispatch("goPipelines")}>

@@ -3,8 +3,7 @@
     import { createEventDispatcher } from 'svelte';
 
     // Keep track of if it is active.
-    export let active;
-    export let closeable = true;
+    export let active, closeable = true;
 
     // Dispatcher to notify parents that the modal was closed.
     const dispatch = createEventDispatcher();

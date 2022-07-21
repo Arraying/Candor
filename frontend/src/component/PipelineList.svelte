@@ -5,6 +5,8 @@
     // Import required components.
     import Loading from "./Loading.svelte";
     import PipelineListEntry from "./PipelineListEntry.svelte";
+
+    // Keep track of state variables.
     import { User, Pipelines } from "../store";
 
     // Keep track of the username.

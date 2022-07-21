@@ -1,7 +1,6 @@
 <script>
     // Keep track of the title and subtitle.
-    export let title;
-    export let subtitle;
+    export let title, subtitle;
 </script>
 
 <h1 class="title is-size-5">

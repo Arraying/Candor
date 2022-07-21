@@ -8,8 +8,7 @@
     import PipelineRuns from "./PipelineRuns.svelte";
 
     // Which pipeline to show.
-    export let pipelineId;
-    export let pipelineName;
+    export let pipelineId, pipelineName;
     
     // Activity depends on the state of the pipeline, only show if we have a pipeline selected.
     $: active = pipelineId !== undefined;
@@ -18,8 +17,7 @@
     $: promise = loadPipeline(pipelineId);
 
     // Keep track of the modals.
-    let showRun = false;
-    let showConfig = false;
+    let showRun = false, showConfig = false;
 
     async function loadPipeline(id) {
         return new Promise((resolve, _) => {

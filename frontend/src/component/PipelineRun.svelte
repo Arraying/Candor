@@ -4,12 +4,10 @@
     import WorkButton from "./WorkButton.svelte";
 
     // The required variables.
-    export let active;
-    export let requiredParameters;
+    export let active, requiredParameters;
     
     // Whether or not the run is in progress.
-    let runProgress;
-    let parameterBindings = {};
+    let runProgress, parameterBindings = {};
 
     /**
      * Runs the pipeline with the provided parameters.
