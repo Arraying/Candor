@@ -14,12 +14,12 @@ const region = "eu-west-1";
  * Archives all the required files to S3 storage.
  * @param client The Docker client.
  * @param lastSuccessfulContainer The ID of the last successfully exited contianer.
- * @param tag The tag for the pipeline run.
+ * @param runId The run ID for the pipeline run.
  * @param toArchive A non-null array of file paths to archive.
  * @param cleaner The cleaner.
  * @returns A promise of void.
  */
-export async function archiveFiles(client: Dockerode, lastSuccessfulContainer: string, tag: string, toArchive: string[], cleaner: Cleaner): Promise<void> {
+export async function archiveFiles(client: Dockerode, lastSuccessfulContainer: string, runId: string, toArchive: string[], cleaner: Cleaner): Promise<void> {
     // Create a temporary directory which will be used to copy the files from the container.
     const { name, removeCallback } = tmp.dirSync({ unsafeCleanup: true });
     // Clean it up at the end.
@@ -84,7 +84,7 @@ export async function archiveFiles(client: Dockerode, lastSuccessfulContainer: s
             continue;
         }
         // The path of the file in S3 storage.
-        const archivedPath = `${tag}/${baseName}`;
+        const archivedPath = `${runId}/${baseName}`;
         // Write the file to S3.
         await s3.fPutObject(bucket, archivedPath, realFileName);
     }

@@ -65,14 +65,11 @@ When sending a pipeline request to a runner, the following format is required:
 ```json
 {
     "runId": "12345",
-    "tag": "veryrandomtaghere",
     "plan": {}
 }
 ```
 The `runId` is optional (defaults to a random hex string).
 If the pipeline is being triggered by a panel or something that has a run ID, this will force the runner to use this ID to make debugging easier.
-The `tag` is also optional (defaults to "untagged"), and specifies some grouping of pipelines.
-Multiple pipeline plans can have the same tag, or they can each have their own.
 
 The following describes the current pipeline plan.
 
@@ -95,7 +92,7 @@ script | string[] | Yes | A possibly empty array of shell commands to execute in
 
 At the end of the pipeline, any file can be archived from the working directory and uploaded to S3 storage.
 
-Archived files will be uploaded to `tag/filename` in S3, where `tag` is the pipeline run's tag and `filename` is the base file name of the file to be archived. Note that when archiving, everything will be flattened: path structures in the working directory are disregarded. For example, `foo/bar.txt` and `baz/bar.txt` both resolve to `bar.txt` and will overwrite eachother. As a workaround, archived files should be renamed before achiving. Furthermore, if folders are specified, these will be skipped and not uploaded to S3.
+Archived files will be uploaded to `runId/filename` in S3, where `runId` is the pipeline run's ID and `filename` is the base file name of the file to be archived. Note that when archiving, everything will be flattened: path structures in the working directory are disregarded. For example, `foo/bar.txt` and `baz/bar.txt` both resolve to `bar.txt` and will overwrite eachother. As a workaround, archived files should be renamed before achiving. Furthermore, if folders are specified, these will be skipped and not uploaded to S3.
 
 ## Container Runtimes
 
