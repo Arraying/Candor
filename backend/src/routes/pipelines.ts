@@ -57,6 +57,7 @@ interface PipelineListEntry {
  * - id: The ID of the pipeline.
  * - name: The name of the pipeline.
  * - running: Whether this pipeline is running at the moment.
+ * - public: Whether the pipeline is public.
  * - lastRuns: A list of the last 5 pipeline runs.
  * - trigger: The secret trigger, only visible to assignees.
  * - assignees: A list of assignee names.
@@ -67,6 +68,7 @@ interface PipelineDetailEntity {
     id: number
     name: string
     running: boolean
+    public: boolean
     lastRuns: PipelineRunEntry[]
     trigger: string
     assignees: string[]
@@ -190,6 +192,7 @@ export async function getPipeline(req: Request, res: Response) {
         id: queriedPipeline.id,
         name: queriedPipeline.name,
         running: running.has(queriedPipeline.id),
+        public: queriedPipeline.public,
         lastRuns: [
             {
                 id: "123abc",
