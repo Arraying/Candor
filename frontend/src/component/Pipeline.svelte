@@ -30,7 +30,7 @@
                             id: "3421fa3a",
                             start: 1017309600000,
                             finish: 1017309900000,
-                            artifacts: [
+                            archived: [
                                 "server.jar",
                                 "client.jar",
                             ],
@@ -54,7 +54,7 @@
                             id: "3bc0969a",
                             start: 1017309600000,
                             finish: 1017309900000,
-                            artifacts: [
+                            archived: [
                                 "server.jar",
                                 "client.jar",
                                 "instructions.md",
@@ -79,7 +79,7 @@
                             id: "b21152cc",
                             start: 1017309600000,
                             finish: 1017309900000,
-                            artifacts: [
+                            archived: [
                                 "server.jar",
                                 "client.jar",
                             ],
@@ -99,7 +99,7 @@
                             id: "60bc7afa",
                             start: 1017309600000,
                             finish: 1017309900000,
-                            artifacts: [
+                            archived: [
                                 "server.jar",
                             ],
                             status: "Passed",
@@ -118,7 +118,7 @@
                             id: "a93675a2",
                             start: 1017309600000,
                             finish: 1017309900000,
-                            artifacts: [
+                            archived: [
                                 "server.jar",
                             ],
                             status: "Passed",
@@ -162,7 +162,7 @@
                     <Loading />
                 {:then pipeline}
                     <PipelineBlock title={"Recent Runs"} subtitle={"The last 5 are shown"}>
-                        <PipelineRuns runs={pipeline.lastRuns}/>
+                        <PipelineRuns {pipelineId} runs={pipeline.lastRuns}/>
                     </PipelineBlock>
                     <PipelineBlock title={"Trigger URL"} subtitle={"Runs this pipeline"}>
                         <blockquote>
