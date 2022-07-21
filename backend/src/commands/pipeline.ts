@@ -10,7 +10,9 @@ import { User } from "../entities/User";
  */
 export async function pipelineList(_: string[]): Promise<boolean> {
     const repository = AppDataSource.manager.getRepository(Pipeline);
-    const pipelines = await repository.find();
+    const pipelines = await repository.find({
+        relations: ["assignees"],
+    });
     console.log("Here is a list of pipelines:")
     for (const pipeline of pipelines) {
         pipelinePrint(pipeline);
