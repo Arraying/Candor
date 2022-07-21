@@ -63,7 +63,7 @@
                 <td>
                     <div class="tags">
                         {#each run.archived as archived}
-                            <a href="/api/pipeline/{pipelineId}/archived" download="{pipelineId}-{run.id}-archive.tar.gz" class="tag is-link is-light">{archived}</a>
+                            <a href="/api/builds/{pipelineId}/${run.id}/archived" download="{pipelineId}-{run.id}-archive.tar.gz" class="tag is-link is-light">{archived}</a>
                         {/each}
                     </div>
                 </td>

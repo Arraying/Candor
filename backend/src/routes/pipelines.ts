@@ -211,3 +211,13 @@ export async function setPipelineConfig(req: Request, res: Response) {
     // TODO: Permissions.
     res.sendStatus(200);
 }
+
+export async function getPipelineArchive(req: Request, res: Response) {
+    // TODO: Implement.
+    res.download(__filename);
+}
+
+export async function getPipelineLog(req: Request, res: Response) {
+    // TODO: Implement.
+    res.send("No log");
+}

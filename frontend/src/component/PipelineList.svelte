@@ -29,11 +29,14 @@
      */
     async function loadPipelines() {
         const response = await call("GET", "/api/pipelines");
+        // If non 200, handle this.
         if (response.status !== 200) {
             console.error(`Received status ${response.status} loading pipelines`);
             return [];
         }
-        return await response.json();
+        // Define the pipelines so they can be sorted.
+        const pipelines = await response.json();
+        return pipelines.sort((left, right) => left.name.localeCompare(right.name));
     }
 </script>
 
