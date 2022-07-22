@@ -63,11 +63,12 @@ export async function run(req: Request): Promise<void> {
  * @returns A promise of a run object.
  */
 async function performRun(runId: string, pipeline: Pipeline, parameters: any): Promise<Run> {
+    const pipelineId = pipeline.id;
     // Get a compatible runner, if possible.
     const runner = await getCompatibleRunner();
     if (!runner) {
         // Delegate failure.
-        return makeFailedRun(runId, "Get Runner");
+        return makeFailedRun(pipelineId, runId, "Get Runner");
     }
     // Get the plan.
     const plan = await generateRequestData(runId, pipeline.plan, parameters);
@@ -84,7 +85,7 @@ async function performRun(runId: string, pipeline: Pipeline, parameters: any): P
     } catch (error) {
         // Wrap the error and delegate it again.
         console.error(error);
-        return makeFailedRun(runId, "Connect Runner");
+        return makeFailedRun(pipelineId, runId, "Connect Runner");
     }
     const finish = Date.now();
     // Status code 400 means the token or plan is invalid.
@@ -92,16 +93,17 @@ async function performRun(runId: string, pipeline: Pipeline, parameters: any): P
     if (runnerResponse.status === 400) {
         console.log(runnerResponse);
         // Delegate.
-        return makeFailedRun(runId, `Error ${runnerResponse.status}`);
+        return makeFailedRun(pipelineId, runId, `Error ${runnerResponse.status}`);
     }
     // Status code 401 means the token is incorrect.
     if (runnerResponse.status === 401) {
         // Delegate.
-        return makeFailedRun(runId, "Auth Runner");
+        return makeFailedRun(pipelineId, runId, "Auth Runner");
     }
     const outcome = runnerResponse.data;
     // Turn this outcome into a real run.
     const run = new Run();
+    run.pipeline = pipelineId;
     run.run_id = runId;
     run.runner = runner.id;
     run.start = start.toString();
@@ -194,12 +196,14 @@ async function generateRequestData(runId: string, config: any, parameters: any) 
 
 /**
  * Creates a fake failed run for a generic configuration issue.
+ * @param pipelineId The pipeline ID.
  * @param runId The run ID.
  * @param whatFailed A short description of what failed, this will become a stage.
  * @returns A run.
  */
-function makeFailedRun(runId: string, whatFailed: string): Run {
+function makeFailedRun(pipelineId: number, runId: string, whatFailed: string): Run {
     const run = new Run();
+    run.pipeline = pipelineId;
     run.run_id = runId;
     const time = Date.now().toString();
     run.start = time;

@@ -13,6 +13,13 @@ export class Run {
     id!: number;
 
     /**
+     * The ID of the pipeline.
+     * Joining is not required here.
+     */
+    @Column({nullable: false})
+    pipeline!: number
+
+    /**
      * The ID of the run, unique.
      */
     @Column({nullable: false})
@@ -43,5 +50,5 @@ export class Run {
      * The runner's response.
      */
     @Column({type: "json"})
-    outcome!: Object;
+    outcome!: any;
 }

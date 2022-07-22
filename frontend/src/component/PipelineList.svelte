@@ -51,11 +51,32 @@
                 <table class="table is-size-5 is-fullwidth is-hoverable" transition:fade|local>
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th><abbr title="Aggregated over all stages">Status</abbr></th>
-                            <th>Stages</th>
-                            <th>Last success</th>
-                            <th>Last failure</th>
+                            <th>
+                                <span class="is-pulled-left">
+                                    Name
+                                </span>
+                            <th>
+                                <span class="is-pulled-left">
+                                    <abbr title="Aggregated over all stages">
+                                        Status
+                                    </abbr>
+                                </span>
+                            </th>
+                            <th>
+                                <span class="is-pulled-left">
+                                    Stages
+                                </span>
+                            </th>
+                            <th>
+                                <span class="is-pulled-left">
+                                    Last success
+                                </span>
+                            </th>
+                            <th>
+                                <span class="is-pulled-left">
+                                    Last failure
+                                </span>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>

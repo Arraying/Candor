@@ -28,12 +28,14 @@
         {pipeline.name}
     </td>
     <td>
-        {pipeline.status}
+        {pipeline.status ? pipeline.status : "-"}
     </td>
     <td>
-        {#each pipeline.stages as stage}
-            <Status status={stage}/>
-        {/each}
+        {#if pipeline.stages}
+            {#each pipeline.stages as stage}
+                <Status status={stage}/>
+            {/each}
+        {/if}
     </td>
     <td>
         <Timestamp millis={pipeline.lastSuccess}/>

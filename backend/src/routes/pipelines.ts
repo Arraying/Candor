@@ -5,6 +5,7 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { Pipeline } from "../entities/Pipeline";
+import { Run } from "../entities/Run";
 import { User } from "../entities/User";
 import { running } from "../running";
 import { isConfigValid } from "../validation";
@@ -45,10 +46,10 @@ const dummyLastBuild = {
 interface PipelineListEntry {
     id: number
     name: string
-    status: "Passed" | "Failed" | "Error"
-    stages: ("Success" | "Failed" | "Error" | "Skipped")[]
-    lastSuccess: number
-    lastFailure: number
+    status?: "Passed" | "Failed" | "Error"
+    stages?: ("Success" | "Failed" | "Error" | "Skipped")[]
+    lastSuccess?: number
+    lastFailure?: number
 }
 
 /**
@@ -118,7 +119,7 @@ export async function listPipelines(req: Request, res: Response) {
         relations: ["assignees"]
     });
     // Obtain the pipelines.
-    const pipelines = allPipelines
+    const pipelinesRaw = allPipelines
         // Get the ones accessible to the user.
         .filter((pipeline: Pipeline): boolean => {
             // If it is public it should definitely be included.
@@ -134,20 +135,36 @@ export async function listPipelines(req: Request, res: Response) {
                 // Include iff they match up.
                 return user.id === req.session.user.id;
             });
-        })
-        // Extract only required information.
-        .map((pipeline: Pipeline): PipelineListEntry => {
-            // TODO.
-            const lastBuild = dummyLastBuild;
-            return {
-                id: pipeline.id,
-                name: pipeline.name,
-                status: <"Passed"> lastBuild.status,
-                stages: lastBuild.stages.map((stage: any) => stage.status),
-                lastSuccess: -1,
-                lastFailure: -1,
-            };
         });
+    // Promise wizardry.
+    const pipelines = await Promise.all(pipelinesRaw.map(async (pipeline: Pipeline): Promise<PipelineListEntry> => {
+        // Query the runs.
+        const runs = await AppDataSource.getRepository(Run).find({
+            // Get runs from this pipeline.
+            where: {
+                pipeline: pipeline.id,
+            },
+            // Order by most recent finish time first.
+            order: {
+                finish: "DESC",
+            },
+        });
+        // Turn into single runs.
+        const lastRun = runs[0];
+        const lastSuccess = runs.find((run: Run): boolean => run.outcome.status === "Passed");
+        const lastFailure = runs.find((run: Run): boolean => run.outcome.status === "Failed");
+        return {
+            // Basic information.
+            id: pipeline.id,
+            name: pipeline.name,
+            // Only if it has run before.
+            status: lastRun?.outcome.status,
+            stages: lastRun?.outcome.stages.map((stage: any): string => stage.status),
+            // Again, only if applicable.
+            lastSuccess: lastSuccess ? parseInt(lastSuccess.finish) : undefined,
+            lastFailure: lastFailure ? parseInt(lastFailure.finish) : undefined,
+        };
+    }));
     res.send(pipelines);
 }
 
