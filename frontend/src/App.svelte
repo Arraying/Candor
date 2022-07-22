@@ -9,9 +9,6 @@
 	import Pipeline from "./component/Pipeline.svelte";
 	import PipelineList from "./component/PipelineList.svelte";
 
-	// Svelte hooks.
-	import { onMount } from "svelte";
-
 	// Import stateful information.
 	import { me } from "./session";
 
@@ -22,6 +19,7 @@
 	// Keep track of the currently selected pipeline.
 	let pipelineId;
 	let pipelineName;
+	let pipelineList;
 
 	// Keep track of the login process.
 	let mePromise = me();
@@ -42,6 +40,14 @@
 		pipelineId = data.detail.id;
 		pipelineName = data.detail.name;
 	}
+
+	/**
+	 * Triggered when the pipeline is closed, updates the list of pipelines.
+	 */
+	const closePipeline = () => {
+		pipelineId = undefined;
+		pipelineList.update();
+	}
 </script>
 
 <main class="app">
@@ -56,8 +62,8 @@
 	{#await mePromise}
 		<Loading />
 	{:then}
-		<Pipeline {pipelineId} {pipelineName} on:closeModal={() => pipelineId = undefined}/>
-		<PipelineList on:pipelineSelect={(event) => selectPipeline(event)}/>
+		<Pipeline {pipelineId} {pipelineName} on:closeModal={closePipeline}/>
+		<PipelineList on:pipelineSelect={(event) => selectPipeline(event)} bind:this={pipelineList}/>
 	{:catch}
 		Could not load self, is the server down?
 	{/await}

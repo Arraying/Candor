@@ -1,7 +1,4 @@
 <script>
-    // Import required Svelte features.
-    import { fade } from "svelte/transition";
-
     // Import required components.
     import Loading from "./Loading.svelte";
     import PipelineListEntry from "./PipelineListEntry.svelte";
@@ -22,6 +19,13 @@
         // The short loading flash is okay here.
         promise = loadPipelines();
     });
+
+    /**
+     * Updates the list of pipelines.
+     */
+    export function update() {
+        promise = loadPipelines();
+    }
 
     /**
      * Loads all pipelines.
@@ -48,7 +52,7 @@
             <Loading />
         {:then overviews}
             <div class="overflow-container">
-                <table class="table is-size-5 is-fullwidth is-hoverable" transition:fade|local>
+                <table class="table is-size-5 is-fullwidth is-hoverable">
                     <thead>
                         <tr>
                             <th>
