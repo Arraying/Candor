@@ -24,10 +24,13 @@ const configSchema = {
         constrainBody: {
             description: "Body values required to run the pipeline",
             type: "object",
-            properties: {},
+            properties: {
+            },
+            additionalProperties: true,
         },
         parameters: {
             description: "Parameters that can be used within the pipeline",
+            type: "object",
             patternProperties: {
                 "^[a-zA-Z_-]+$": {
                     description: "Keys represent the name, values the JSPath",
@@ -107,7 +110,7 @@ const configSchema = {
     ]
 }
 
-const validator = new ajv({ allErrors: true });
+const validator = new ajv({ allErrors: true, allowUnionTypes: true });
 const validate = validator.compile(configSchema);
 
 /**

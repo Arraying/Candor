@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import crypto from "crypto";
+import jspath from "jspath";
 import { Request } from "express";
 import { AppDataSource } from "./data-source";
 import { Pipeline } from "./entities/Pipeline";
@@ -39,6 +40,20 @@ export async function constraintsMet(req: Request): Promise<boolean> {
         const expected = Array.isArray(compare) ? compare : [compare];
         // If it's not met, reject.
         if (!expected.includes(actual)) {
+            return false;
+        }
+    }
+    // See if the body constraints are met.
+    for (const required in body) {
+        const expected = body[required];
+        try {
+            const actual = jspath.apply(required, req.body);
+            // If it's not met, reject.
+            if (actual !== expected) {
+                return false;
+            }
+        } catch (error) {
+            console.warn(`[JSPath]: ${required} raised exception`);
             return false;
         }
     }
