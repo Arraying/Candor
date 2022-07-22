@@ -74,7 +74,9 @@ export async function run(req: Request): Promise<void> {
         return;
     }
     const pipeline = req.pipeline!;
-    const parameters: object = req.query;
+    const parameters = extractJSPathParameters(pipeline.plan, req.body);
+    // Overwrite the parameters with any querystrings.
+    Object.assign(parameters, req.query);
     // Create the run ID.
     const runId = crypto.randomBytes(4).toString("hex");
     console.log(`[${runId}] Preparing`);
@@ -273,6 +275,39 @@ function makeFailedRun(pipelineId: number, runId: string, whatFailed: string): R
         }],
     };
     return run;
+}
+
+/**
+ * Extracts parameters from the request body using JSPath.
+ * @param plan The pipeline plan.
+ * @param body The request body.
+ * @returns An object of all the parameters.
+ */
+function extractJSPathParameters(plan: any, body: any): any {
+    // If none are specified, that's fine too.
+    if (!plan.parameters) {
+        return {};
+    }
+    const map = new Map<string, string>();
+    // Go through each parameter.
+    for (const parameter in plan.parameters) {
+        const path = plan.parameters[parameter]
+        // If this is a manual variable, skip.
+        if (!path) {
+            continue;
+        }
+        try {
+            const result = jspath.apply(path, body);
+            // Always use the first one, even if it is an array.
+            // Also convert to string, because otherwise this will be a headache.
+            map.set(parameter, result ? result[0].toString() : undefined);
+        } catch (error) {
+            console.warn(`[JSPath]: ${parameter} raised exception`);
+            return false;
+        }
+    }
+    // Return the result.
+    return Object.fromEntries(map);
 }
 
 /**

@@ -34,7 +34,7 @@ const configSchema = {
             patternProperties: {
                 "^[a-zA-Z_-]+$": {
                     description: "Keys represent the name, values the JSPath",
-                    type: "string",
+                    type: [ "string", "null" ],
                 },
             },
             additionalProperties: false,

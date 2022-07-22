@@ -26,7 +26,7 @@
         // Convert to queryString.
         const queryString = requiredParameters.length > 0 ? `?${new URLSearchParams(parameterBindings).toString()}` : "";
         // Execute request.
-        call("POST", `/trigger/${trigger}${queryString}`, {})
+        call("POST", `/trigger/${trigger}${queryString}`, { source: "Web" })
             .then(_ => {
                 modal.closeModal();
                 dispatch("pipelineRun");
@@ -49,7 +49,7 @@
                     {requiredParameter}
                 </label>
                 <div class="control">
-                    <input type="text" class="input" bind:value={parameterBindings[requiredParameter]} required>
+                    <input type="text" class="input" bind:value={parameterBindings[requiredParameter]} placeholder="Leave blank to infer">
                 </div>
             </div>
         {/each}
