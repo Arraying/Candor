@@ -4,7 +4,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
  * Represents a pipeline run.
  */
 @Entity("runs")
-export class Runs {
+export class Run {
 
     /**
      * The auto incremented primary key.

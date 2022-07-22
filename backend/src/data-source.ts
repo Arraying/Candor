@@ -4,6 +4,7 @@ import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { Assignment } from "./entities/Assignment";
 import { Pipeline } from "./entities/Pipeline";
+import { Run } from "./entities/Run";
 import { Runner } from "./entities/Runner";
 import { User } from "./entities/User";
 
@@ -27,7 +28,7 @@ export const AppDataSource = new DataSource({
     // Other settings.
     synchronize: false,
     logging: false,
-    entities: [Runner, Pipeline, User, Assignment],
+    entities: [Runner, Pipeline, User, Assignment, Run],
     migrations: [migrations],
     subscribers: [],
 })

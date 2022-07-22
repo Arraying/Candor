@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { running } from "../running";
+import { canRun, run } from "../running";
 
 // TODO: Guarantees and thread safety.
 
@@ -10,18 +10,16 @@ import { running } from "../running";
  * @returns Nothing.
  */
 export async function trigger(req: Request, res: Response) {
-   // Get the pipeline.
-   const queriedPipeline = req.pipeline!;
-   // Reject if the pipeline is already running.
-   if (running.has(queriedPipeline.id)) {
+   // Reject if the pipeline cannot run.
+   if (!await canRun(req)) {
       res.sendStatus(400);
       return;
    }
-   // TODO: Actually run.
-   running.add(queriedPipeline.id);
-   setTimeout(() => {
-         running.delete(queriedPipeline.id);
-   }, 20000);
+   // Run the pipeline.
+   run(req).catch(error => {
+      console.error(error);
+   });
+   // Don't wait for it to be done, just send the status now.
    res.sendStatus(200);
 }
 

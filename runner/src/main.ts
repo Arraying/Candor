@@ -46,10 +46,6 @@ app.post("/run", async (req: Request, res: Response) => {
     if (!request.runId) {
         request.runId = crypto.randomBytes(6).toString("hex");
     }
-    // Set the name to untagged if there is no associated name.
-    if (!request.tag) {
-        request.tag = "untagged";
-    }
     // Check if the plan is valid.
     if (request.plan == null || !isPlanValid(request.plan)) {
         res.sendStatus(400);

@@ -25,7 +25,7 @@ export async function archiveFiles(client: Dockerode, lastSuccessfulContainer: s
     // Clean it up at the end.
     cleaner.addJob(async (): Promise<void> => removeCallback());
     // Check if there even is anything to archive.
-    if (!toArchive) {
+    if (toArchive.length === 0) {
         return [];
     }
     const result = [];

@@ -7,6 +7,7 @@ import { AppDataSource } from "../data-source";
 import { Pipeline } from "../entities/Pipeline";
 import { User } from "../entities/User";
 import { running } from "../running";
+import { isConfigValid } from "../validation";
 
 // TODO: Remove.
 const dummyLastBuild = {
@@ -232,11 +233,16 @@ export async function getPipelineConfig(req: Request, res: Response) {
 export async function setPipelineConfig(req: Request, res: Response) {
     const repository = AppDataSource.getRepository(Pipeline);
     const queriedPipeline = req.pipeline!;
-    // Update the plan.
     const newPlan = req.body;
+    // Make sure it is valid first!
+    if (!isConfigValid(newPlan)) {
+        res.send({ valid: false });
+        return;
+    }
+    // Update!
     queriedPipeline.plan = newPlan;
     await repository.save(queriedPipeline);
-    res.sendStatus(200);
+    res.send({ valid: true });
 }
 
 export async function getPipelineArchive(req: Request, res: Response) {

@@ -41,7 +41,7 @@
     /**
      * Saves the config.
      */
-    const save = () => {
+    const save = async () => {
         if (!binding) {
             errorText = "The config may not be empty!";
             return;
@@ -54,20 +54,17 @@
             return;
         }
         editProgress = true;
-        call("POST", `/api/pipelines/${pipelineId}/config`, config)
-            .then(_ => {
-                dispatch("pipelineEdit");
-                modal.closeModal();
-            })
-            .catch(error => {
-                console.log(error);
-            })
-            .finally(() => {
-                editProgress = false;
-                binding = "Loading...";
-                disabled = true;
-                errorText = undefined;
-            });
+        const response = await call("POST", `/api/pipelines/${pipelineId}/config`, config);
+        const validity = await response.json();
+        if (validity.valid) {
+            dispatch("pipelineEdit");
+            modal.closeModal();
+            errorText = undefined;
+            disabled = true;
+        } else {
+            errorText = "The config schema is invalid!";
+        }
+        editProgress = false;
     };
 </script>
 
