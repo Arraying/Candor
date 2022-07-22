@@ -79,7 +79,7 @@ app.get("/api/runs/:pipelineId/:runId/log", pipelineInspect, getPipelineLog);
 app.get("/api/runs/:pipelineId/:runId/archived", pipelineInspect, getPipelineArchive);
 
 // Trigger routes.
-app.post("/trigger/:token", pipelineInteract, trigger);
-app.post("/trigger/:token/github", pipelineInteract, triggerWithGitHub);
+app.post("/trigger/:token", trigger);
+app.post("/trigger/:token/github", triggerWithGitHub);
 
 export default app;
