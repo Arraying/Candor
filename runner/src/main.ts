@@ -29,9 +29,15 @@ makeLogDirectory();
 const app = express();
 
 // Add the authentication middleware.
-app.use(authorizationMiddleware);
+// Exclude root.
+app.use("/.+", authorizationMiddleware);
 // Add the JSON middleware to handle bodies.
 app.use(express.json());
+
+app.get("/", (req: Request, res: Response) => {
+    res.sendStatus(200);
+    return;
+})
 
 // Add the route to run the pipeline.
 app.post("/run", async (req: Request, res: Response) => {

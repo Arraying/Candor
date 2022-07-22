@@ -59,7 +59,7 @@ app.use(expressSession({
 }));
 
 // Protect and simplify routes that interact modify the pipeline.
-app.use("/api/pipelines/:pipelineId/*", pipelineInteract);
+app.use("/api/pipelines/:pipelineId/.+", pipelineInteract);
 app.use("/trigger/:token", pipelineInteract);
 
 // Allow reverse proxy in production.
