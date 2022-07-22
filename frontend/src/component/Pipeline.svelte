@@ -75,7 +75,7 @@
         const pipeline = await response.json();
         // Quickly compute durations.
         pipeline.lastRuns.forEach(run => {
-            run.started = new Date(run.start).toString();
+            run.started = new Date(run.start).toLocaleString("de-DE");
             run.duration = relativeTimeDifference(run.finish, run.start);
         })
         return pipeline;

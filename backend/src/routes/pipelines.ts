@@ -204,6 +204,29 @@ export async function getPipeline(req: Request, res: Response) {
     // Extract the required parameters.
     const parameterObject = (queriedPipeline.plan as any)?.parameters;
     const parameters = parameterObject ? Object.keys(parameterObject) : [];
+    // Get the last few runs.
+    const runsRaw = await AppDataSource.getRepository(Run).find({
+        // Get runs from this pipeline.
+        where: {
+            pipeline: queriedPipeline.id,
+        },
+        order: {
+            finish: "DESC",
+        },
+        // Limit to 5.
+        take: 5,
+    });
+    // Convert the runs to the correct format.
+    const runs = runsRaw.map((run: Run): PipelineRunEntry => {
+        return {
+            id: run.run_id,
+            start: parseInt(run.start),
+            finish: parseInt(run.finish),
+            status: run.outcome.status,
+            stages: run.outcome.stages || [],
+            archived: run.outcome.archived || [],
+        };
+    })
     // Make the pipeline.
     const pipeline: PipelineDetailEntity = {
         assigned: isUserAssigned,
@@ -211,19 +234,7 @@ export async function getPipeline(req: Request, res: Response) {
         name: queriedPipeline.name,
         running: running.has(queriedPipeline.id),
         public: queriedPipeline.public,
-        lastRuns: [
-            {
-                id: "123abc",
-                start: 1658417618000,
-                finish: 1658417738000,
-                status: "Passed",
-                stages: [{
-                    name: "Compile",
-                    status: "Success",
-                }],
-                archived: ["Foo.js"],
-            },
-        ], // TODO
+        lastRuns: runs,
         trigger: isUserAssigned ? queriedPipeline.token : "hidden",
         assignees: queriedPipeline.assignees.map((user: User): string => user.name),
         requiredParameters: parameters,

@@ -18,6 +18,7 @@
     const log = (runId) => {
         dispatch("showLog", { runId: runId });
     };
+    console.log(runs);
 </script>
 
 <table class="table is-fullwidth">
