@@ -20,7 +20,7 @@ export function logCreate(runId: string): fs.WriteStream {
  * @param total The total number of steps.
  */
 export async function logHeader(writeStream: fs.WriteStream, index: number, total: number): Promise<void> {
-    const header = `\n${"*".repeat(16)} [${index + 1}/${total}] ${"*".repeat(16)}\n`;
+    const header = `${index !== 0 ? "\n" : ""}${"*".repeat(16)} [${index + 1}/${total}] ${"*".repeat(16)}\n`;
     await promiseWrite(writeStream, header);
 }
 

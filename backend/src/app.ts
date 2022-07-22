@@ -2,7 +2,7 @@ import cors from "cors";
 import express from "express";
 import expressSession from "express-session";
 import connectPgSimple from "connect-pg-simple";
-import { pipelineInteract } from "./middleware/security";
+import { pipelineInspect, pipelineInteract } from "./middleware/security";
 import { login, logout, me } from "./routes/auth";
 import { listPipelines, getPipeline, getPipelineConfig, setPipelineConfig, getPipelineLog, getPipelineArchive } from "./routes/pipelines";
 import { trigger, triggerWithGitHub } from "./routes/trigger";
@@ -75,8 +75,8 @@ app.get("/api/pipelines/:pipelineId/config", pipelineInteract, getPipelineConfig
 app.post("/api/pipelines/:pipelineId/config", pipelineInteract, setPipelineConfig);
 
 // Build routes.
-app.get("/api/runs/:pipelineId/:buildId/log", getPipelineLog);
-app.get("/api/runs/:pipelineId/:buildId/archived", getPipelineArchive);
+app.get("/api/runs/:pipelineId/:runId/log", pipelineInspect, getPipelineLog);
+app.get("/api/runs/:pipelineId/:runId/archived", pipelineInspect, getPipelineArchive);
 
 // Trigger routes.
 app.post("/trigger/:token", pipelineInteract, trigger);

@@ -6,8 +6,9 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { Pipeline } from "../entities/Pipeline";
 import { Run } from "../entities/Run";
+import { Runner } from "../entities/Runner";
 import { User } from "../entities/User";
-import { running } from "../running";
+import { log, run, running } from "../running";
 import { isConfigValid } from "../validation";
 
 // TODO: Remove.
@@ -279,8 +280,56 @@ export async function getPipelineArchive(req: Request, res: Response) {
     res.download(__filename);
 }
 
+/**
+ * Gets the pipeline log by requesting the runner than ran it.
+ * @param req The request.
+ * @param res The response.
+ */
 export async function getPipelineLog(req: Request, res: Response) {
-    // TODO: Implement.
-    // TODO: Permissions.
-    res.send("No log");
+    // Constants.
+    const pipelineId = req.pipeline?.id;
+    const runId = req.params.runId;
+    try {
+        // See if the run actually exists.
+        const run = await AppDataSource.getRepository(Run).findOneBy({
+            pipeline: pipelineId,
+            run_id: runId,
+        });
+        // If not, relay that.
+        if (!run) {
+            throw new Error("Run does not exist");
+        }
+        if (!run.runner) {
+            throw new Error("Runner no longer exists");
+        }
+        // Get the runner.
+        const runner = await AppDataSource.getRepository(Runner).findOneBy({
+            id: run.runner,
+        });
+        // Unlikely, but you never know.
+        if (!runner) {
+            throw new Error("Runner could not be found");
+        }
+        // Request the logs from the runner.
+        const logRequest = log(runner, runId);
+        logRequest
+            // Axios wizardry.
+            // Pipe the response from the runner directly into this response.
+            .then(response => {
+                response.data.pipe(res);
+            })
+            // Could happen, make sure to handle.
+            .catch(error => {
+                if (error.response && error.response.status === 404) {
+                    res.send("No log could be found (deleted on server)");
+                } else {
+                    console.error(error);
+                    res.send("An error occurred");
+                }
+            })
+
+    } catch (error) {
+        console.warn(`[${runId}] ${error}`);
+        res.send("No log could be found");
+    }
 }

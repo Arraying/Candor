@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import crypto from "crypto";
 import { Request } from "express";
 import { AppDataSource } from "./data-source";
@@ -51,6 +51,22 @@ export async function run(req: Request): Promise<void> {
         console.log(`[${runId}] Done`);
         running.delete(pipeline.id);
     }
+}
+
+/**
+ * Requests a log from the runner.
+ * @param runner The runner.
+ * @param runId The run ID.
+ * @returns A promise containing the response.
+ */
+export function log(runner: Runner, runId: string): Promise<AxiosResponse> {
+    return axios.get(getRunnerEndpoint(runner, `/logs/${runId}`), {
+        headers: {
+            Authorization: `Bearer ${process.env.RUNNER_TOKEN}`,
+        },
+        // Use a stream to pipe, and we also want to validate statuses.
+        responseType: "stream",
+    });
 }
 
 /**
@@ -189,7 +205,7 @@ async function generateRequestData(runId: string, config: any, parameters: any) 
         }
     });
     return {
-        runid: runId,
+        runId: runId,
         plan: config,
     };
 }
