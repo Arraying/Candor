@@ -22,7 +22,9 @@
 	let pipelineList;
 
 	// Keep track of the login process.
-	let mePromise = me();
+	let mePromise = me()
+		.then(_ => {})
+		.catch(_ => {})
 
 	/**
 	 * Shows the default modals.
