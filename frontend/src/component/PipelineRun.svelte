@@ -26,7 +26,7 @@
         // Convert to queryString.
         const queryString = requiredParameters.length > 0 ? `?${new URLSearchParams(parameterBindings).toString()}` : "";
         // Execute request.
-        call("POST", `/trigger/${trigger}${queryString}`)
+        call("POST", `/trigger/${trigger}${queryString}`, {})
             .then(_ => {
                 modal.closeModal();
                 dispatch("pipelineRun");

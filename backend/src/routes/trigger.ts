@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { canRun, run } from "../running";
+import { canRun, constraintsMet, run } from "../running";
 
 // TODO: Guarantees and thread safety.
 
@@ -13,6 +13,11 @@ export async function trigger(req: Request, res: Response) {
    // Reject if the pipeline cannot run.
    if (!await canRun(req)) {
       res.sendStatus(400);
+      return;
+   }
+   // Ignore if the constraints are not met.
+   if (!await constraintsMet(req)) {
+      res.sendStatus(204);
       return;
    }
    // Run the pipeline.

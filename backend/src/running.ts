@@ -22,6 +22,31 @@ export async function canRun(req: Request): Promise<boolean> {
     return req.pipeline != null && !running.has(req.pipeline.id);
 }
 
+
+export async function constraintsMet(req: Request): Promise<boolean> {
+    // This should never be the case.
+    if (!req.pipeline) {
+        return false;
+    }
+    // Defines the variables.
+    const plan = req.pipeline.plan as any;
+    const headers = plan.constrainHeaders || {};
+    const body = plan.constrainBody || {};
+    // See if header constraints are met.
+    for (const required in headers) {
+        const compare = headers[required];
+        const actual = req.headers[required.toLowerCase()];
+        const expected = Array.isArray(compare) ? compare : [compare];
+        // If it's not met, reject.
+        if (!expected.includes(actual)) {
+            return false;
+        }
+    }
+    // See if the body constraints are met.
+    // No problem.
+    return true;
+}
+
 /**
  * Runs the pipeline and saves the result.
  * The actual heavylifting is done in another method.
