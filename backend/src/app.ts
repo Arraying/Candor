@@ -58,10 +58,6 @@ app.use(expressSession({
     },
 }));
 
-// Protect and simplify routes that interact modify the pipeline.
-app.use("/api/pipelines/:pipelineId/.+", pipelineInteract);
-app.use("/trigger/:token", pipelineInteract);
-
 // Allow reverse proxy in production.
 if (process.env.NODE_ENV === "production") {
     app.set("trust proxy", 1);
@@ -75,15 +71,15 @@ app.post("/logout", logout);
 // Pipeline routes.
 app.get("/api/pipelines", listPipelines);
 app.get("/api/pipelines/:pipelineId", getPipeline);
-app.get("/api/pipelines/:pipelineId/config", getPipelineConfig);
-app.post("/api/pipelines/:pipelineId/config", setPipelineConfig);
+app.get("/api/pipelines/:pipelineId/config", pipelineInteract, getPipelineConfig);
+app.post("/api/pipelines/:pipelineId/config", pipelineInteract, setPipelineConfig);
 
 // Build routes.
 app.get("/api/runs/:pipelineId/:buildId/log", getPipelineLog);
 app.get("/api/runs/:pipelineId/:buildId/archived", getPipelineArchive);
 
 // Trigger routes.
-app.post("/trigger/:token", trigger);
-app.post("/trigger/:token/github", triggerWithGitHub);
+app.post("/trigger/:token", pipelineInteract, trigger);
+app.post("/trigger/:token/github", pipelineInteract, triggerWithGitHub);
 
 export default app;

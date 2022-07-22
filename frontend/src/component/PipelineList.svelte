@@ -24,7 +24,13 @@
      * Updates the list of pipelines.
      */
     export function update() {
-        promise = loadPipelines();
+        const refreshedPromise = loadPipelines();
+        // Only update later to avoid flashes.
+        refreshedPromise            
+            .catch(error => console.error(error))
+            .finally(() => {
+                promise = refreshedPromise;
+            });
     }
 
     /**

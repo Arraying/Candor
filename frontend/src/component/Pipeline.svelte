@@ -87,7 +87,7 @@
     function createRefresher() {
         return setInterval(() => {
             executePipelineRefresh();
-        }, 5000);
+        }, 2500);
     }
 
     /**
@@ -99,7 +99,7 @@
         // Wait for the promise to complete, and then use it as a drop-in replacement.
         // This will make it so the old information is still displayed while everything is being loaded.
         refreshedPromise
-            .catch(() => {}) // Ignore this.
+            .catch(error => console.error(error))
             .finally(() => {
                 promise = refreshedPromise;
             });
