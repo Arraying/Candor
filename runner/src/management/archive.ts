@@ -17,17 +17,18 @@ const region = "eu-west-1";
  * @param runId The run ID for the pipeline run.
  * @param toArchive A non-null array of file paths to archive.
  * @param cleaner The cleaner.
- * @returns A promise of void.
+ * @returns A promise of flat file names that were archived.
  */
-export async function archiveFiles(client: Dockerode, lastSuccessfulContainer: string, runId: string, toArchive: string[], cleaner: Cleaner): Promise<void> {
+export async function archiveFiles(client: Dockerode, lastSuccessfulContainer: string, runId: string, toArchive: string[], cleaner: Cleaner): Promise<string[]> {
     // Create a temporary directory which will be used to copy the files from the container.
     const { name, removeCallback } = tmp.dirSync({ unsafeCleanup: true });
     // Clean it up at the end.
     cleaner.addJob(async (): Promise<void> => removeCallback());
     // Check if there even is anything to archive.
     if (!toArchive) {
-        return;
+        return [];
     }
+    const result = [];
     // Create the S3 client. This can't be done earlier because the environment variables won't be there.
     const s3 = new Client({
         endPoint: process.env.S3_ENDPOINT!,
@@ -87,5 +88,8 @@ export async function archiveFiles(client: Dockerode, lastSuccessfulContainer: s
         const archivedPath = `${runId}/${baseName}`;
         // Write the file to S3.
         await s3.fPutObject(bucket, archivedPath, realFileName);
+        // Register it.
+        result.push(baseName);
     }
+    return result;
 }

@@ -22,6 +22,7 @@ export type Status = "Passed" | "Failed" | "Skipped" | "Error";
 export interface PipelineRun {
     status: Status
     stages?: StageRun[]
+    archived?: string[]
 }
 
 /**
@@ -66,16 +67,17 @@ export async function run(request: RunRequest): Promise<PipelineRun> {
         // Determine the overall status.
         const status = determineOverallStatus(containerRun.stageRuns);
         // Archive all the important files after the pipeline ran, if successful.
+        let archived: string[] | undefined = undefined;
         if (status === "Passed" && containerRun.lastSuccessfulContainer) {
             log(runId, "Archiving files");
-            //await archiveFiles(tag, containerRun.workspacePath, plan.archive);
-            await archiveFiles(client, containerRun.lastSuccessfulContainer!, runId, plan.archive || [], cleaner);
+            archived = await archiveFiles(client, containerRun.lastSuccessfulContainer!, runId, plan.archive || [], cleaner);
         }
         // Return the relevant information of the run.
         log(runId, "Run complete");
         return {
             status: determineOverallStatus(containerRun.stageRuns),
-            stages: containerRun.stageRuns
+            stages: containerRun.stageRuns,
+            archived: archived,
         };
     } catch (exception) {
         log(runId, "Pipeline encountered internal error:")
