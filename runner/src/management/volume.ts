@@ -11,6 +11,7 @@ export async function createVolume(client: Docker, cleaner: Cleaner): Promise<st
     // First create the volume.
     const volumeCreation = await client.createVolume();
     // The types think it is Name, the property is actually name.
+    // eslint-disable-next-line
     const name = (volumeCreation as any).name;
     // Then get access to the volume object.
     const volume = await client.getVolume(name);

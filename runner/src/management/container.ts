@@ -34,7 +34,7 @@ export async function runContainers(client: Docker, request: RunRequest, volumeN
     const systemInfo = await client.info();
     const runtimesAvailable = Object.keys(systemInfo.Runtimes);
     // Setup logging.
-    const log = logCreate(request.runId!);
+    const log = logCreate(request.runId);
     // The stream can be closed.
     cleaner.addJob(async (): Promise<void> => log.close());
     // Iterate through all image IDs, each image ID is one stage.

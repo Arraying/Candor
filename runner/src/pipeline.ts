@@ -49,7 +49,7 @@ export async function run(request: RunRequest): Promise<PipelineRun> {
     // Create the client.
     const client = new Docker();
     // Declare variables.
-    const runId = request.runId!;
+    const runId = request.runId;
     const plan = request.plan;
     // Start running the pipeline!
     log(runId, "Starting pipeline");
@@ -70,7 +70,7 @@ export async function run(request: RunRequest): Promise<PipelineRun> {
         let archived: string[] | undefined = undefined;
         if (status === "Passed" && containerRun.lastSuccessfulContainer) {
             log(runId, "Archiving files");
-            archived = await archiveFiles(client, containerRun.lastSuccessfulContainer!, runId, plan.archive || [], cleaner);
+            archived = await archiveFiles(client, containerRun.lastSuccessfulContainer, runId, plan.archive || [], cleaner);
         }
         // Return the relevant information of the run.
         log(runId, "Run complete");

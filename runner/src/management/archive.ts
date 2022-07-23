@@ -28,17 +28,24 @@ export async function archiveFiles(client: Dockerode, lastSuccessfulContainer: s
     if (toArchive.length === 0) {
         return [];
     }
+    // If the credentials are not specified, return.
+    if (!process.env.S3_ENDPOINT
+        || !process.env.S3_PORT
+        || !process.env.S3_ACCESS
+        || !process.env.S3_SECRET) {
+        return [];
+    }
     const result = [];
     // Create the S3 client. This can't be done earlier because the environment variables won't be there.
     const s3 = new Client({
-        endPoint: process.env.S3_ENDPOINT!,
-        port: parseInt(process.env.S3_PORT!),
-        accessKey: process.env.S3_ACCESS!,
-        secretKey: process.env.S3_SECRET!,
+        endPoint: process.env.S3_ENDPOINT,
+        port: parseInt(process.env.S3_PORT),
+        accessKey: process.env.S3_ACCESS,
+        secretKey: process.env.S3_SECRET,
         useSSL: false,
     });
     // Check if the bucket exists.
-    const bucket = process.env.S3_BUCKET!;
+    const bucket = process.env.S3_BUCKET || "candor";
     const bucketExists = await s3.bucketExists(bucket);
     if (!bucketExists) {
         // Create it so it can be written to.

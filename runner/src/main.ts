@@ -1,10 +1,10 @@
-import crypto from "crypto";
-import dotenv from "dotenv";
 import express, { Request, Response, } from "express";
 import { getPath, makeLogDirectory, verifyPath, } from "./logging";
 import { authorizationMiddleware, } from "./middleware";
 import { run, } from "./pipeline";
-import { RunRequest, isPlanValid, } from "./plan";
+import { RunRequest, RunRequestRaw, isPlanValid, } from "./plan";
+import crypto from "crypto";
+import dotenv from "dotenv";
 
 // Load the environment variables.
 dotenv.config();
@@ -47,7 +47,7 @@ app.post("/run", async (req: Request, res: Response) => {
         return;
     }
     // Get the request.
-    const request: RunRequest = req.body;
+    const request: RunRequestRaw = req.body;
     // Generate a run ID if not specified.
     if (!request.runId) {
         request.runId = crypto.randomBytes(6).toString("hex");
@@ -58,7 +58,7 @@ app.post("/run", async (req: Request, res: Response) => {
         return;
     }
     // Run the plan.
-    const result = await run(request);
+    const result = await run(request as RunRequest);
     res.send(result);
 });
 

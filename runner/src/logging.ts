@@ -39,7 +39,7 @@ export async function logInfo(writeStream: fs.WriteStream, info: string): Promis
 export function makeLogDirectory() {
     try {
         fs.mkdirSync(getLogDirectory(), { recursive: true, });
-    } catch (error: any) {
+    } catch (error) {
         if (error.code !== "EEXIST") {
             throw error;
         }

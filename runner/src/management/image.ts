@@ -47,7 +47,9 @@ export async function buildImages(client: Docker, plan: Plan, cleaner: Cleaner):
         const src = shell ? [dockerfileName, shellName,] : [dockerfileName,];
         const buildStream = await client.buildImage({ context: name, src: src, }, { dockerfile: dockerfileName,});
         // Create a promise that awaits the image build.
+        // eslint-disable-next-line
         const buildProgress: Promise<any[]> = new Promise((resolve, reject) => {
+            // eslint-disable-next-line
             client.modem.followProgress(buildStream, (err: Error | null, result: any) => err ? reject(err) : resolve(result));
         });
         // Await build completion, so we can add the image ID.

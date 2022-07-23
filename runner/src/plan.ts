@@ -2,8 +2,16 @@
  * Represents a request to run the pipeline.
  * The run ID is an optional ID so the same ID can be used for the runner and scheduler.
  */
-export interface RunRequest {
+export interface RunRequestRaw {
     runId?: string
+    plan?: Plan
+}
+
+/**
+ * A request with everything present.
+ */
+export interface RunRequest {
+    runId: string
     plan: Plan
 }
 
