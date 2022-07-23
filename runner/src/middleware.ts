@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, } from "express";
 
 /**
  * Ensures that only authorized requests may trigger actions.

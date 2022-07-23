@@ -1,10 +1,10 @@
 import crypto from "crypto";
 import dotenv from "dotenv";
-import express, { Request, Response } from "express";
-import { getPath, makeLogDirectory, verifyPath } from "./logging";
-import { authorizationMiddleware } from "./middleware";
-import { run } from "./pipeline";
-import { RunRequest, isPlanValid } from "./plan";
+import express, { Request, Response, } from "express";
+import { getPath, makeLogDirectory, verifyPath, } from "./logging";
+import { authorizationMiddleware, } from "./middleware";
+import { run, } from "./pipeline";
+import { RunRequest, isPlanValid, } from "./plan";
 
 // Load the environment variables.
 dotenv.config();

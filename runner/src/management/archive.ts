@@ -1,11 +1,11 @@
 import Dockerode from "dockerode";
-import { Client } from "minio";
+import { Client, } from "minio";
 import fs from "fs";
 import path from "path";
 import tar from "tar";
 import tmp from "tmp";
-import { Cleaner } from "../cleaner";
-import { workingDirectory } from "../pipeline";
+import { Cleaner, } from "../cleaner";
+import { workingDirectory, } from "../pipeline";
 
 // Constant region.
 const region = "eu-west-1";
@@ -21,7 +21,7 @@ const region = "eu-west-1";
  */
 export async function archiveFiles(client: Dockerode, lastSuccessfulContainer: string, runId: string, toArchive: string[], cleaner: Cleaner): Promise<string[]> {
     // Create a temporary directory which will be used to copy the files from the container.
-    const { name, removeCallback } = tmp.dirSync({ unsafeCleanup: true });
+    const { name, removeCallback, } = tmp.dirSync({ unsafeCleanup: true, });
     // Clean it up at the end.
     cleaner.addJob(async (): Promise<void> => removeCallback());
     // Check if there even is anything to archive.
@@ -35,7 +35,7 @@ export async function archiveFiles(client: Dockerode, lastSuccessfulContainer: s
         port: parseInt(process.env.S3_PORT!),
         accessKey: process.env.S3_ACCESS!,
         secretKey: process.env.S3_SECRET!,
-        useSSL: false
+        useSSL: false,
     });
     // Check if the bucket exists.
     const bucket = process.env.S3_BUCKET!;

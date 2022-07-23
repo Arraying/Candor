@@ -10,7 +10,7 @@ export function logCreate(runId: string): fs.WriteStream {
     // The exact log file.
     const logFilePath = getPath(runId);
     // Create the log file as a file that can just be appended to.
-    return fs.createWriteStream(logFilePath, { flags: "a", encoding: "utf-8" });
+    return fs.createWriteStream(logFilePath, { flags: "a", encoding: "utf-8", });
 }
 
 /**
@@ -38,7 +38,7 @@ export async function logInfo(writeStream: fs.WriteStream, info: string): Promis
  */
 export function makeLogDirectory() {
     try {
-        fs.mkdirSync(getLogDirectory(), { recursive: true });
+        fs.mkdirSync(getLogDirectory(), { recursive: true, });
     } catch (error: any) {
         if (error.code !== "EEXIST") {
             throw error;

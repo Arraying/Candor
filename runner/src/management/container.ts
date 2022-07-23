@@ -1,8 +1,8 @@
 import Docker from "dockerode";
-import { Cleaner } from "../cleaner";
-import { logCreate, logHeader, logInfo } from "../logging";
-import { StageRun, workingDirectory } from "../pipeline";
-import { RunRequest, Stage } from "../plan";
+import { Cleaner, } from "../cleaner";
+import { logCreate, logHeader, logInfo, } from "../logging";
+import { StageRun, workingDirectory, } from "../pipeline";
+import { RunRequest, Stage, } from "../plan";
 
 /**
  * Contains relevant information on the container run.
@@ -11,7 +11,7 @@ import { RunRequest, Stage } from "../plan";
 export interface ContainerRun {
     stageRuns: StageRun[]
     lastSuccessfulContainer?: string
-};
+}
 
 /**
  * Runs the pipeline containers. 
@@ -25,8 +25,8 @@ export interface ContainerRun {
  */
 export async function runContainers(client: Docker, request: RunRequest, volumeName: string, imageIds: string[], runtimes: (string | undefined)[], cleaner: Cleaner): Promise<ContainerRun> {
     // Keep track of the stages so far.
-    let stageRuns: StageRun[] = [];
-    let stageNames = request.plan.stages.map((stage: Stage): string => stage.name);
+    const stageRuns: StageRun[] = [];
+    const stageNames = request.plan.stages.map((stage: Stage): string => stage.name);
     let lastSuccessfulContainer = undefined;
     // When a stage fails, we want to be able to skip all stages afterwards.
     let skip = false;
@@ -38,7 +38,7 @@ export async function runContainers(client: Docker, request: RunRequest, volumeN
     // The stream can be closed.
     cleaner.addJob(async (): Promise<void> => log.close());
     // Iterate through all image IDs, each image ID is one stage.
-    for (const [index, imageId] of imageIds.entries()) {
+    for (const [index, imageId,] of imageIds.entries()) {
         // Log the stage, even if it gets skipped.
         await logHeader(log, index, imageIds.length);
         // Check if we are skipping.
@@ -81,7 +81,7 @@ export async function runContainers(client: Docker, request: RunRequest, volumeN
                     },
                 ],
                 Runtime: runtimeName,
-            }
+            },
         };
         // Create the container and run it.
         const container = await client.createContainer(options);
@@ -89,7 +89,7 @@ export async function runContainers(client: Docker, request: RunRequest, volumeN
         cleaner.addJob(async (): Promise<void> => await container.remove());
         try {
             // Write logs.
-            const logStream = await container.attach({stream: true, stdout: true, stderr: true});
+            const logStream = await container.attach({stream: true, stdout: true, stderr: true,});
             container.modem.demuxStream(logStream, log, log);
             // Put the rest in a try so the container can be cleaned on error.
             await container.start();
@@ -131,6 +131,6 @@ export async function runContainers(client: Docker, request: RunRequest, volumeN
     // Return the information of the pipeline run.
     return {
         stageRuns: stageRuns,
-        lastSuccessfulContainer: lastSuccessfulContainer
+        lastSuccessfulContainer: lastSuccessfulContainer,
     };
 }

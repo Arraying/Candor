@@ -2,9 +2,9 @@ import Docker from "dockerode";
 import fs from "fs";
 import path from "path";
 import tmp from "tmp";
-import { Cleaner } from "../cleaner";
-import { workingDirectory } from "../pipeline";
-import { Plan, Stage } from "../plan";
+import { Cleaner, } from "../cleaner";
+import { workingDirectory, } from "../pipeline";
+import { Plan, Stage, } from "../plan";
 
 type ImageMeta = {
     dockerfile: string,
@@ -26,9 +26,9 @@ export async function buildImages(client: Docker, plan: Plan, cleaner: Cleaner):
     // First, create all the Dockerfiles as strings.
     const dockerfiles = await makeDockerfiles(plan.stages);
     // Keep track of image IDs.
-    let imageIds = [];
+    const imageIds = [];
     // Then, create a temporary directory to write these to.
-    const { name, removeCallback } = tmp.dirSync({ unsafeCleanup: true });
+    const { name, removeCallback, } = tmp.dirSync({ unsafeCleanup: true, });
     // Make sure to clean up this directory.
     cleaner.addJob(async (): Promise<void> => removeCallback());
     // Write all the Dockerfiles.
@@ -44,8 +44,8 @@ export async function buildImages(client: Docker, plan: Plan, cleaner: Cleaner):
             fs.writeFileSync(shellPath, shell);
         }
         // Build the image through the Docker API.
-        const src = shell ? [dockerfileName, shellName] : [dockerfileName];
-        const buildStream = await client.buildImage({ context: name, src: src }, { dockerfile: dockerfileName});
+        const src = shell ? [dockerfileName, shellName,] : [dockerfileName,];
+        const buildStream = await client.buildImage({ context: name, src: src, }, { dockerfile: dockerfileName,});
         // Create a promise that awaits the image build.
         const buildProgress: Promise<any[]> = new Promise((resolve, reject) => {
             client.modem.followProgress(buildStream, (err: Error | null, result: any) => err ? reject(err) : resolve(result));
@@ -64,12 +64,12 @@ export async function buildImages(client: Docker, plan: Plan, cleaner: Cleaner):
                 // Get the image by ID.
                 const image = await client.getImage(possibleId);
                 // Remove the image, forcefully if applicable.
-                await image.remove({ force: true });
+                await image.remove({ force: true, });
             });
         } else {
             throw {
                 reason: "Could not find built image ID",
-                result: result
+                result: result,
             };
         }
     }
@@ -83,7 +83,7 @@ export async function buildImages(client: Docker, plan: Plan, cleaner: Cleaner):
  * @returns A promise of a list of Dockerfiles, as strings.
  */
 async function makeDockerfiles(stages: Stage[]): Promise<ImageMeta[]> {
-    let dockerfiles = [];
+    const dockerfiles = [];
     // Loop through all stages.
     for (const stage of stages) {
         // Each stage has its own Dockerfile.
@@ -93,13 +93,13 @@ async function makeDockerfiles(stages: Stage[]): Promise<ImageMeta[]> {
         // Iterate through the environment variables if possible.
         for (const kvPair of stage.environment || []) {
             // Attempt to parse the key value pair.
-            let [key, value] = kvPair.split('=', 2);
+            let [key, value,] = kvPair.split("=", 2);
             // Just use the key name if malformed.
             if (value == null) {
                 value = key;
             }
             // Only write if the key works.
-            if (key !== '') {
+            if (key !== "") {
                 dockerfile += `ENV ${key} ${value}\n`;
             }
         }
@@ -121,7 +121,7 @@ async function makeDockerfiles(stages: Stage[]): Promise<ImageMeta[]> {
         // Write the information.
         dockerfiles.push({
             dockerfile: dockerfile,
-            shell: shell
+            shell: shell,
         });
     }
     return dockerfiles;
