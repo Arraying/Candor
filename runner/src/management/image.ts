@@ -1,10 +1,10 @@
-import { Plan, Stage, } from "../plan";
-import { Cleaner, } from "../cleaner";
+import { Plan, Stage } from "../plan";
+import { Cleaner } from "../cleaner";
 import Docker from "dockerode";
 import fs from "fs";
 import path from "path";
 import tmp from "tmp";
-import { workingDirectory, } from "../pipeline";
+import { workingDirectory } from "../pipeline";
 
 type ImageMeta = {
     dockerfile: string,
@@ -28,7 +28,7 @@ export async function buildImages(client: Docker, plan: Plan, cleaner: Cleaner):
     // Keep track of image IDs.
     const imageIds = [];
     // Then, create a temporary directory to write these to.
-    const { name, removeCallback, } = tmp.dirSync({ unsafeCleanup: true, });
+    const { name, removeCallback } = tmp.dirSync({ unsafeCleanup: true });
     // Make sure to clean up this directory.
     cleaner.addJob(async (): Promise<void> => removeCallback());
     // Write all the Dockerfiles.
@@ -44,8 +44,8 @@ export async function buildImages(client: Docker, plan: Plan, cleaner: Cleaner):
             fs.writeFileSync(shellPath, shell);
         }
         // Build the image through the Docker API.
-        const src = shell ? [dockerfileName, shellName,] : [dockerfileName,];
-        const buildStream = await client.buildImage({ context: name, src: src, }, { dockerfile: dockerfileName,});
+        const src = shell ? [dockerfileName, shellName] : [dockerfileName];
+        const buildStream = await client.buildImage({ context: name, src: src }, { dockerfile: dockerfileName});
         // Create a promise that awaits the image build.
         // eslint-disable-next-line
         const buildProgress: Promise<any[]> = new Promise((resolve, reject) => {
@@ -65,7 +65,7 @@ export async function buildImages(client: Docker, plan: Plan, cleaner: Cleaner):
                 // Get the image by ID.
                 const image = await client.getImage(possibleId);
                 // Remove the image, forcefully if applicable.
-                await image.remove({ force: true, });
+                await image.remove({ force: true });
             });
         } else {
             throw {

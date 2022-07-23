@@ -13,7 +13,7 @@
         "plugin:@typescript-eslint/recommended"
     ],
     "rules": {
-        "comma-dangle": ["error", "always"],
+        "comma-dangle": ["error", "always-multiline"],
         "eqeqeq": ["error", "smart"],
         "quotes": ["error", "double"],
         "sort-imports": ["error", {

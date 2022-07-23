@@ -1,7 +1,7 @@
-import { logCreate, logHeader, logInfo, } from "../logging";
-import { RunRequest, Stage, } from "../plan";
-import { StageRun, workingDirectory, } from "../pipeline";
-import { Cleaner, } from "../cleaner";
+import { logCreate, logHeader, logInfo } from "../logging";
+import { RunRequest, Stage } from "../plan";
+import { StageRun, workingDirectory } from "../pipeline";
+import { Cleaner } from "../cleaner";
 import Docker from "dockerode";
 
 /**
@@ -38,7 +38,7 @@ export async function runContainers(client: Docker, request: RunRequest, volumeN
     // The stream can be closed.
     cleaner.addJob(async (): Promise<void> => log.close());
     // Iterate through all image IDs, each image ID is one stage.
-    for (const [index, imageId,] of imageIds.entries()) {
+    for (const [index, imageId] of imageIds.entries()) {
         // Log the stage, even if it gets skipped.
         await logHeader(log, index, imageIds.length);
         // Check if we are skipping.
@@ -89,7 +89,7 @@ export async function runContainers(client: Docker, request: RunRequest, volumeN
         cleaner.addJob(async (): Promise<void> => await container.remove());
         try {
             // Write logs.
-            const logStream = await container.attach({stream: true, stdout: true, stderr: true,});
+            const logStream = await container.attach({stream: true, stdout: true, stderr: true});
             container.modem.demuxStream(logStream, log, log);
             // Put the rest in a try so the container can be cleaned on error.
             await container.start();

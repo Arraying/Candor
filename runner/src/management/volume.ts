@@ -1,4 +1,4 @@
-import { Cleaner, } from "../cleaner";
+import { Cleaner } from "../cleaner";
 import Docker from "dockerode";
 
 /**

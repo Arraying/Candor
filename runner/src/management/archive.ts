@@ -1,11 +1,11 @@
-import { Cleaner, } from "../cleaner";
-import { Client, } from "minio";
+import { Cleaner } from "../cleaner";
+import { Client } from "minio";
 import Dockerode from "dockerode";
 import fs from "fs";
 import path from "path";
 import tar from "tar";
 import tmp from "tmp";
-import { workingDirectory, } from "../pipeline";
+import { workingDirectory } from "../pipeline";
 
 // Constant region.
 const region = "eu-west-1";
@@ -21,7 +21,7 @@ const region = "eu-west-1";
  */
 export async function archiveFiles(client: Dockerode, lastSuccessfulContainer: string, runId: string, toArchive: string[], cleaner: Cleaner): Promise<string[]> {
     // Create a temporary directory which will be used to copy the files from the container.
-    const { name, removeCallback, } = tmp.dirSync({ unsafeCleanup: true, });
+    const { name, removeCallback } = tmp.dirSync({ unsafeCleanup: true });
     // Clean it up at the end.
     cleaner.addJob(async (): Promise<void> => removeCallback());
     // Check if there even is anything to archive.

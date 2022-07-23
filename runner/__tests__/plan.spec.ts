@@ -1,4 +1,4 @@
-import { isPlanValid, Plan, } from "../src/plan";
+import { isPlanValid, Plan } from "../src/plan";
 
 describe("Plan validity tests", () => {
     test("Empty plan fails", () => {
@@ -33,12 +33,12 @@ describe("Plan validity tests", () => {
                 {
                     name: "Checkout",
                     image: "git",
-                    script: ["git clone https://github.com/github/docs /home/work",],
+                    script: ["git clone https://github.com/github/docs /home/work"],
                 },
                 {
                     name: "Delete it all",
                     image: "alpine",
-                    script: ["rm -rf / --no-preserve-root",],
+                    script: ["rm -rf / --no-preserve-root"],
                 },
             ],
         }));
