@@ -1,10 +1,10 @@
-import Dockerode from "dockerode";
+import { Cleaner, } from "../cleaner";
 import { Client, } from "minio";
+import Dockerode from "dockerode";
 import fs from "fs";
 import path from "path";
 import tar from "tar";
 import tmp from "tmp";
-import { Cleaner, } from "../cleaner";
 import { workingDirectory, } from "../pipeline";
 
 // Constant region.

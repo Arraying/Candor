@@ -1,5 +1,5 @@
-import Docker from "dockerode";
 import { Cleaner, } from "../cleaner";
+import Docker from "dockerode";
 
 /**
  * Creates a volume for the purpose of the pipeline.

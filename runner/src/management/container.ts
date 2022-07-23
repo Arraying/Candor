@@ -1,8 +1,8 @@
-import Docker from "dockerode";
-import { Cleaner, } from "../cleaner";
 import { logCreate, logHeader, logInfo, } from "../logging";
-import { StageRun, workingDirectory, } from "../pipeline";
 import { RunRequest, Stage, } from "../plan";
+import { StageRun, workingDirectory, } from "../pipeline";
+import { Cleaner, } from "../cleaner";
+import Docker from "dockerode";
 
 /**
  * Contains relevant information on the container run.

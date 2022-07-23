@@ -14,8 +14,11 @@
     ],
     "rules": {
         "comma-dangle": ["error", "always"],
+        "eqeqeq": ["error", "smart"],
         "quotes": ["error", "double"],
-        "sort-imports": ["error"],
+        "sort-imports": ["error", {
+            "ignoreCase": true
+        }],
         "spaced-comment": ["error"]
     }
   }

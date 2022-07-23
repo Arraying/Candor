@@ -1,10 +1,10 @@
+import { Plan, Stage, } from "../plan";
+import { Cleaner, } from "../cleaner";
 import Docker from "dockerode";
 import fs from "fs";
 import path from "path";
 import tmp from "tmp";
-import { Cleaner, } from "../cleaner";
 import { workingDirectory, } from "../pipeline";
-import { Plan, Stage, } from "../plan";
 
 type ImageMeta = {
     dockerfile: string,
@@ -57,8 +57,7 @@ export async function buildImages(client: Docker, plan: Plan, cleaner: Cleaner):
         const possibleId = result
             .map(object => object.aux)
             .filter(object => object != null)
-            .map(aux => aux.ID)
-            [0]
+            .map(aux => aux.ID)[0]
         // Only write the image ID if it succeeded.
         if (possibleId != null) {
             imageIds.push(possibleId);
@@ -95,6 +94,7 @@ async function makeDockerfiles(stages: Stage[]): Promise<ImageMeta[]> {
         // Iterate through the environment variables if possible.
         for (const kvPair of stage.environment || []) {
             // Attempt to parse the key value pair.
+            // eslint-disable-next-line
             let [key, value,] = kvPair.split("=", 2);
             // Just use the key name if malformed.
             if (value == null) {

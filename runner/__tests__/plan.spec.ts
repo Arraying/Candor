@@ -1,4 +1,4 @@
-import { Plan, isPlanValid, } from "../src/plan";
+import { isPlanValid, Plan, } from "../src/plan";
 
 describe("Plan validity tests", () => {
     test("Empty plan fails", () => {

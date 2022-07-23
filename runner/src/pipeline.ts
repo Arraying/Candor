@@ -1,10 +1,11 @@
-import Docker from "dockerode";
-import { Cleaner, } from "./cleaner";
 import { archiveFiles, } from "./management/archive";
-import { runContainers, } from "./management/container";
 import { buildImages, } from "./management/image";
+import { Cleaner, } from "./cleaner";
 import { createVolume, } from "./management/volume";
+import Docker from "dockerode";
+import { runContainers, } from "./management/container";
 import { RunRequest, } from "./plan";
+
 
 /**
  * The status of the pipeline or its individual stages.
