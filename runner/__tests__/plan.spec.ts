@@ -1,4 +1,4 @@
-import { isPlanValid, Plan } from "../src/plan";
+import { Plan, isPlanValid, } from "../src/plan";
 
 describe("Plan validity tests", () => {
     test("Empty plan fails", () => {
@@ -6,16 +6,20 @@ describe("Plan validity tests", () => {
     });
     test("Plan with no image fails", () => {
         expect(isPlanValid({
-            stages: [{
-                name: "Hello",
-            }],
+            stages: [
+                {
+                    name: "Hello",
+                },
+            ],
         } as Plan)).toBeFalsy();
     });
     test("Plan with no name fails", () => {
         expect(isPlanValid({
-            stages: [{
-                image: "alpine",
-            }],
+            stages: [
+                {
+                    image: "alpine",
+                },
+            ],
         } as Plan)).toBeFalsy();
     });
     test("Plan with no stages is valid", () => {
@@ -29,13 +33,13 @@ describe("Plan validity tests", () => {
                 {
                     name: "Checkout",
                     image: "git",
-                    script: ["git clone https://github.com/github/docs /home/work"],
+                    script: ["git clone https://github.com/github/docs /home/work",],
                 },
                 {
                     name: "Delete it all",
                     image: "alpine",
-                    script: ["rm -rf / --no-preserve-root"],
-                }
+                    script: ["rm -rf / --no-preserve-root",],
+                },
             ],
         }));
     });
