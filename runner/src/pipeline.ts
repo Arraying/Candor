@@ -98,7 +98,7 @@ export async function run(request: RunRequest): Promise<PipelineRun> {
  * @param stageRuns An array of all the stage runs if applicable.
  * @returns The overall pipeline status code.
  */
-function determineOverallStatus(stageRuns?: StageRun[]): Status {
+export function determineOverallStatus(stageRuns?: StageRun[]): Status {
     if (stageRuns) {
         // Go through every run.
         for (const run of stageRuns) {

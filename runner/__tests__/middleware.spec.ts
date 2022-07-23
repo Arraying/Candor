@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { authorizationMiddleware } from "../src/middleware";
 
-describe("Authorization middleware", () => {
+describe("Authorization middleware tests", () => {
     test("Reject when no token is provided", () => {
         process.env.RUNNER_TOKEN = "Foo";
         const [req, res, next, status] = variables(undefined);
