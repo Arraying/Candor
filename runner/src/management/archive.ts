@@ -42,7 +42,7 @@ export async function archiveFiles(client: Dockerode, lastSuccessfulContainer: s
         port: parseInt(process.env.S3_PORT),
         accessKey: process.env.S3_ACCESS,
         secretKey: process.env.S3_SECRET,
-        useSSL: false,
+        useSSL: process.env.S3_SSL === "true",
     });
     // Check if the bucket exists.
     const bucket = process.env.S3_BUCKET || "candor";
