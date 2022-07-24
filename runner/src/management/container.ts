@@ -105,6 +105,8 @@ export async function runContainers(client: Docker, request: RunRequest, volumeN
             // Await the container's exit.
             const exit = await container.wait();
             const exitCode = exit.StatusCode;
+            // Write it.
+            logInfo(log, `Process exited with status code ${exitCode}`);
             if (exitCode === 0) {
                 // Exit code 0, so everything went smoothly.
                 stageRuns.push({
