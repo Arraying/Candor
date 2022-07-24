@@ -83,6 +83,15 @@ export async function runContainers(client: Docker, request: RunRequest, volumeN
                 Runtime: runtimeName,
             },
         };
+        // Bind the shared data if applicable.
+        if (process.env.RUNNER_SHARED) {
+            options.HostConfig?.Mounts?.push({
+                Target: "/srv/candor",
+                Source: process.env.RUNNER_SHARED,
+                Type: "bind",
+                ReadOnly: true,
+            });
+        }
         // Create the container and run it.
         const container = await client.createContainer(options);
         // Add deleting the container to the cleanup task.
