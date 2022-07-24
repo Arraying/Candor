@@ -18,4 +18,5 @@ RUN npm i --only=production
 FROM node:16-alpine
 WORKDIR /opt/runner
 COPY --from=cleaner /opt/runner ./
+RUN mv ./build/src/* ./build && rm -r ./build/__tests__
 CMD [ "node", "build/main.js" ]
