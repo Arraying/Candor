@@ -21,4 +21,4 @@ COPY --from=cleaner /opt/runner ./
 RUN mv ./build/src/* ./build && rm -r ./build/__tests__
 ENV RUNNER_PORT=3001
 ENV RUNNER_LOGS=/var/log/candor/
-CMD [ "node", "build/main.js" ]
+CMD [ "node", "build/index.js" ]

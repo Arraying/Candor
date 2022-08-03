@@ -3,6 +3,7 @@ import { RunRequest, Stage } from "../plan";
 import { StageRun, workingDirectory } from "../pipeline";
 import { Cleaner } from "../cleaner";
 import Docker from "dockerode";
+import mergician from "mergician";
 
 /**
  * Contains relevant information on the container run.
@@ -69,7 +70,7 @@ export async function runContainers(client: Docker, request: RunRequest, volumeN
             }
         }
         // Configure the container options.
-        const options: Docker.ContainerCreateOptions = {
+        const candorOption: Docker.ContainerCreateOptions = {
             Image: imageId,
             HostConfig: {
                 Mounts: [
@@ -85,13 +86,19 @@ export async function runContainers(client: Docker, request: RunRequest, volumeN
         };
         // Bind the shared data if applicable.
         if (process.env.RUNNER_SHARED) {
-            options.HostConfig?.Mounts?.push({
+            candorOption.HostConfig?.Mounts?.push({
                 Target: "/srv/candor",
                 Source: process.env.RUNNER_SHARED,
                 Type: "bind",
                 ReadOnly: true,
             });
         }
+        // Merge this with any custom user settings, if applicable.
+        const overrideOptions = getOverrideConfig();
+        console.log(overrideOptions);
+        const options = mergician(candorOption, overrideOptions);
+        console.log('aa')
+        console.log(options)
         // Create the container and run it.
         const container = await client.createContainer(options);
         // Add deleting the container to the cleanup task.
@@ -144,4 +151,24 @@ export async function runContainers(client: Docker, request: RunRequest, volumeN
         stageRuns: stageRuns,
         lastSuccessfulContainer: lastSuccessfulContainer,
     };
+}
+
+/**
+ * Gets the container creation config override as an object.
+ * @returns The override container creation config.
+ */
+export function getOverrideConfig(): Docker.CreateServiceOptions {
+    const base64Config = process.env.RUNNER_CONTAINER_CONFIG_B;
+    // If not defined, we just use no settings.
+    if (!base64Config) {
+        return {};
+    }
+    // Attempt to decode.
+    try {
+        const string = Buffer.from(base64Config, "base64").toString("utf-8");
+        return JSON.parse(string);
+    } catch (error) {
+        console.log("Error decoding RUNNER_CONTAINER_CONFIG_B into UTF-8 JSON, is it correct?");
+        return {};
+    }
 }

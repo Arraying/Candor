@@ -34,9 +34,9 @@ app.use("/.+", authorizationMiddleware);
 // Add the JSON middleware to handle bodies.
 app.use(express.json());
 
-app.get("/", (req: Request, res: Response) => {
+// Healthcheck, always returns 200.
+app.get("/", (_: Request, res: Response) => {
     res.sendStatus(200);
-    return;
 })
 
 // Add the route to run the pipeline.
