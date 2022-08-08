@@ -1,7 +1,3 @@
-// TODO:
-// - List all pipleines (name, last status, last stages, last success, last failure)
-// - List a single pipeline (name, last 5 builds + artifacts)
-
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { Pipeline } from "../entities/Pipeline";
@@ -10,28 +6,6 @@ import { Runner } from "../entities/Runner";
 import { User } from "../entities/User";
 import { log, run, running } from "../running";
 import { isConfigValid } from "../validation";
-
-// TODO: Remove.
-const dummyLastBuild = {
-    status: "Passed",
-    stages: [
-        {
-            name: "Foo",
-            status: "Success",
-            exitCode: 0,
-        },
-        {
-            name: "Bar",
-            status: "Success",
-            exitCode: 0,
-        },
-        {
-            name: "Baz",
-            status: "Success",
-            exitCode: 0,
-        },
-    ]
-};
 
 /**
  * An object that represents the summary of a pipeline in a tabular format.

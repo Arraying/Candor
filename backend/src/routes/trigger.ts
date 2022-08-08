@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { canRun, constraintsMet, run } from "../running";
 
-// TODO: Guarantees and thread safety.
-
 /**
  * Triggers a pipeline.
  * @param req The request.
@@ -35,5 +33,6 @@ export async function trigger(req: Request, res: Response) {
  * @returns Nothing.
  */
 export async function triggerWithGitHub(req: Request, res: Response) {
+   // TODO: GitHub integration.
    res.sendStatus(200);
 }
