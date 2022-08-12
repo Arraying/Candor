@@ -1,9 +1,15 @@
+import { pipelineList, pipelineAdd, pipelinePublic, pipelineDel } from "./actions/actions-pipeline";
+import { userList, userAdd, userReset, userDel } from "./actions/actions-user";
+import { runnerList, runnerAdd, runnerHost, runnerDel } from "./actions/actions-runner";
 import prompts from "prompts";
 
 /**
  * The main menu loop, this will ensure the menu is always shown.
  */
 export async function mainMenuLoop() {
+    // Print the main menu.
+    console.log("\nCandor by @Arraying");
+    console.log("Licensed under the MIT license.");
     while (true) {
         if (await mainMenu()) {
             break;
@@ -16,6 +22,7 @@ export async function mainMenuLoop() {
  * @returns True if the menu should break out of the loop.
  */
 async function mainMenu(): Promise<boolean> {
+    console.log();
     // Ask the main menu question.
     const response = await prompts({
         type: "select",
@@ -32,6 +39,7 @@ async function mainMenu(): Promise<boolean> {
             { title: "Delete user", description: "Deletes an existing user.", value: userDel },
             { title: "List runners", description: "Lists all runners.", value: runnerList },
             { title: "New runner", description: "Registers a new runner.", value: runnerAdd },
+            { title: "Modify runner host", description: "Changes the runner's host.", value: runnerHost },
             { title: "Delete runner", description: "Deletes an existing runner.", value: runnerDel },
             { title: "Exit", description: "Shuts down the dashboard.", value: shutdown },
         ],
@@ -42,50 +50,6 @@ async function mainMenu(): Promise<boolean> {
         return false;
     }
     return true;
-}
-
-async function pipelineList() {
-
-}
-
-async function pipelineAdd() {
-
-}
-
-async function pipelinePublic() {
-
-}
-
-async function pipelineDel() {
-
-}
-
-async function userList() {
-
-}
-
-async function userAdd() {
-
-}
-
-async function userReset() {
-
-}
-
-async function userDel() {
-
-}
-
-async function runnerList() {
-
-}
-
-async function runnerAdd() {
-
-}
-
-async function runnerDel() {
-
 }
 
 async function shutdown() {
