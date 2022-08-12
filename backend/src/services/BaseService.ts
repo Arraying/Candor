@@ -25,8 +25,19 @@ export type GenericStatus = "success" | "error";
  */
 export abstract class BaseService<T extends NamedEntity> {
 
+    /**
+     * Gets the repository.
+     */
     abstract getRepository(): Repository<T>
-
+    
+    /**
+     * Gets any required relations when querying.
+     */
+    abstract getRelations(): string[]
+    
+    /**
+     * Makes a blank entity.
+     */
     abstract makeEmpty(): T
 
     /**
@@ -35,7 +46,13 @@ export abstract class BaseService<T extends NamedEntity> {
      */
     async getAll(): Promise<ReadsStatus<T>> {
         try {
-            const entities = await this.getRepository().find();
+            const entities = await this.getRepository().find({ 
+                relations: this.getRelations(),
+                // @ts-ignore Currently typechecking with NamedEntity does not work.
+                order: {
+                    name: "ASC"
+                },
+            });
             return entities == null ? [] : entities;
         } catch (error) {
             console.error(error);

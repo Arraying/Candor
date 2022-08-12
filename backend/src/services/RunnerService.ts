@@ -9,6 +9,10 @@ export class RunnerService extends BaseService<Runner> {
         return AppDataSource.getRepository(Runner);
     }
 
+    getRelations(): string[] {
+        return [];
+    }
+
     makeEmpty(): Runner {
         return new Runner();
     }

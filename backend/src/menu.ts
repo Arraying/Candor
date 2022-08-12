@@ -1,4 +1,4 @@
-import { pipelineList, pipelineAdd, pipelinePublic, pipelineDel } from "./actions/actions-pipeline";
+import { pipelineList, pipelineAdd, pipelinePublic, pipelineReroll, pipelineDel } from "./actions/actions-pipeline";
 import { userList, userAdd, userReset, userDel } from "./actions/actions-user";
 import { runnerList, runnerAdd, runnerHost, runnerDel } from "./actions/actions-runner";
 import prompts from "prompts";
@@ -32,6 +32,7 @@ async function mainMenu(): Promise<boolean> {
             { title: "List pipelines", description: "Lists all pipelines.", value: pipelineList },
             { title: "New pipeline", description: "Creates a new pipeline.", value: pipelineAdd },
             { title: "Modify pipeline visibility", description: "Modifies whether or not the pipeline is visible.", value: pipelinePublic },
+            { title: "Reroll pipeline token", description: "Re-generates a new token for the pipeline.", value: pipelineReroll },
             { title: "Delete pipeline", description: "Deletes an existing pipeline.", value: pipelineDel },
             { title: "List users", description: "Lists all users.", value: userList },
             { title: "New user", description: "Creates a new user.", value: userAdd },
