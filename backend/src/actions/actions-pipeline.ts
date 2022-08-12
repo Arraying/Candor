@@ -10,10 +10,10 @@ const service = new PipelineService();
 /**
  * Lists all pipelines.
  */
- export async function pipelineList() {
+export async function pipelineList() {
     const pipelines = await service.getAll();
     if (pipelines === "error") {
-        console.log("An error occurred listing all pipelines");
+        console.log("An error occurred listing all pipelines.");
         return;
     }
     if (pipelines.length === 0) {
@@ -116,6 +116,36 @@ export async function pipelineReroll() {
         ? "The pipeline has been updated."
         : "An error occurred updating the pipeline."
     );
+}
+
+export async function pipelineAssign() {
+    const pipelines = await service.getAll();
+    if (pipelines === "error") {
+        console.log("An error occurred getting all pipelines.");
+        return;
+    }
+    if (pipelines.length === 0) {
+        console.log("There are no pipelines.");
+        return;
+    }
+    const names = pipelines.map((pipeline: Pipeline): string => pipeline.name);
+    let response = await prompts(promptList("Which pipeline should someone be added to?", names));
+    // TODO: Assign.
+}
+
+export async function pipelineUnassign() {
+    const pipelines = await service.getAll();
+    if (pipelines === "error") {
+        console.log("An error occurred getting all pipelines.");
+        return;
+    }
+    if (pipelines.length === 0) {
+        console.log("There are no pipelines.");
+        return;
+    }
+    const names = pipelines.map((pipeline: Pipeline): string => pipeline.name);
+    let response = await prompts(promptList("Which pipeline should someone be removed from?", names));
+    // TODO: Unassign.
 }
 
 /**

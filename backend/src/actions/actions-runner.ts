@@ -12,7 +12,7 @@ const service = new RunnerService();
 export async function runnerList() {
     const runners = await service.getAll();
     if (runners === "error") {
-        console.log("An error occurred listing all runners");
+        console.log("An error occurred listing all runners.");
         return;
     }
     if (runners.length === 0) {
