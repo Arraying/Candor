@@ -21,30 +21,6 @@ export async function pipelineList(_: string[]): Promise<boolean> {
 }
 
 /**
- * Shows information on a single pipeline.
- * @param args The first argument must be the name.
- * @returns True if the name is provided.
- */
-export async function pipelineInfo(args: string[]): Promise<boolean> {
-    if (!args[0]) {
-        return false;
-    }
-    const repository = AppDataSource.manager.getRepository(Pipeline);
-    const pipeline = await repository.findOne({
-        where: {
-            name: args[0],
-        },
-        relations: ["assignees"],
-    });
-    if (pipeline) {
-        pipelinePrint(pipeline);
-    } else {
-        console.log("A pipeline with that name does not exist");
-    }
-    return true;
-}
-
-/**
  * Creates a pipeline by name if it does not exist yet.
  * @param args The first argument must be the name.
  * @returns True if the name is provided.

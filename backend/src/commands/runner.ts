@@ -17,27 +17,6 @@ export async function runnerList(_: string[]): Promise<boolean> {
 }
 
 /**
- * Shows information on a single runner.
- * @param args The first argument must be the name.
- * @returns True if the name is provided.
- */
-export async function runnerInfo(args: string[]): Promise<boolean> {
-    if (!args[0]) {
-        return false;
-    }
-    const repository = AppDataSource.manager.getRepository(Runner);
-    const runner = await repository.findOneBy({
-        name: args[0],
-    });
-    if (runner) {
-        runnerPrint(runner);
-    } else {
-        console.log("A runner with that name does not exist!");
-    }
-    return true;
-}
-
-/**
  * Creates a runner by name if it does not exist yet.
  * @param args The first argument must be the name, the second the host:port.
  * @returns True if the name and host:port are provided.

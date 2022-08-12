@@ -21,30 +21,6 @@ export async function userList(_: string[]): Promise<boolean> {
 }
 
 /**
- * Shows information on a single user.
- * @param args The first argument must be the name.
- * @returns True if the name is provided.
- */
-export async function userInfo(args: string[]): Promise<boolean> {
-    if (!args[0]) {
-        return false;
-    }
-    const repository = AppDataSource.manager.getRepository(User);
-    const user = await repository.findOne({
-        where: {
-            name: args[0],
-        },
-        relations: ["pipelines"],
-    });
-    if (user) {
-        userPrint(user);
-    } else {
-        console.log("A user with that name does not exist");
-    }
-    return true;
-}
-
-/**
  * Creates a user by name if they does not exist yet.
  * @param args The first argument must be the name.
  * @returns True if the name is provided.

@@ -1,7 +1,7 @@
 import * as readline from "readline";
-import { runnerList, runnerInfo, runnerAdd, runnerDel } from "./commands/runner";
-import { pipelineList, pipelineInfo, pipelineAdd, pipelineDel, pipelinePublic, run } from "./commands/pipeline";
-import { userList, userInfo, userAdd, userDel, userReset } from "./commands/user";
+import { runnerList, runnerAdd, runnerDel } from "./commands/runner";
+import { pipelineList, pipelineAdd, pipelineDel, pipelinePublic, run } from "./commands/pipeline";
+import { userList, userAdd, userDel, userReset } from "./commands/user";
 import { assign, unassign } from "./commands/permission";
 
 /**
@@ -74,11 +74,6 @@ const commands = new Map<string, Command>([
         usage: "",
         executor: runnerList,
     }],
-    ["runner info", {
-        description: "Shows information on a pipeline runner.",
-        usage: "<name>",
-        executor: runnerInfo,
-    }],
     ["runner add", {
         description: "Registers a new pipeline runner.",
         usage: "<name> <host:port>",
@@ -93,11 +88,6 @@ const commands = new Map<string, Command>([
         description: "Lists all pipelines.",
         usage: "",
         executor: pipelineList,
-    }],
-    ["pipeline info", {
-        description: "Shows information on a pipeline.",
-        usage: "<name>",
-        executor: pipelineInfo,
     }],
     ["pipeline add", {
         description: "Creates a new pipeline.",
@@ -123,11 +113,6 @@ const commands = new Map<string, Command>([
         description: "Lists all users.",
         usage: "",
         executor: userList,
-    }],
-    ["user info", {
-        description: "Shows information on a user.",
-        usage: "<name>",
-        executor: userInfo,
     }],
     ["user add", {
         description: "Creates a new user.",
