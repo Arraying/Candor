@@ -1,5 +1,5 @@
 import app from "./app";
-import { cli } from "./cli";
+import { mainMenuLoop } from "./menu";
 import { AppDataSource } from "./data-source";
 
 // Make it possible to not run the CLI i.e. for development purposes.
@@ -10,7 +10,7 @@ AppDataSource.initialize()
     .then(async () => {
         // Run the command-line tool.
         if (WEB_ONLY != "true") {
-            cli();
+            mainMenuLoop();
         }
         // Serve the web server.
         app.listen(3000);
