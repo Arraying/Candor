@@ -1,11 +1,13 @@
 import { Pipeline } from "../entities/Pipeline";
 import { User } from "../entities/User";
 import { PipelineService } from "../services/PipelineService";
+import { UserService } from "../services/UserService";
 import { promptName, promptList, unanswered } from "./actions-utils";
 import crypto from "crypto";
 import prompts from "prompts";
 
 const service = new PipelineService();
+const userService = new UserService();
 
 /**
  * Lists all pipelines.
@@ -118,6 +120,9 @@ export async function pipelineReroll() {
     );
 }
 
+/**
+ * Assigns someone to a pipeline.
+ */
 export async function pipelineAssign() {
     const pipelines = await service.getAll();
     if (pipelines === "error") {
@@ -128,11 +133,44 @@ export async function pipelineAssign() {
         console.log("There are no pipelines.");
         return;
     }
+    const users = await userService.getAll();
+    if (users === "error") {
+        console.log("An error occurred getting all users.");
+        return;
+    }
+    if (users.length === 0) {
+        console.log("There are no users");
+        return;
+    }
     const names = pipelines.map((pipeline: Pipeline): string => pipeline.name);
     let response = await prompts(promptList("Which pipeline should someone be added to?", names));
-    // TODO: Assign.
+    // Check for early return.
+    if (unanswered(response)) {
+        return;
+    }
+    // Get the pipeline by name.
+    const pipeline = await service.getOne(response.name);
+    // Ask for the user.
+    const userNames = users.map((user: User): string => user.name);
+    response = await prompts(promptList("Which user should be added to this pipeline?", userNames));
+    // Check for early returns.
+    if (unanswered(response)) {
+        return;
+    }
+    // Get the user by name.
+    const user = await userService.getOne(response.name);
+    // Add them.
+    pipeline.assignees.push(user);
+    const status = await service.update(pipeline);
+    console.log(status === "success" 
+        ? "The user has been assigned."
+        : "An error occurred assigning the user."
+    );
 }
 
+/**
+ * Unassigns someone from a pipeline.
+ */
 export async function pipelineUnassign() {
     const pipelines = await service.getAll();
     if (pipelines === "error") {
@@ -145,7 +183,22 @@ export async function pipelineUnassign() {
     }
     const names = pipelines.map((pipeline: Pipeline): string => pipeline.name);
     let response = await prompts(promptList("Which pipeline should someone be removed from?", names));
-    // TODO: Unassign.
+    // Get the pipeline by name.
+    const pipeline = await service.getOne(response.name);
+    // Ask for the user.
+    const userNames = pipeline.assignees.map((user: User): string => user.name);
+    response = await prompts(promptList("Which user should be added to this pipeline?", userNames));
+    // Check for early returns.
+    if (unanswered(response)) {
+        return;
+    }
+    // Remove them.
+    pipeline.assignees = pipeline.assignees.filter((user: User): boolean => user.name !== response.name);
+    const status = await service.update(pipeline);
+    console.log(status === "success" 
+        ? "The user has been unassigned."
+        : "An error occurred unassigning the user."
+    );
 }
 
 /**

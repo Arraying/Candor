@@ -67,8 +67,13 @@ export abstract class BaseService<T extends NamedEntity> {
      */
     async getOne(name: string): Promise<T> {
         try {
-            // @ts-ignore Currently typechecking with NamedEntity does not work.
-            const find = await this.getRepository().findOneBy({ name: name });
+            const find = await this.getRepository().findOne({
+                relations: this.getRelations(),
+                // @ts-ignore Currently typechecking with NamedEntity does not work.
+                where: {
+                    name: name
+                },
+            });
             // If find is empty, then we can just create it instead.
             return find == null ? this.makeEmpty() : find;
         } catch (error) {
