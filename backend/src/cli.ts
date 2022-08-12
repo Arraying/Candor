@@ -1,6 +1,6 @@
 import * as readline from "readline";
 import { runnerList, runnerAdd, runnerDel } from "./commands/runner";
-import { pipelineList, pipelineAdd, pipelineDel, pipelinePublic, run } from "./commands/pipeline";
+import { pipelineList, pipelineAdd, pipelineDel, pipelinePublic } from "./commands/pipeline";
 import { userList, userAdd, userDel, userReset } from "./commands/user";
 import { assign, unassign } from "./commands/permission";
 
@@ -103,11 +103,6 @@ const commands = new Map<string, Command>([
         description: "Sets the pipeline public visibility",
         usage: "<name> true|false",
         executor: pipelinePublic,
-    }],
-    ["pipeline run", {
-        description: "Runs a pipeline (optionally on a specified runner).",
-        usage: "<name> [runner]",
-        executor: run,
     }],
     ["user ls", {
         description: "Lists all users.",

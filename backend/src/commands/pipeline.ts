@@ -89,10 +89,6 @@ export async function pipelinePublic(args: string[]): Promise<boolean> {
     return true;
 }
 
-export async function run(args: string[]): Promise<boolean> {
-    return false;
-}
-
 /**
  * Pretty prints a pipeline.
  * @param pipeline The pipeline.
