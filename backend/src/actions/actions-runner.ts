@@ -20,7 +20,7 @@ export async function runnerList() {
         return;
     }
     for (const runner of runners) {
-        console.log(`==> ID: ${runner.id}\n    Name: ${runner.name}\n    Host: ${runner.hostname}\n    Port: ${runner.port}`);
+        console.log(`==> ID: ${runner.id}\n    Name: ${runner.name}\n    Host: ${runner.hostname}`);
     }
 }
 
@@ -46,8 +46,6 @@ export async function runnerAdd() {
     const runner = new Runner();
     runner.name = response.name;
     runner.hostname = host;
-    // TODO: Remove.
-    runner.port = 3001;
     const status = await service.create(runner);
     console.log(status === "success" 
         ? "The runner has been created. Please ensure that it uses the same secret."

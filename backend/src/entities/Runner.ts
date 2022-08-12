@@ -22,11 +22,5 @@ export class Runner {
      * The hostname (excl. port).
      */
     @Column({nullable: false})
-    hostname!: string;
-
-    /**
-     * The port.
-     */
-    @Column({nullable: false})
-    port!: number;   
+    hostname!: string; 
 }

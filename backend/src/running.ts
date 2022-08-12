@@ -317,5 +317,5 @@ function extractJSPathParameters(plan: any, body: any): any {
  * @returns A correctly formatted endpoint.
  */
 function getRunnerEndpoint(runner: Runner, endpoint: string): string {
-    return `http://${runner.hostname}:${runner.port}${endpoint}`;
+    return `${runner.hostname}${endpoint}`;
 }
