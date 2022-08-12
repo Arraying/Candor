@@ -9,7 +9,7 @@ const WEB_ONLY = process.env.WEB_ONLY || false;
 AppDataSource.initialize()
     .then(async () => {
         // Serve the web server.
-        const server = app.listen(3000);
+        const server = app.listen(parseInt(process.env.DASHBOARD_PORT || "3000"));
         // Run the command-line tool.
         if (WEB_ONLY != "true") {
             mainMenuLoop()
