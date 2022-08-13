@@ -10,7 +10,7 @@
     import WorkButton from "./WorkButton.svelte";
 
     // Import utility functions.
-    import { call } from "../requests";
+    import { call, throttler } from "../requests";
     import { relativeTimeDifference } from "../utils";
 
     // Which pipeline to show.
@@ -20,7 +20,7 @@
     $: active = pipelineId !== undefined;
 
     // The promise that loads the actual pipeline.
-    $: promise = loadPipeline(pipelineId);
+    $: promise = loadPipeline(pipelineId, true);
 
     // Keep track of the modals.
     let showRun = false, showConfig = false, showLog = false;
@@ -58,14 +58,20 @@
     /**
      * Loads the pipeline by ID.
      * @param id The pipeline ID.
+     * @param performThrottling Whether or not to throttle the request a bit so the UI does not flash.
      */
-    async function loadPipeline(id) {
+    async function loadPipeline(id, performThrottling) {
         // At this point no pipeline is selected, just reject the promise
         if (!id) {
             return new Promise((_, reject) => reject());
         }
         // Fetch it.
-        const response = await call("GET", `/api/pipelines/${pipelineId}`);
+        const request = call("GET", `/api/pipelines/${pipelineId}`);
+        // Throttle this down a bit otherwise the flash will be uncomfortable to the user.
+        const throttle = performThrottling ?  throttler(175) : Promise.resolve();
+        const responseRaw = await Promise.all([request, throttle]);
+        // Get the actual request.
+        const response = responseRaw[0];
         // Handle non 200.
         if (response.status !== 200) {
             console.error(`Received status ${response.status} loading pipeline ${pipelineId}`);
@@ -95,7 +101,7 @@
      */
     function executePipelineRefresh() {
         // Get a new promise that refreshes the data.
-        const refreshedPromise = loadPipeline(pipelineId);
+        const refreshedPromise = loadPipeline(pipelineId, false);
         // Wait for the promise to complete, and then use it as a drop-in replacement.
         // This will make it so the old information is still displayed while everything is being loaded.
         refreshedPromise
