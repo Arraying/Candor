@@ -128,13 +128,14 @@ export async function listPipelines(req: Request, res: Response) {
         const lastRun = runs[0];
         const lastSuccess = runs.find((run: Run): boolean => run.outcome.status === "Passed");
         const lastFailure = runs.find((run: Run): boolean => run.outcome.status === "Failed");
+        const lastStages = lastRun?.outcome.stages ? lastRun.outcome.stages.map((stage: any): string => stage.status) : undefined;
         return {
             // Basic information.
             id: pipeline.id,
             name: pipeline.name,
             // Only if it has run before.
             status: lastRun?.outcome.status,
-            stages: lastRun?.outcome.stages.map((stage: any): string => stage.status),
+            stages: lastStages,
             // Again, only if applicable.
             lastSuccess: lastSuccess ? parseInt(lastSuccess.finish) : undefined,
             lastFailure: lastFailure ? parseInt(lastFailure.finish) : undefined,

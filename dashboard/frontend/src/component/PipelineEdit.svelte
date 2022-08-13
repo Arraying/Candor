@@ -2,6 +2,9 @@
     // Import the event dispatcher such that we can update the pipeline parameters.
     import { createEventDispatcher } from 'svelte';
 
+    // Import YAML library. 
+    import yaml from "js-yaml";
+
     // Import the required components.
     import Modal from "./Modal.svelte";
     import WorkButton from "./WorkButton.svelte";
@@ -31,7 +34,10 @@
     async function load(pipelineId) {
         const response = await call("GET", `/api/pipelines/${pipelineId}/config`);
         if (response.status === 200) {
-            binding = JSON.stringify(await response.json(), null, 2);
+            const json = await response.json();
+            // Debug in case of future deserialization issues.
+            console.debug(json);
+            binding = yaml.dump(json);
             disabled = false;
         } else {
             errorText = `Internal error: ${response.status}`;
@@ -48,11 +54,12 @@
         }
         let config;
         try {
-            config = JSON.parse(binding);
-        } catch (_) {
-            errorText = "The config is not valid JSON!";
-            return;
+            config = yaml.load(binding, { json: true });
+        } catch (error) {
+            errorText = error.message;
         }
+        // Debug in case of future serialization issues.
+        console.debug(config);
         editProgress = true;
         const response = await call("POST", `/api/pipelines/${pipelineId}/config`, config);
         const validity = await response.json();
@@ -75,7 +82,7 @@
                 Configuration
             </label>
             <div class="control">
-                <textarea class="textarea is-small" bind:value={binding} rows="20" {disabled}/>
+                <textarea class="yaml textarea is-small" bind:value={binding} rows="20" {disabled}/>
             </div>
             {#if errorText}
                 <p class="help is-danger">
@@ -95,3 +102,10 @@
         </div>
     </form>
 </Modal>
+
+<style>
+    .yaml {
+        font-family: monospace;
+        font-size: 1em;
+    }
+</style>
