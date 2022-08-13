@@ -28,7 +28,7 @@ export class RunnerAction extends BaseAction<Runner> {
         return null;
     }
 
-    protected createBuildEntity(response: any): Runner {
+    protected async createBuildEntity(response: any): Promise<Runner> {
         const host = buildHost(response.protocol, response.domain);
         const runner = new Runner();
         runner.hostname = host;
@@ -40,9 +40,9 @@ export class RunnerAction extends BaseAction<Runner> {
     }
 
     /**
-     * Updates the host of the runner.
+     * Updates an existing runner's host.
      */
-    async actionUpdateHost() {
+    async actionUpdateHost(): Promise<void> {
         await this.actionUpdate({
             prompts: promptHost(),
             update: updateHost,

@@ -3,13 +3,6 @@ import { NamedEntity, BaseService } from "../services/BaseService";
 import { promptList, promptName, unanswered } from "./actions-utils";
 
 /**
- * Represents a named response, which contains at least a name.
- */
-interface NamedResponse {
-    name: string
-}
-
-/**
  * Represents an updater that can be used to update entities.
  */
 type Updater<T> = {
@@ -62,14 +55,14 @@ export abstract class BaseAction<T extends NamedEntity> {
      * Returns an error string, or null if everything is fine.
      * @param response The response.
      */
-    protected abstract createValidateInput(response: NamedResponse): Promise<string | null>;
+    protected abstract createValidateInput(response: any): Promise<string | null>;
 
     /**
      * Constructs an entity from a response.
      * The name does not need to be set here.
      * @param response The newly constructed entity.
      */
-    protected abstract createBuildEntity(response: NamedResponse): T;
+    protected abstract createBuildEntity(response: any): Promise<T>;
 
     /**
      * The info message when an entity is created, can be blank.
@@ -102,7 +95,7 @@ export abstract class BaseAction<T extends NamedEntity> {
             promptName(this._nameLimit, (name: string): Promise<boolean> => this._service.doesNameExist(name)), 
             ...this.createPrompts()
         ];
-        const response = <NamedEntity> await prompts(questions);
+        const response = await prompts(questions);
         // Check if we need to return early.
         if (unanswered(response)) {
             return;
@@ -114,7 +107,7 @@ export abstract class BaseAction<T extends NamedEntity> {
             return;
         }
         // Create the entity.
-        const entity = this.createBuildEntity(response);
+        const entity = await this.createBuildEntity(response);
         entity.name = response.name;
         const status = await this._service.create(entity);
         console.log(status === "success" 
@@ -164,7 +157,7 @@ export abstract class BaseAction<T extends NamedEntity> {
             console.log(`There are no ${this._name}s.`);
             return;
         }
-        const names = entities.map((entity: NamedEntity): string => entity.name);
+        const names = entities.map((entity: T): string => entity.name);
         let response = await prompts(promptList(`Which ${this._name} should be updated?`, names));
         // Check for early return.
         if (unanswered(response)) {

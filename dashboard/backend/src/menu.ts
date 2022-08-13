@@ -1,8 +1,9 @@
 import { pipelineList, pipelineAdd, pipelinePublic, pipelineReroll, pipelineAssign, pipelineUnassign, pipelineDel } from "./actions/actions-pipeline";
-import { userList, userAdd, userReset, userDel } from "./actions/actions-user";
 import prompts from "prompts";
 import { RunnerAction } from "./actions/RunnerAction";
+import { UserAction } from "./actions/UserAction";
 
+const userAction = new UserAction();
 const runnerAction = new RunnerAction();
 
 /**
@@ -38,10 +39,10 @@ async function mainMenu(): Promise<boolean> {
             { title: "Assign user to pipeline", description: "Gives a user access to the pipeline.", value: pipelineAssign },
             { title: "Unassign user from pipeline", description: "Removes access of a user from a pipeline.", value: pipelineUnassign },
             { title: "Delete pipeline", description: "Deletes an existing pipeline.", value: pipelineDel },
-            { title: "List users", description: "Lists all users.", value: userList },
-            { title: "New user", description: "Creates a new user.", value: userAdd },
-            { title: "Reset user password", description: "Resets an existing user's password.", value: userReset},
-            { title: "Delete user", description: "Deletes an existing user.", value: userDel },
+            { title: "List users", description: "Lists all users.", value: () => userAction.actionList() },
+            { title: "New user", description: "Creates a new user.", value: () => userAction.actionCreate() },
+            { title: "Reset user password", description: "Resets an existing user's password.", value: () => userAction.actionUpdatePassword() },
+            { title: "Delete user", description: "Deletes an existing user.", value: () => userAction.actionDelete() },
             { title: "List runners", description: "Lists all runners.", value: () => runnerAction.actionList() },
             { title: "New runner", description: "Registers a new runner.", value: () => runnerAction.actionCreate() },
             { title: "Modify runner host", description: "Changes the runner's host.", value: () => runnerAction.actionUpdateHost() },
