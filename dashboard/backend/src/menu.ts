@@ -1,7 +1,9 @@
 import { pipelineList, pipelineAdd, pipelinePublic, pipelineReroll, pipelineAssign, pipelineUnassign, pipelineDel } from "./actions/actions-pipeline";
 import { userList, userAdd, userReset, userDel } from "./actions/actions-user";
-import { runnerList, runnerAdd, runnerHost, runnerDel } from "./actions/actions-runner";
 import prompts from "prompts";
+import { RunnerAction } from "./actions/RunnerAction";
+
+const runnerAction = new RunnerAction();
 
 /**
  * The main menu loop, this will ensure the menu is always shown.
@@ -40,10 +42,10 @@ async function mainMenu(): Promise<boolean> {
             { title: "New user", description: "Creates a new user.", value: userAdd },
             { title: "Reset user password", description: "Resets an existing user's password.", value: userReset},
             { title: "Delete user", description: "Deletes an existing user.", value: userDel },
-            { title: "List runners", description: "Lists all runners.", value: runnerList },
-            { title: "New runner", description: "Registers a new runner.", value: runnerAdd },
-            { title: "Modify runner host", description: "Changes the runner's host.", value: runnerHost },
-            { title: "Delete runner", description: "Deletes an existing runner.", value: runnerDel },
+            { title: "List runners", description: "Lists all runners.", value: () => runnerAction.actionList() },
+            { title: "New runner", description: "Registers a new runner.", value: () => runnerAction.actionCreate() },
+            { title: "Modify runner host", description: "Changes the runner's host.", value: () => runnerAction.actionUpdateHost() },
+            { title: "Delete runner", description: "Deletes an existing runner.", value: () => runnerAction.actionDelete() },
             { title: "Exit", description: "Shuts down the dashboard.", value: shutdown },
         ],
     });
