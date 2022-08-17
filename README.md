@@ -2,115 +2,47 @@
 ![Candor](assets/candor_white.png#gh-dark-mode-only)
 
 
-> **An extremely simple containerized CI server.**
+> **🚀 A mimimalistic containerized Continuous Integration ecosystem.**
 
-# Ecosystem
+# Features
+- [🌊] Minimalistic from the ground up. Who says powerful can't be beautiful?
+- [🖇️] One dashboard, as many runners as you want. 
+- [🐳] Containerization with Docker at its core. Say goodbye to conflicting PATHs and dependencies.
+- [🗄️] Artifact archiving to S3 storage.
+- [🎨] Fast, responsive, modern design. Every piece of information is hand-selected and placed with purpose.
+- [🖥️] Management performed through an elegant CLI, day-to-day business served through the web.
 
-![Ecosystem](assets/flowchart.png)
+Convinced already? [Click me to get started]().
 
-**The Candor ecosystem is straightforward, and entirely containerized.**
+# Showcase
 
+![Homepage](assets/showcase_home.png)
 
-Docker runs on the host machine(s) of the controller and pipeline runner(s).
-The controller's panel and API runs as a container. 
-The pipeline runner(s) run(s) as a container.
-The controller keeps track of the semantics of pipelines, their users and permissions, etc.
+> 🏠 The home page contains an overview of all pipelines.
 
-When the controller should run the pipeline, it chooses an available runner.
-It then sends the runner a blueprint of the tasks to perform for this pipeline run.
-The runner builds the required images for each stage on the host Docker.
-Next, it creates a volume for the run of the pipeline.
-With the created images, it runs a container per stage of the pipeline, whereby the working directory is mounted on the shared volume.
-Optionally, after the pipeline has passed, **files can be archived to S3** from the working directory of the last stage.
-Lastly, all created images, containers, volumes, etc. get destroyed, even in the case of errors.
+![Pipeline](assets/showcase_pipeline.png)
 
-## Pipeline Philosophy.
+> 🛠️ A single pipeline can be inspected, modified and run.
 
-- A pipeline may have multiple **stages**, which will be executed one after another.
-- Pipeline stages all perform work in a single **working directory**, which gets passed from one stage to the next.
-- If a stage **fails**, all subsequent stages are **skipped** and the pipeline fails.
-- If the pipeline or a stage **errors**, all subsequent stages are **skipped** as well, and the pipeline also fails.
-- If the pipeline **passes**, select files from the working directory may be permanently **archived**.
+![CLI](assets/showcase_cli.png)
 
-## Components
+> 📝 CRUD operations are performed through the interactive CLI.
 
-Candor consists of multiple components, which all play an important role in the ecosystem.
-Although Candor is in an encosystem, **it is entirely possible to pick and choose applicable components**.
-For example, a single pipeline runner can be used without its corresponding controller.
-Or, custom runners can be used in place of the provided one with the same CI controller.
+# Installation & Documentation
 
-# CI Controller 
+Almost all documentation can be found in the [wiki](https://github.com/Arraying/Candor/wiki). If something is not covered in the wiki, feel free to [submit an issue](https://github.com/Arraying/Candor/issues/new) with your question.
 
-**The CI controller is both a web panel and API.**
-Under the hood, it is a command line tool, capable of modifying the state of the ecosystem.
-Very minimal information is reflected on the dashboard, in order to keep everything simple and to avoid clutter.
+Quick links:
+- [Installation guide](https://github.com/Arraying/Candor/wiki/Installation).
+- [Understanding the basic concepts](https://github.com/Arraying/Candor/wiki/Concepts).
+- [Configuring dashboard and runners](https://github.com/Arraying/Candor/wiki/Configuration).
+- [Hands-on first pipeline](https://github.com/Arraying/Candor/wiki/Pipelines-101).
+- [API reference](https://github.com/Arraying/Candor/wiki/API).
 
-The controller's backend is written in *TypeScript*, using *Express.js*, *TypeORM* and a *PostgreSQL* database.
-The controller's frontend is written in *Svelte*.
+# Contributing
 
-# Runner
+Coming soon.
 
-**The runner is at the heart of the ecossytem.**
-It exposes a single endpoint that contains a pipeline plan, and the runner's job is to execute this plan.
-Everything the runner does is containerized.
+# License
 
-The runner is written in *TypeScript* using *Express.js*.
-
-## Plans
-
-A plan describes how the pipeline should function.
-Plans are at their core written in JSON.
-
-When sending a pipeline request to a runner, the following format is required:
-```json
-{
-    "runId": "12345",
-    "plan": {}
-}
-```
-The `runId` is optional (defaults to a random hex string).
-If the pipeline is being triggered by a panel or something that has a run ID, this will force the runner to use this ID to make debugging easier.
-
-The following describes the current pipeline plan.
-
-Field | Type | Nullable | Description
--- | -- | -- | --
-stages | stage[] | No | A possibly empty array of pipeline stages.
-archive | string[] | Yes | The paths of all the filenames that will be archived.
-
-The following describes the current stage plan.
-
-Field | Type | Nullable | Description
--- | -- | -- | --
-name | string | No | The name of the stage.
-image | string | No | The name of the Docker image to use for the stage.
-runtime | string | Yes | The runtime for the container. Defaults to the default system runtime.
-environment | string[] | Yes | A possibly empty array of `KEY=VALUE` environment variables.
-script | string[] | Yes | A possibly empty array of shell commands to execute in the container.
-
-## Archiving
-
-At the end of the pipeline, any file can be archived from the working directory and uploaded to S3 storage.
-
-Archived files will be uploaded to `runId/filename` in S3, where `runId` is the pipeline run's ID and `filename` is the base file name of the file to be archived. Note that when archiving, everything will be flattened: path structures in the working directory are disregarded. For example, `foo/bar.txt` and `baz/bar.txt` both resolve to `bar.txt` and will overwrite eachother. As a workaround, archived files should be renamed before achiving. Furthermore, if folders are specified, these will be skipped and not uploaded to S3.
-
-## Container Runtimes
-
-Pipeline containers do not get started with `--priveleged` nor do they have access to the Docker daemon.
-In order to provide functionality to e.g. build and publish an image, Docker needs to run inside of Docker.
-Such functionality is supported using third party runtimes like `sysbox`. 
-
-Candor makes no assumption about runtimes. 
-It is up to the host system to install and configure additional container runtimes if the default runtime does not meet system requirements or expectations.
-
-# Bootstrap
-
-The `bootstrap/` directory provides a super simple way to spin up a fully functioning Candor CI stack. 
-This create the following.
-- A locally hosted S3 server to handle archives.
-- A single pipeline runner.
-- A web server to serve the dashboard.
-- A database server for the dashboard.
-
-**Warning:** This exposes the Docker socket to the runner's container. 
-If you believe this is not worth the risk, please run the runner on baremetal instead.
+Licensed under the MIT license.
