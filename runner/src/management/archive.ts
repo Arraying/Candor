@@ -7,9 +7,6 @@ import tar from "tar";
 import tmp from "tmp";
 import { workingDirectory } from "../pipeline";
 
-// Constant region.
-const region = "eu-west-1";
-
 /**
  * Archives all the required files to S3 storage.
  * @param client The Docker client.
@@ -29,7 +26,8 @@ export async function archiveFiles(client: Dockerode, lastSuccessfulContainer: s
         return [];
     }
     // If the credentials are not specified, return.
-    if (!process.env.S3_ENDPOINT
+    if (!process.env.S3_REGION
+        || !process.env.S3_ENDPOINT
         || !process.env.S3_PORT
         || !process.env.S3_ACCESS
         || !process.env.S3_SECRET) {
@@ -49,7 +47,7 @@ export async function archiveFiles(client: Dockerode, lastSuccessfulContainer: s
     const bucketExists = await s3.bucketExists(bucket);
     if (!bucketExists) {
         // Create it so it can be written to.
-        await s3.makeBucket(bucket, region);
+        await s3.makeBucket(bucket, process.env.S3_REGION);
     }
     // Resovle the container.
     const container = await client.getContainer(lastSuccessfulContainer);
