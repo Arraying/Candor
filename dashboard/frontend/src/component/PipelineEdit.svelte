@@ -82,7 +82,7 @@
                 Configuration
             </label>
             <div class="control">
-                <textarea class="yaml textarea is-small" bind:value={binding} rows="20" {disabled}/>
+                <textarea class="yaml textarea is-small" bind:value={binding} rows="20" wrap="off" {disabled}/>
             </div>
             {#if errorText}
                 <p class="help is-danger">
