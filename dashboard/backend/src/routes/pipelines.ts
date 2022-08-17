@@ -266,12 +266,9 @@ export async function getPipelineLog(req: Request, res: Response) {
     const runId = req.params.runId;
     try {
         // See if the run actually exists.
-        const run = await AppDataSource.getRepository(Run).findOneBy({
-            pipeline: pipelineId,
-            run_id: runId,
-        });
+        const run = await getRunFromRunId(pipelineId, runId);
         // If not, relay that.
-        if (!run) {
+        if (run == null) {
             throw new Error("Run does not exist");
         }
         if (!run.runner) {
@@ -286,7 +283,7 @@ export async function getPipelineLog(req: Request, res: Response) {
             throw new Error("Runner could not be found");
         }
         // Request the logs from the runner.
-        const logRequest = log(runner, runId);
+        const logRequest = log(runner, run.run_id);
         logRequest
             // Axios wizardry.
             // Pipe the response from the runner directly into this response.
@@ -305,6 +302,31 @@ export async function getPipelineLog(req: Request, res: Response) {
 
     } catch (error) {
         console.warn(`[${runId}] ${error}`);
-        res.send("No log could be found");
+        res.status(400).send("No log could be found");
     }
+}
+
+/**
+ * Looks up a run for a pipeline given a run ID, with support for last.
+ * @param pipelineId The pipeline ID, can be undefined.
+ * @param runId The run ID, can be undefined.
+ * @returns The run for that pipeline matching the run ID.
+ */
+async function getRunFromRunId(pipelineId: number | undefined, runId: string | undefined): Promise<Run | null> {
+    // If it's last, try to get the last run ID.
+    if (runId === "last") {
+        return await AppDataSource.getRepository(Run).findOne({
+            where: {
+                pipeline: pipelineId,
+            },
+            order: {
+                start: "DESC",
+            },
+        });
+    }
+    // Get it the normal way.
+    return await AppDataSource.getRepository(Run).findOneBy({
+        pipeline: pipelineId,
+        run_id: runId,
+    });   
 }
