@@ -104,6 +104,10 @@
 </Modal>
 
 <style>
+    .box {
+        border-radius: 0;
+    }
+
     .yaml {
         font-family: monospace;
         font-size: 1em;

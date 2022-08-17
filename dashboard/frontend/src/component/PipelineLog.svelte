@@ -4,7 +4,7 @@
     import Modal from "./Modal.svelte";
 
     // Utility for requests.
-    import { call } from "../requests";
+    import { call, throttler } from "../requests";
 
     // Export the required variables.
     export let active, pipelineId, runId;
@@ -24,7 +24,9 @@
      * @param runId The run ID.
      */
     async function loadLog(pipelineId, runId) {
-        const response = await call("GET", `/api/runs/${pipelineId}/${runId}/log`);
+        const request = call("GET", `/api/runs/${pipelineId}/${runId}/log`);
+        const responseRaw = await Promise.all([request, throttler(200)]);
+        const response = responseRaw[0];
         // Handle non 200.
         if (response.status !== 200) {
             console.error(`Received status ${response.status} loading pipeline ${pipelineId} build ${buildId} logs`);
@@ -62,6 +64,7 @@
 
     .logs {
         border-radius: 0;
+        font-family: monospace;
         overflow: scroll;
         scroll-padding: 1.25rem;
         white-space: pre-wrap;
