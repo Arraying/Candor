@@ -1,7 +1,14 @@
 import { getTimeoutPromise, getOverrideConfig, StageTimeoutError } from "../src/management/container";
 
 describe("Timeout parsing tests", () => {
-    environmentVariableHooks();
+    const env = process.env;
+    beforeEach(() => {
+        jest.resetModules();
+        process.env = { ...env };
+    });
+    afterEach(() => {
+        process.env = env;
+    });
     test("Returns null when not specified", () => {
         expect(getTimeoutPromise()).toBeNull();
     })
@@ -39,16 +46,5 @@ describe("Overridge config tests", () => {
     test("Returns nothing when invalid JSON", () => {
         process.env.RUNNER_CONTAINER_CONFIG_B = "hello world";
         expect(getOverrideConfig()).toStrictEqual({});
-    })
-})
-
-function environmentVariableHooks() {
-    const env = process.env;
-    beforeEach(() => {
-        jest.resetModules();
-        process.env = { ...env };
     });
-    afterEach(() => {
-        process.env = env;
-    })
-}
+});

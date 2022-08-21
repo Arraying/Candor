@@ -66,20 +66,12 @@ export function verifyPath(candidate: string): boolean {
 }
 
 /**
- * Gets the log base directory.
- * @returns The log directory as defined in the config or the current working directory.
- */
-function getLogDirectory(): string {
-    return process.env.RUNNER_LOGS || process.cwd();
-}
-
-/**
  * Writes to a stream and returns a promise.
  * @param stream The write stream to write to.
  * @param text The text to write.
  * @returns A promise of void.
  */
-function promiseWrite(stream: fs.WriteStream, text: string): Promise<void> {
+ export function promiseWrite(stream: fs.WriteStream, text: string): Promise<void> {
     return new Promise((resolve, reject) => {
         stream.write(text, (error: Error | null | undefined) => {
             if (!error) {
@@ -89,4 +81,12 @@ function promiseWrite(stream: fs.WriteStream, text: string): Promise<void> {
             }
         })
     });
+}
+
+/**
+ * Gets the log base directory.
+ * @returns The log directory as defined in the config or the current working directory.
+ */
+function getLogDirectory(): string {
+    return process.env.RUNNER_LOGS || process.cwd();
 }
