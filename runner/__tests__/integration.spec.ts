@@ -187,7 +187,6 @@ describe("Bad weather recovery tests", () => {
         });
         const response = await run(runRequest);
         expect(response).toStrictEqual({
-            archived: undefined,
             status: "Error",
             stages: [
                 {
@@ -250,7 +249,6 @@ describe("Bad weather recovery tests", () => {
         });
         const response = await run(runRequest);
         expect(response).toStrictEqual({
-            archived: undefined,
             status: "Error",
             stages: [
                 {
@@ -332,7 +330,6 @@ describe("Bad weather behaviour tests", () => {
         };
         const response = await run(invalidRunRequest);
         expect(response).toStrictEqual({
-            archived: undefined,
             status: "Error",
             stages: [{
                 exitCode: -2,
@@ -375,7 +372,6 @@ describe("Bad weather behaviour tests", () => {
         });
         const response = await run(runRequest);
         expect(response).toStrictEqual({
-            archived: undefined,
             status: "Failed",
             stages: [
                 {
@@ -444,7 +440,6 @@ describe("Timeout tests", () => {
         });
         const response = await run(runRequest);
         expect(response).toStrictEqual({
-            archived: undefined,
             status: "Passed",
             stages: [
                 {
@@ -503,7 +498,6 @@ describe("Timeout tests", () => {
         });
         const response = await run(runRequest);
         expect(response).toStrictEqual({
-            archived: undefined,
             status: "Failed",
             stages: [
                 {

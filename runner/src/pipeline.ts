@@ -75,11 +75,15 @@ export async function run(request: RunRequest): Promise<PipelineRun> {
         }
         // Return the relevant information of the run.
         log(runId, "Run complete");
-        return {
+        const response: PipelineRun = {
             status: determineOverallStatus(containerRun.stageRuns),
             stages: containerRun.stageRuns,
-            archived: archived,
         };
+        // Prevent undefined to be added to the payload.
+        if (archived) {
+            response.archived = archived;
+        }
+        return response;
     } catch (exception) {
         log(runId, "Pipeline encountered internal error:")
         console.error(exception);
