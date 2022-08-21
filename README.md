@@ -39,6 +39,17 @@ Quick links:
 - [Hands-on first pipeline](https://github.com/Arraying/Candor/wiki/Pipelines-101).
 - [API reference](https://github.com/Arraying/Candor/wiki/API).
 
+# Roadmap
+
+The current development roadmap is as follows:
+- [⭐] Quality of life improvements to the config editor.
+- [🐙] A GitHub status integration.
+- [💾] The ability to use state of previous pipelines as base images.
+- [🔌] A plugin system such that common pipeline steps such as Git clones can be abbreviated.
+- [🔧] A fully-fledged web dashboard replacing the CLI.
+
+Please note that this roadmap will most likely change as priorities shift or new ideas arise.
+
 # Contributing
 
 Coming soon.
