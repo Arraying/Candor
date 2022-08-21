@@ -36,6 +36,10 @@ describe("Overridge config tests", () => {
         process.env.RUNNER_CONTAINER_CONFIG_B = objectBase64;
         expect(getOverrideConfig()).toStrictEqual(object);
     });
+    test("Returns nothing when invalid JSON", () => {
+        process.env.RUNNER_CONTAINER_CONFIG_B = "hello world";
+        expect(getOverrideConfig()).toStrictEqual({});
+    })
 })
 
 function environmentVariableHooks() {

@@ -97,7 +97,7 @@ export async function runContainers(client: Docker, request: RunRequest, volumeN
         };
         // Bind the shared data if applicable.
         if (process.env.RUNNER_SHARED) {
-            candorOption.HostConfig?.Mounts?.push({
+            candorOption.HostConfig!.Mounts!.push({
                 Target: "/srv/candor",
                 Source: process.env.RUNNER_SHARED,
                 Type: "bind",
@@ -164,6 +164,8 @@ export async function runContainers(client: Docker, request: RunRequest, volumeN
                         status: "Failed",
                         exitCode: -3,
                     });
+                    // Skip the next few ones.
+                    skip = true;
                 } else {
                     // Delegate the error to the main error handler.
                     throw error;
