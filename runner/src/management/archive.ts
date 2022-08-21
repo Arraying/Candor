@@ -33,7 +33,7 @@ export async function archiveFiles(client: Dockerode, lastSuccessfulContainer: s
         || !process.env.S3_SECRET) {
         return [];
     }
-    const result = [];
+    const result: string[] = [];
     // Create the S3 client. This can't be done earlier because the environment variables won't be there.
     const s3 = new Client({
         endPoint: process.env.S3_ENDPOINT,
@@ -86,7 +86,7 @@ export async function archiveFiles(client: Dockerode, lastSuccessfulContainer: s
         // The name of the file in the temporary filesystem.
         const realFileName = path.join(name, baseName);
         // If file is a directory, skip it.
-        if (await (await fs.promises.lstat(realFileName)).isDirectory) {
+        if ((await fs.promises.lstat(realFileName)).isDirectory()) {
             continue;
         }
         // The path of the file in S3 storage.
