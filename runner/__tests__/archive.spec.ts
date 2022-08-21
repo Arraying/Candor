@@ -34,7 +34,7 @@ jest.mock("tar", () => ({
 }));
 
 const client = new Docker();
-const runId: string = "abc123";
+const runId = "abc123";
 
 describe("Archiving tests", () => {
     const env = process.env;

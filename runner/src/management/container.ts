@@ -156,7 +156,7 @@ export async function runContainers(client: Docker, request: RunRequest, volumeN
                 // See if this error is expected/recoverable.
                 if (error instanceof StageTimeoutError) {
                     // Handle the timeout.
-                    logInfo(log, `Process exceeded stage execution time limit`);
+                    logInfo(log, "Process exceeded stage execution time limit");
                     // Write the failure.
                     // The container does not need to be killed, the cleaner will remove it with force.
                     stageRuns.push({

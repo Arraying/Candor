@@ -1,4 +1,4 @@
-import { getTimeoutPromise, getOverrideConfig, StageTimeoutError } from "../src/management/container";
+import { getOverrideConfig, getTimeoutPromise, StageTimeoutError } from "../src/management/container";
 
 describe("Timeout parsing tests", () => {
     const env = process.env;

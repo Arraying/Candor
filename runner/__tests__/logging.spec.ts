@@ -34,7 +34,7 @@ describe("Logger tests", () => {
                     callback(error);
                 }
                 return false;
-            }
+            },
         }
         try {
             // @ts-ignore

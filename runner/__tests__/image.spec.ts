@@ -16,7 +16,7 @@ describe("Making the Docker image", () => {
             environment: [
                 "FOO=bar",
                 "COW=Goes moo",
-            ]
+            ],
         }];
         const result = (await makeDockerfiles(stages))[0];
         expect(result.dockerfile).toContain("ENV FOO bar");
@@ -28,7 +28,7 @@ describe("Making the Docker image", () => {
             image: "node",
             environment: [
                 "FOO",
-            ]
+            ],
         }];
         const result = (await makeDockerfiles(stages))[0];
         expect(result.dockerfile).toContain("ENV FOO FOO");
@@ -39,7 +39,7 @@ describe("Making the Docker image", () => {
             image: "node",
             environment: [
                 "",
-            ]
+            ],
         }];
         const result = (await makeDockerfiles(stages))[0];
         expect(result.dockerfile).not.toContain("ENV");
