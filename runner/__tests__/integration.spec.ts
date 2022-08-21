@@ -103,6 +103,27 @@ describe("Bad weather recovery tests", () => {
         expect(response).toStrictEqual(errorResponse);
         expect(mockedVolume.remove).toBeCalled();
     });
+    test("Recovery when image progress track fails", async () => {
+        const mockedVolume = mockVolume();
+        // @ts-ignore
+        createVolume.mockImplementation(async () => {
+            return {
+                name: "testvolume",
+            };
+        });
+        // @ts-ignore
+        getVolume.mockImplementation(async () => {
+            return mockedVolume;
+        });
+        // @ts-ignore (the stream is ignored in our Dockermodem mock so we can use whatever we want).
+        buildImage.mockImplementation(() => undefined);
+        followProgress.mockImplementation((_: any, onFinished: (error: Error | null, result: any[]) => void) => {
+            onFinished(new Error("test error"), []);
+        });
+        const response = await run(runRequest);
+        expect(response).toStrictEqual(errorResponse);
+        expect(mockedVolume.remove).toBeCalled();
+    });
     test("Recovery when image find fails", async () => {
         const mockedVolume = mockVolume();
         const mockedImage = mockImage();

@@ -83,14 +83,12 @@ export async function buildImages(client: Docker, plan: Plan, cleaner: Cleaner):
  * @param stages An array of stages.
  * @returns A promise of a list of Dockerfiles, as strings.
  */
-async function makeDockerfiles(stages: Stage[]): Promise<ImageMeta[]> {
+export async function makeDockerfiles(stages: Stage[]): Promise<ImageMeta[]> {
     const dockerfiles = [];
     // Loop through all stages.
     for (const stage of stages) {
         // Each stage has its own Dockerfile.
-        let dockerfile = `FROM ${stage.image}\n
-            MAINTAINER Candor\n
-            WORKDIR ${workingDirectory}\n`;
+        let dockerfile = `FROM ${stage.image}\nMAINTAINER Candor\nWORKDIR ${workingDirectory}\n`;
         // Iterate through the environment variables if possible.
         for (const kvPair of stage.environment || []) {
             // Attempt to parse the key value pair.
@@ -115,10 +113,7 @@ async function makeDockerfiles(stages: Stage[]): Promise<ImageMeta[]> {
             }
             shell = script;
             // Add the relevant information to the Dockerfile.
-            dockerfile += `ADD ./${shellName} /${shellName}\n
-                RUN chmod +x /${shellName}\n
-                ENTRYPOINT ["/bin/sh"]\n
-                CMD ["/${shellName}"]`;
+            dockerfile += `ADD ./${shellName} /${shellName}\nRUN chmod +x /${shellName}\nENTRYPOINT ["/bin/sh"]\nCMD ["/${shellName}"]`;
         }
         // Write the information.
         dockerfiles.push({
