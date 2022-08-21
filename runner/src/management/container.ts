@@ -81,7 +81,7 @@ export async function runContainers(client: Docker, request: RunRequest, volumeN
             }
         }
         // Configure the container options.
-        const candorOption: Docker.ContainerCreateOptions = {
+        const candorOption = {
             Image: imageId,
             HostConfig: {
                 Mounts: [
@@ -97,7 +97,7 @@ export async function runContainers(client: Docker, request: RunRequest, volumeN
         };
         // Bind the shared data if applicable.
         if (process.env.RUNNER_SHARED) {
-            candorOption.HostConfig!.Mounts!.push({
+            candorOption.HostConfig.Mounts.push({
                 Target: "/srv/candor",
                 Source: process.env.RUNNER_SHARED,
                 Type: "bind",

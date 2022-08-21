@@ -1,16 +1,17 @@
-import Docker from "dockerode";
+import Docker, { Container } from "dockerode";
+import { archiveFiles } from "../src/management/archive";
+import { Cleaner } from "../src/cleaner";
 import { promises } from "fs"
 import { Readable } from "stream";
-import { Cleaner } from "../src/cleaner";
-import { archiveFiles } from "../src/management/archive";
 
-// @ts-ignore Container related mocks.
-jest.spyOn(Docker.prototype, "getContainer").mockImplementation(() => {
-    return {
+
+jest.spyOn(Docker.prototype, "getContainer").mockImplementation((): Container => {
+    const container: unknown = {
         getArchive: () => {
             return Readable.from(["foo foo bar bar"]);
         },
     };
+    return (container as Container);
 });
 
 jest.mock("fs", () => ({
@@ -55,8 +56,7 @@ describe("Archiving tests", () => {
     });
     test("Archives pure files", async () => {
         setupEnvironment();
-        // @ts-ignore
-        promises.lstat.mockImplementation(async () => {
+        (promises.lstat as jest.Mock).mockImplementation(async () => {
             return {
                 isDirectory: () => false,
             };
@@ -67,8 +67,7 @@ describe("Archiving tests", () => {
     });
     test("Archives pure files", async () => {
         setupEnvironment();
-        // @ts-ignore
-        promises.lstat.mockImplementation(async () => {
+        (promises.lstat as jest.Mock).mockImplementation(async () => {
             return {
                 isDirectory: () => true,
             };

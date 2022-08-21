@@ -1,5 +1,5 @@
-import { mkdirSync } from "fs";
 import { makeLogDirectory, promiseWrite, verifyPath } from "../src/logging";
+import { mkdirSync, WriteStream } from "fs";
 
 jest.mock("fs", () => ({
     mkdirSync: jest.fn(),
@@ -16,8 +16,7 @@ describe("Logger tests", () => {
         process.env = env;
     });
     test("Fails when the directory cannot be created", () => {
-        // @ts-ignore
-        mkdirSync.mockImplementation(() => {
+        (mkdirSync as jest.Mock).mockImplementation(() => {
             throw new Error("test error");
         });
         expect(makeLogDirectory).toThrowError();
@@ -28,6 +27,7 @@ describe("Logger tests", () => {
     });
     test("Handles write errors correctly", async () => {
         const fakeWriter = {
+            // eslint-disable-next-line
             write(_: any, callback?: (error: Error | null | undefined) => void): boolean {
                 const error = new Error("test error");
                 if (callback) {
@@ -37,8 +37,7 @@ describe("Logger tests", () => {
             },
         }
         try {
-            // @ts-ignore
-            await promiseWrite(fakeWriter, "text");
+            await promiseWrite(fakeWriter as WriteStream, "text");
             fail();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);

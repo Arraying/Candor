@@ -1,9 +1,9 @@
-import DockerModem from "docker-modem";
-import Docker from "dockerode";
+import { PipelineRun, run } from "../src/pipeline";
 import tmp, { DirResult } from "tmp";
+import Docker from "dockerode";
+import DockerModem from "docker-modem";
 import fs from "fs";
 import path from "path";
-import { PipelineRun, run } from "../src/pipeline";
 import { RunRequest } from "../src/plan";
 
 // Needed to get compatible runtimes.
@@ -88,15 +88,14 @@ describe("Bad weather recovery tests", () => {
     });
     test("Recovery when image creation fails", async () => {
         const mockedVolume = mockVolume();
-        // @ts-ignore
         createVolume.mockImplementation(async () => {
-            return {
+            const volume: unknown = {
                 name: "testvolume",
             };
+            return volume as Docker.VolumeCreateResponse;
         });
-        // @ts-ignore
-        getVolume.mockImplementation(async () => {
-            return mockedVolume;
+        getVolume.mockImplementation(() => {
+            return mockedVolume as unknown as Docker.Volume;
         });
         buildImage.mockRejectedValue(new Error("test error"));
         const response = await run(runRequest);
@@ -105,18 +104,19 @@ describe("Bad weather recovery tests", () => {
     });
     test("Recovery when image progress track fails", async () => {
         const mockedVolume = mockVolume();
-        // @ts-ignore
         createVolume.mockImplementation(async () => {
-            return {
+            const volume: unknown = {
                 name: "testvolume",
             };
+            return volume as Docker.VolumeCreateResponse;
         });
-        // @ts-ignore
-        getVolume.mockImplementation(async () => {
-            return mockedVolume;
+        getVolume.mockImplementation(() => {
+            return mockedVolume as unknown as Docker.Volume;
         });
-        // @ts-ignore (the stream is ignored in our Dockermodem mock so we can use whatever we want).
-        buildImage.mockImplementation(() => undefined);
+        buildImage.mockImplementation(async (): Promise<NodeJS.ReadableStream> => {
+            return undefined as unknown as NodeJS.ReadableStream;
+        });
+        // eslint-disable-next-line
         followProgress.mockImplementation((_: any, onFinished: (error: Error | null, result: any[]) => void) => {
             onFinished(new Error("test error"), []);
         });
@@ -127,22 +127,22 @@ describe("Bad weather recovery tests", () => {
     test("Recovery when image find fails", async () => {
         const mockedVolume = mockVolume();
         const mockedImage = mockImage();
-        // @ts-ignore
         createVolume.mockImplementation(async () => {
-            return {
+            const volume: unknown = {
                 name: "testvolume",
             };
+            return volume as Docker.VolumeCreateResponse;
         });
-        // @ts-ignore
-        getVolume.mockImplementation(async () => {
-            return mockedVolume;
+        getVolume.mockImplementation(() => {
+            return mockedVolume as unknown as Docker.Volume;
         });
-        // @ts-ignore (the stream is ignored in our Dockermodem mock so we can use whatever we want).
-        buildImage.mockImplementation(() => undefined);
-        // @ts-ignore
-        getImage.mockImplementation(async () => {
-            return mockedImage;
+        buildImage.mockImplementation(async (): Promise<NodeJS.ReadableStream> => {
+            return undefined as unknown as NodeJS.ReadableStream;
         });
+        getImage.mockImplementation((): Docker.Image => {
+            return mockedImage as unknown as Docker.Image;
+        });
+        // eslint-disable-next-line
         followProgress.mockImplementation((_: any, onFinished: (error: Error | null, result: any[]) => void) => {
             onFinished(null, []);
         });
@@ -153,21 +153,20 @@ describe("Bad weather recovery tests", () => {
     test("Recovery when container creation fails", async () => {
         const mockedVolume = mockVolume();
         const mockedImage = mockImage();
-        // @ts-ignore
         createVolume.mockImplementation(async () => {
-            return {
+            const volume: unknown = {
                 name: "testvolume",
             };
+            return volume as Docker.VolumeCreateResponse;
         });
-        // @ts-ignore
-        getVolume.mockImplementation(async () => {
-            return mockedVolume;
+        getVolume.mockImplementation(() => {
+            return mockedVolume as unknown as Docker.Volume;
         });
-        // @ts-ignore (the stream is ignored in our Dockermodem mock so we can use whatever we want).
-        buildImage.mockImplementation(() => undefined);
-        // @ts-ignore
-        getImage.mockImplementation(async () => {
-            return mockedImage;
+        buildImage.mockImplementation(async (): Promise<NodeJS.ReadableStream> => {
+            return undefined as unknown as NodeJS.ReadableStream;
+        });
+        getImage.mockImplementation((): Docker.Image => {
+            return mockedImage as unknown as Docker.Image;
         });
         mockProgress();
         createContainer.mockRejectedValue(new Error("test error"));
@@ -185,26 +184,24 @@ describe("Bad weather recovery tests", () => {
         const mockedContainer = mockContainer(() => 0, () => {
             return -1;
         });
-        // @ts-ignore
         createVolume.mockImplementation(async () => {
-            return {
+            const volume: unknown = {
                 name: "testvolume",
             };
+            return volume as Docker.VolumeCreateResponse;
         });
-        // @ts-ignore
-        getVolume.mockImplementation(async () => {
-            return mockedVolume;
+        getVolume.mockImplementation(() => {
+            return mockedVolume as unknown as Docker.Volume;
         });
-        // @ts-ignore (the stream is ignored in our Dockermodem mock so we can use whatever we want).
-        buildImage.mockImplementation(() => undefined);
-        // @ts-ignore
-        getImage.mockImplementation(async () => {
-            return mockedImage;
+        buildImage.mockImplementation(async (): Promise<NodeJS.ReadableStream> => {
+            return undefined as unknown as NodeJS.ReadableStream;
+        });
+        getImage.mockImplementation((): Docker.Image => {
+            return mockedImage as unknown as Docker.Image;
         });
         mockProgress();
-        // @ts-ignore
-        createContainer.mockImplementation(async () => {
-            return mockedContainer;
+        createContainer.mockImplementation(async (): Promise<Docker.Container> => {
+            return mockedContainer as unknown as Docker.Container;
         });
         const response = await run(runRequest);
         expect(response).toStrictEqual({
@@ -247,26 +244,24 @@ describe("Bad weather recovery tests", () => {
             mockContainerCounter++;
             return 1;
         });
-        // @ts-ignore
         createVolume.mockImplementation(async () => {
-            return {
+            const volume: unknown = {
                 name: "testvolume",
             };
+            return volume as Docker.VolumeCreateResponse;
         });
-        // @ts-ignore
-        getVolume.mockImplementation(async () => {
-            return mockedVolume;
+        getVolume.mockImplementation(() => {
+            return mockedVolume as unknown as Docker.Volume;
         });
-        // @ts-ignore (the stream is ignored in our Dockermodem mock so we can use whatever we want).
-        buildImage.mockImplementation(() => undefined);
-        // @ts-ignore
-        getImage.mockImplementation(async () => {
-            return mockedImage;
+        buildImage.mockImplementation(async (): Promise<NodeJS.ReadableStream> => {
+            return undefined as unknown as NodeJS.ReadableStream;
+        });
+        getImage.mockImplementation((): Docker.Image => {
+            return mockedImage as unknown as Docker.Image;
         });
         mockProgress();
-        // @ts-ignore
-        createContainer.mockImplementation(async () => {
-            return mockedContainer;
+        createContainer.mockImplementation(async (): Promise<Docker.Container> => {
+            return mockedContainer as unknown as Docker.Container;
         });
         const response = await run(runRequest);
         expect(response).toStrictEqual({
@@ -318,26 +313,24 @@ describe("Bad weather behaviour tests", () => {
         const mockedContainer = mockContainer(() => 0, () => {
             return 10;
         });
-        // @ts-ignore
         createVolume.mockImplementation(async () => {
-            return {
+            const volume: unknown = {
                 name: "testvolume",
             };
+            return volume as Docker.VolumeCreateResponse;
         });
-        // @ts-ignore
-        getVolume.mockImplementation(async () => {
-            return mockedVolume;
+        getVolume.mockImplementation(() => {
+            return mockedVolume as unknown as Docker.Volume;
         });
-        // @ts-ignore (the stream is ignored in our Dockermodem mock so we can use whatever we want).
-        buildImage.mockImplementation(() => undefined);
-        // @ts-ignore
-        getImage.mockImplementation(async () => {
-            return mockedImage;
+        buildImage.mockImplementation(async (): Promise<NodeJS.ReadableStream> => {
+            return undefined as unknown as NodeJS.ReadableStream;
+        });
+        getImage.mockImplementation((): Docker.Image => {
+            return mockedImage as unknown as Docker.Image;
         });
         mockProgress();
-        // @ts-ignore
-        createContainer.mockImplementation(async () => {
-            return mockedContainer;
+        createContainer.mockImplementation(async (): Promise<Docker.Container> => {
+            return mockedContainer as unknown as Docker.Container;
         });
         const invalidRunRequest = {
             runId: testRunId,
@@ -370,26 +363,24 @@ describe("Bad weather behaviour tests", () => {
             mockContainerCounter++;
             return 0;
         }, () => 10);
-        // @ts-ignore
         createVolume.mockImplementation(async () => {
-            return {
+            const volume: unknown = {
                 name: "testvolume",
             };
+            return volume as Docker.VolumeCreateResponse;
         });
-        // @ts-ignore
-        getVolume.mockImplementation(async () => {
-            return mockedVolume;
+        getVolume.mockImplementation(() => {
+            return mockedVolume as unknown as Docker.Volume;
         });
-        // @ts-ignore (the stream is ignored in our Dockermodem mock so we can use whatever we want).
-        buildImage.mockImplementation(() => undefined);
-        // @ts-ignore
-        getImage.mockImplementation(async () => {
-            return mockedImage;
+        buildImage.mockImplementation(async (): Promise<NodeJS.ReadableStream> => {
+            return undefined as unknown as NodeJS.ReadableStream;
+        });
+        getImage.mockImplementation((): Docker.Image => {
+            return mockedImage as unknown as Docker.Image;
         });
         mockProgress();
-        // @ts-ignore
-        createContainer.mockImplementation(async () => {
-            return mockedContainer;
+        createContainer.mockImplementation(async (): Promise<Docker.Container> => {
+            return mockedContainer as unknown as Docker.Container;
         });
         const response = await run(runRequest);
         expect(response).toStrictEqual({
@@ -438,26 +429,24 @@ describe("Timeout tests", () => {
         const mockedContainer = mockContainer(() => 0, () => {
             return 10;
         });
-        // @ts-ignore
         createVolume.mockImplementation(async () => {
-            return {
+            const volume: unknown = {
                 name: "testvolume",
             };
+            return volume as Docker.VolumeCreateResponse;
         });
-        // @ts-ignore
-        getVolume.mockImplementation(async () => {
-            return mockedVolume;
+        getVolume.mockImplementation(() => {
+            return mockedVolume as unknown as Docker.Volume;
         });
-        // @ts-ignore (the stream is ignored in our Dockermodem mock so we can use whatever we want).
-        buildImage.mockImplementation(() => undefined);
-        // @ts-ignore
-        getImage.mockImplementation(async () => {
-            return mockedImage;
+        buildImage.mockImplementation(async (): Promise<NodeJS.ReadableStream> => {
+            return undefined as unknown as NodeJS.ReadableStream;
+        });
+        getImage.mockImplementation((): Docker.Image => {
+            return mockedImage as unknown as Docker.Image;
         });
         mockProgress();
-        // @ts-ignore
-        createContainer.mockImplementation(async () => {
-            return mockedContainer;
+        createContainer.mockImplementation(async (): Promise<Docker.Container> => {
+            return mockedContainer as unknown as Docker.Container;
         });
         const response = await run(runRequest);
         expect(response).toStrictEqual({
@@ -496,26 +485,24 @@ describe("Timeout tests", () => {
         const mockedContainer = mockContainer(() => 0, () => {
             return 1001;
         });
-        // @ts-ignore
         createVolume.mockImplementation(async () => {
-            return {
+            const volume: unknown = {
                 name: "testvolume",
             };
+            return volume as Docker.VolumeCreateResponse;
         });
-        // @ts-ignore
-        getVolume.mockImplementation(async () => {
-            return mockedVolume;
+        getVolume.mockImplementation(() => {
+            return mockedVolume as unknown as Docker.Volume;
         });
-        // @ts-ignore (the stream is ignored in our Dockermodem mock so we can use whatever we want).
-        buildImage.mockImplementation(() => undefined);
-        // @ts-ignore
-        getImage.mockImplementation(async () => {
-            return mockedImage;
+        buildImage.mockImplementation(async (): Promise<NodeJS.ReadableStream> => {
+            return undefined as unknown as NodeJS.ReadableStream;
+        });
+        getImage.mockImplementation((): Docker.Image => {
+            return mockedImage as unknown as Docker.Image;
         });
         mockProgress();
-        // @ts-ignore
-        createContainer.mockImplementation(async () => {
-            return mockedContainer;
+        createContainer.mockImplementation(async (): Promise<Docker.Container> => {
+            return mockedContainer as unknown as Docker.Container;
         });
         const response = await run(runRequest);
         expect(response).toStrictEqual({
@@ -588,6 +575,7 @@ function mockContainer(statusCode: () => number, howLongItTakes: () => number) {
 }
 
 function mockProgress() {
+    // eslint-disable-next-line
     followProgress.mockImplementation((_: any, onFinished: (error: Error | null, result: any[]) => void) => {
         onFinished(null, [{
                 aux: {
