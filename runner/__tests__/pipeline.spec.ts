@@ -65,10 +65,6 @@ describe("Operating tests", () => {
     });
 });
 
-describe("Error behaviour tests", () => {
-
-});
-
 describe("Status computation tests", () => {
     test("Nothing was run", () => {
         expect(determineOverallStatus(undefined)).toBe("Error");
