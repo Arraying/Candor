@@ -25,9 +25,9 @@ declare module "express" {
 
 // The path where all the static material is rendered.
 // This is where Svelte should compile to.
-const PUBLIC = process.env.PUBLIC || "../frontend/public";
+const DASHBOARD_PUBLIC = process.env.DASHBOARD_PUBLIC || "../frontend/public";
 // The cookie secret.
-const COOKIE_SECRET = process.env.COOKIE_SECRET || "legends never die";
+const COOKIE_SECRET = process.env.DASHBOARD_COOKIE_SECRET || "legends never die";
 
 // Create the server.
 const app = express();
@@ -35,13 +35,13 @@ const app = express();
 const pgSessionStore = connectPgSimple(expressSession);
 
 // Use static for the SPA.
-app.use(express.static(PUBLIC));
+app.use(express.static(DASHBOARD_PUBLIC));
 // Use JSON for API.
 app.use(express.json());
 // Allow CORS.
 app.use(cors({
     credentials: true,
-    origin: process.env.ORIGIN
+    origin: process.env.DASHBOARD_ORIGIN
 }))
 
 // Use sessions.
