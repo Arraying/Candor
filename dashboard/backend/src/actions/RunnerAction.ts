@@ -1,8 +1,9 @@
+import { BaseAction, Response } from "./BaseAction";
+import prompts, { PromptObject } from "prompts";
+import axios from "axios";
 import { Runner } from "../entities/Runner";
 import { RunnerService } from "../services/RunnerService";
-import { BaseAction } from "./BaseAction";
-import axios from "axios";
-import prompts, { PromptObject } from "prompts";
+
 
 export class RunnerAction extends BaseAction<Runner> {
 
@@ -19,19 +20,25 @@ export class RunnerAction extends BaseAction<Runner> {
         return promptHost();
     }
 
-    protected async createValidateInput(response: any): Promise<string | null> {
-        const host = buildHost(response.protocol, response.domain);
-        // Check if the host is reachable.
-        if (!await testHost(host)) {
-            return `Could not establish a connection to ${host}, so the runner has not been added.`;
+    protected async createValidateInput(response: Response): Promise<string | null> {
+        if (typeof response.protocol === "boolean" && typeof response.domain === "string") {
+            const host = buildHost(response.protocol, response.domain);
+            // Check if the host is reachable.
+            if (!await testHost(host)) {
+                return `Could not establish a connection to ${host}, so the runner has not been added.`;
+            }
+            return null;
+        } else {
+            return "Invalid datatypes.";
         }
-        return null;
     }
 
-    protected async createBuildEntity(response: any): Promise<Runner> {
-        const host = buildHost(response.protocol, response.domain);
+    protected async createBuildEntity(response: Response): Promise<Runner> {
         const runner = new Runner();
-        runner.hostname = host;
+        if (typeof response.protocol === "boolean" && typeof response.domain === "string") {
+            const host = buildHost(response.protocol, response.domain);
+            runner.hostname = host;
+        }
         return runner;
     }
 
@@ -55,10 +62,12 @@ export class RunnerAction extends BaseAction<Runner> {
  * @param runner The runner.
  * @param response The response.
  */
-function updateHost(runner: Runner, response: any) {
-    // Update the host. Don't perform any validation.
-    const host = buildHost(response.protocol, response.domain);
-    runner.hostname = host;
+function updateHost(runner: Runner, response: Response) {
+    if (typeof response.protocol === "boolean" && typeof response.domain === "string") {
+        // Update the host. Don't perform any validation.
+        const host = buildHost(response.protocol, response.domain);
+        runner.hostname = host;
+    }
 }
 
 /**

@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 module.exports = class CreatePipelinesTable1654350913919 {
     async up(queryRunner) {
         await queryRunner.query(`

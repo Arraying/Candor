@@ -1,11 +1,12 @@
-import crypto from "crypto";
-import prompts, { PromptObject } from "prompts";
-import { Pipeline } from "../entities/Pipeline";
-import { User } from "../entities/User";
-import { PipelineService } from "../services/PipelineService";
-import { UserService } from "../services/UserService";
+import { BaseAction, Response } from "./BaseAction";
 import { promptList, unanswered } from "./actions-utils";
-import { BaseAction } from "./BaseAction";
+import prompts, { PromptObject } from "prompts";
+import crypto from "crypto";
+import { Pipeline } from "../entities/Pipeline";
+import { PipelineService } from "../services/PipelineService";
+import { User } from "../entities/User";
+import { UserService } from "../services/UserService";
+
 
 export class PipelineAction extends BaseAction<Pipeline> {
 
@@ -27,14 +28,16 @@ export class PipelineAction extends BaseAction<Pipeline> {
         return [promptVisibility()];
     }
 
-    protected async createValidateInput(response: any): Promise<string | null> {
+    protected async createValidateInput(): Promise<string | null> {
         return null;
     }
 
-    protected async createBuildEntity(response: any): Promise<Pipeline> {
+    protected async createBuildEntity(response: Response): Promise<Pipeline> {
         const pipeline = new Pipeline();
         pipeline.token = await randomToken();
-        pipeline.public = response.public;
+        if (typeof response.public === "boolean") {
+            pipeline.public = response.public;
+        }
         return pipeline;
     }
 
@@ -151,8 +154,10 @@ export class PipelineAction extends BaseAction<Pipeline> {
  * @param pipeline The pipeline.
  * @param response The response.
  */
-async function updateVisbility(pipeline: Pipeline, response: any) {
-    pipeline.public = response.public;
+async function updateVisbility(pipeline: Pipeline, response: Response) {
+    if (typeof response.public === "boolean") {
+        pipeline.public = response.public;
+    }
 }
 
 /**
@@ -160,7 +165,7 @@ async function updateVisbility(pipeline: Pipeline, response: any) {
  * @param pipeline The pipeline.
  * @param _ The response, ignored.
  */
-async function updateToken(pipeline: Pipeline, _: any) {
+async function updateToken(pipeline: Pipeline) {
     pipeline.token = await randomToken();
 }
 

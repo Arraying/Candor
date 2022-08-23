@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 module.exports = class CreateRunnersTable1654349350759 {
     async up(queryRunner) {
         await queryRunner.query(`

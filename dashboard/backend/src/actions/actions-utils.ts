@@ -1,11 +1,12 @@
 import prompts from "prompts";
+import { Response } from "./BaseAction";
 
 /**
  * Whether or not the prompt has been unanswered.
  * @param response The response given.
  * @returns False if there is an answer, true otherwise.
  */
-export function unanswered(response: any): boolean {
+export function unanswered(response: Response): boolean {
     if (!response) {
         return true;
     }

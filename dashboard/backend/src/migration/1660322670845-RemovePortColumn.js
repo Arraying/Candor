@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 module.exports = class RemovePortColumn1660322670845 {
     async up(queryRunner) {
         queryRunner.query(`

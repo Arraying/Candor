@@ -1,6 +1,6 @@
-import prompts from "prompts";
 import { BaseService, NamedEntity } from "../services/BaseService";
 import { promptList, promptName, unanswered } from "./actions-utils";
+import prompts from "prompts";
 
 /**
  * Represents an updater that can be used to update entities.
@@ -15,7 +15,14 @@ type Updater<T> = {
      * Takes in an entity and the response.
      * The name does not need to be set.
      */
-    update: (entity: T, response: any) => void,
+    update: (entity: T, response: Response) => void,
+}
+
+/**
+ * A generic response that isn't very strict but better than "any".
+ */
+export type Response = {
+    [key: string]: string | boolean | number;
 }
 
 /**
@@ -55,14 +62,14 @@ export abstract class BaseAction<T extends NamedEntity> {
      * Returns an error string, or null if everything is fine.
      * @param response The response.
      */
-    protected abstract createValidateInput(response: any): Promise<string | null>;
+    protected abstract createValidateInput(response: Response): Promise<string | null>;
 
     /**
      * Constructs an entity from a response.
      * The name does not need to be set here.
      * @param response The newly constructed entity.
      */
-    protected abstract createBuildEntity(response: any): Promise<T>;
+    protected abstract createBuildEntity(response: Response): Promise<T>;
 
     /**
      * The info message when an entity is created, can be blank.

@@ -1,9 +1,10 @@
-import bcrypt from "bcrypt";
+
+import { BaseAction, Response } from "./BaseAction";
 import prompts, { PromptObject } from "prompts";
+import bcrypt from "bcrypt";
 import { Pipeline } from "../entities/Pipeline";
 import { User } from "../entities/User";
 import { UserService } from "../services/UserService";
-import { BaseAction } from "./BaseAction";
 
 export class UserAction extends BaseAction<User> {
 
@@ -22,14 +23,16 @@ export class UserAction extends BaseAction<User> {
         return [promptPassword()];
     }
 
-    protected async createValidateInput(_: any): Promise<string | null> {
+    protected async createValidateInput(): Promise<string | null> {
         return null;
     }
 
-    protected async createBuildEntity(response: any): Promise<User> {
+    protected async createBuildEntity(response: Response): Promise<User> {
         const user = new User();
         // Hash the password.
-        user.token = await hashPassword(response.password);
+        if (typeof response.password === "string") {
+            user.token = await hashPassword(response.password);
+        }
         return user;
     }
 
@@ -54,8 +57,10 @@ export class UserAction extends BaseAction<User> {
  * @param user The user.
  * @param response The response containing the plaintext password.
  */
-async function updatePassword(user: User, response: any) {
-    user.token = await hashPassword(response.password);
+async function updatePassword(user: User, response: Response) {
+    if (typeof response.password === "string") {
+        user.token = await hashPassword(response.password);
+    }
 }
 
 /**
