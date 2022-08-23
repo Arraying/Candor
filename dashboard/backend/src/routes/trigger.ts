@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { logger } from "../logger";
 import { canRun, constraintsMet, run } from "../running";
 
 /**
@@ -20,7 +21,7 @@ export async function trigger(req: Request, res: Response) {
    }
    // Run the pipeline.
    run(req).catch(error => {
-      console.error(error);
+      logger.error(error);
    });
    // Don't wait for it to be done, just send the status now.
    res.sendStatus(200);

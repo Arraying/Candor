@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
+import { logger } from "../logger";
 import { Pipeline } from "../entities/Pipeline";
 import { Run } from "../entities/Run";
 import { Runner } from "../entities/Runner";
 import { User } from "../entities/User";
-import { log, run, running } from "../running";
+import { log, running } from "../running";
 import { isConfigValid } from "../validation";
 
 /**
@@ -295,13 +296,13 @@ export async function getPipelineLog(req: Request, res: Response) {
                 if (error.response && error.response.status === 404) {
                     res.send("No log could be found (deleted on server)");
                 } else {
-                    console.error(error);
+                    logger.error(error);
                     res.send("An error occurred");
                 }
             })
 
     } catch (error) {
-        console.warn(`[${runId}] ${error}`);
+        logger.warn(`[${runId}] ${error}`);
         res.status(400).send("No log could be found");
     }
 }

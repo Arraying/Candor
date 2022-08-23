@@ -3,6 +3,7 @@ import crypto from "crypto";
 import jspath from "jspath";
 import { Request } from "express";
 import { AppDataSource } from "./data-source";
+import { logger } from "./logger";
 import { Pipeline } from "./entities/Pipeline";
 import { Run } from "./entities/Run";
 import { Runner } from "./entities/Runner";
@@ -53,7 +54,7 @@ export async function constraintsMet(req: Request): Promise<boolean> {
                 return false;
             }
         } catch (error) {
-            console.warn(`[JSPath]: ${required} raised exception`);
+            logger.warn(`[JSPath]: ${required} raised exception`);
             return false;
         }
     }
@@ -79,18 +80,18 @@ export async function run(req: Request): Promise<void> {
     Object.assign(parameters, req.query);
     // Create the run ID.
     const runId = crypto.randomBytes(4).toString("hex");
-    console.log(`[${runId}] Preparing`);
+    logger.info(`[${runId}] Preparing`);
     try {
         running.add(pipeline.id);
         // Perform the run.
         const run = await performRun(runId, pipeline, parameters);
-        console.log(`[${runId}] Complete`);
+        logger.info(`[${runId}] Complete`);
         // Save the run.
         await AppDataSource.getRepository(Run).save(run);
     } catch(error) {
-        console.error(`[${runId}] Failure: ${error}`);
+        logger.error(`[${runId}] Failure: ${error}`);
     } finally {
-        console.log(`[${runId}] Done`);
+        logger.info(`[${runId}] Done`);
         running.delete(pipeline.id);
     }
 }
@@ -149,7 +150,7 @@ async function performRun(runId: string, pipeline: Pipeline, parameters: any): P
     // Status code 400 means the token or plan is invalid.
     // This should technically never happen.
     if (runnerResponse.status === 400) {
-        console.log(runnerResponse);
+        logger.error(runnerResponse);
         // Delegate.
         return makeFailedRun(pipelineId, runId, `Error ${runnerResponse.status}`);
     }
@@ -302,7 +303,7 @@ function extractJSPathParameters(plan: any, body: any): any {
             // Also convert to string, because otherwise this will be a headache.
             map.set(parameter, result ? result[0].toString() : undefined);
         } catch (error) {
-            console.warn(`[JSPath]: ${parameter} raised exception`);
+            logger.warn(`[JSPath]: ${parameter} raised exception`);
             return false;
         }
     }

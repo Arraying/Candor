@@ -1,4 +1,5 @@
-import { Repository } from "typeorm"
+import { Repository } from "typeorm";
+import { logger } from "../logger";
 
 /**
  * Represents a partial entity that has a name and ID.
@@ -55,7 +56,7 @@ export abstract class BaseService<T extends NamedEntity> {
             });
             return entities == null ? [] : entities;
         } catch (error) {
-            console.error(error);
+            logger.error(error);
             return "error";
         }
     }
@@ -77,7 +78,7 @@ export abstract class BaseService<T extends NamedEntity> {
             // If find is empty, then we can just create it instead.
             return find == null ? this.makeEmpty() : find;
         } catch (error) {
-            console.error(error);
+            logger.error(error);
             return this.makeEmpty();
         }
     }
@@ -107,7 +108,7 @@ export abstract class BaseService<T extends NamedEntity> {
             await this.getRepository().save(entity);
             return "success";
         } catch (error) {
-            console.error(error);
+            logger.error(error);
             return "error";
         }
     }
@@ -122,7 +123,7 @@ export abstract class BaseService<T extends NamedEntity> {
             await this.getRepository().save(entity);
             return "success";
         } catch (error) {
-            console.log(error);
+            logger.error(error);
             return "error";
         }
     }
@@ -138,7 +139,7 @@ export abstract class BaseService<T extends NamedEntity> {
             await this.getRepository().delete({ name: name });
             return "success";
         } catch (error) {
-            console.log(error);
+            logger.error(error);
             return "error";
         }
     }

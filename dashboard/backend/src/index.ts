@@ -1,6 +1,7 @@
 import app from "./app";
 import { mainMenuLoop } from "./menu";
 import { AppDataSource } from "./data-source";
+import { logger } from "./logger";
 
 // Make it possible to not run the CLI i.e. for development purposes.
 const WEB_ONLY = process.env.WEB_ONLY || false;
@@ -19,12 +20,12 @@ AppDataSource.initialize()
                 })
                 // Generic error handling.
                 .catch((error) => {
-                    console.error(error);
+                    logger.error(error);
                 });
         }
 
     })
-    .catch((e) => {
-        console.error("Could not setup database.");
-        console.error(e);
+    .catch((error) => {
+        logger.error("Could not setup database.");
+        logger.error(error);
     });
