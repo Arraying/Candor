@@ -51,7 +51,7 @@ export abstract class BaseService<T extends NamedEntity> {
                 relations: this.getRelations(),
                 // @ts-ignore Currently typechecking with NamedEntity does not work.
                 order: {
-                    name: "ASC"
+                    name: "ASC",
                 },
             });
             return entities == null ? [] : entities;
@@ -72,7 +72,7 @@ export abstract class BaseService<T extends NamedEntity> {
                 relations: this.getRelations(),
                 // @ts-ignore Currently typechecking with NamedEntity does not work.
                 where: {
-                    name: name
+                    name: name,
                 },
             });
             // If find is empty, then we can just create it instead.

@@ -18,6 +18,6 @@ module.exports = class CreateAssignmentsTable1654351001488 {
     }
 
     async down(queryRunner) {
-        await queryRunner.query(`DROP TABLE "assignments";`);
+        await queryRunner.query("DROP TABLE \"assignments\";");
     }
 }

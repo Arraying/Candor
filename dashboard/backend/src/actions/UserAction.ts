@@ -72,7 +72,7 @@ function promptPassword(): prompts.PromptObject {
                 return "Password cannot be empty.";
             }
             return true;
-        }
+        },
     };
 }
 

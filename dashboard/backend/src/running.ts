@@ -139,7 +139,7 @@ async function performRun(runId: string, pipeline: Pipeline, parameters: any): P
             headers: {
                 Authorization: `Bearer ${process.env.RUNNER_TOKEN}`,
             },
-            validateStatus: null // Don't error!
+            validateStatus: null, // Don't error!
         });
     } catch (error) {
         // Wrap the error and delegate it again.
@@ -199,7 +199,7 @@ async function getCompatibleRunner(): Promise<Runner | undefined> {
                 }
                 // Seems to be online.
                 return runner;
-            } catch { }; // Ignore errors.
+            } catch { } // Ignore errors.
         }
         // At this point, no runners are available.
         return undefined;

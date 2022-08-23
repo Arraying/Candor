@@ -85,7 +85,7 @@ function promptHost(): prompts.PromptObject[] {
                     return "The domain cannot be empty";
                 }
                 return true;
-            }
+            },
         },
     ];
 }

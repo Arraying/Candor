@@ -11,6 +11,6 @@ module.exports = class CreatePipelinesTable1654350913919 {
     }
 
     async down(queryRunner) {
-        await queryRunner.query(`DROP TABLE pipelines;`);
+        await queryRunner.query("DROP TABLE pipelines;");
     }
 }

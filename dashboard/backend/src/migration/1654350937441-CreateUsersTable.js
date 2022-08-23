@@ -10,6 +10,6 @@ module.exports = class CreateUsersTable1654350937441 {
     }
 
     async down(queryRunner) {
-        await queryRunner.query(`DROP TABLE "users";`);
+        await queryRunner.query("DROP TABLE \"users\";");
     }
 }

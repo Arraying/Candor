@@ -11,6 +11,6 @@ module.exports = class CreateRunnersTable1654349350759 {
     }
 
     async down(queryRunner) {
-        await queryRunner.query(`DROP TABLE "runners";`);
+        await queryRunner.query("DROP TABLE \"runners\";");
     }
 }

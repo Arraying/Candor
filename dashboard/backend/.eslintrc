@@ -1,0 +1,24 @@
+{
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "project": "./tsconfig.json"
+    },
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "rules": {
+        "comma-dangle": ["error", "always-multiline"],
+        "eqeqeq": ["error", "smart"],
+        "quotes": ["error", "double"],
+        "sort-imports": ["error", {
+            "ignoreCase": true
+        }],
+        "spaced-comment": ["error"]
+    }
+  }

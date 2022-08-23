@@ -48,66 +48,66 @@ const configSchema = {
                 properties: {
                     name: {
                         description: "The name of the stage",
-                        type: "string"
+                        type: "string",
                     },
                     image: {
                         description: "The name of the Docker image",
-                        type: "string"
+                        type: "string",
                     },
                     runtime: {
                         description: "The name of the custom runtime",
                         type: [
                             "string",
-                            "null"
-                        ]
+                            "null",
+                        ],
                     },
                     environment: {
                         description: "List of environment variables to be set",
                         type: [
                             "array",
-                            "null"
+                            "null",
                         ],
                         items: {
                             description: "A key=value pair or just key to take from the shell",
-                            type: "string"
-                        }
+                            type: "string",
+                        },
                     },
                     script: {
                         description: "List of commands to execute",
                         type: [
                             "array",
-                            "null"
+                            "null",
                         ],
                         items: {
                             description: "A command",
-                            type: "string"
-                        }
-                    }
+                            type: "string",
+                        },
+                    },
                 },
                 additionalProperties: false,
                 required: [
                     "name",
-                    "image"
-                ]
+                    "image",
+                ],
             },
-            minItems: 0
+            minItems: 0,
         },
         archive: {
             description: "List of file paths to archive",
             type: [
                 "array",
-                "null"
+                "null",
             ],
             items: {
                 description: "The file path to archive",
-                type: "string"
-            }
-        }
+                type: "string",
+            },
+        },
     },
     additionalProperties: false,
     required: [
-        "stages"
-    ]
+        "stages",
+    ],
 }
 
 const validator = new ajv({ allErrors: true, allowUnionTypes: true });

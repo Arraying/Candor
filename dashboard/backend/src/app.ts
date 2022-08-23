@@ -4,7 +4,7 @@ import expressSession from "express-session";
 import connectPgSimple from "connect-pg-simple";
 import { pipelineInspect, pipelineInteract } from "./middleware/security";
 import { login, logout, me } from "./routes/auth";
-import { listPipelines, getPipeline, getPipelineConfig, setPipelineConfig, getPipelineLog, getPipelineArchive } from "./routes/pipelines";
+import { getPipeline, getPipelineArchive, getPipelineConfig, getPipelineLog, listPipelines, setPipelineConfig } from "./routes/pipelines";
 import { trigger, triggerWithGitHub } from "./routes/trigger";
 import { User } from "./entities/User";
 import { Pipeline } from "./entities/Pipeline";
@@ -41,7 +41,7 @@ app.use(express.json());
 // Allow CORS.
 app.use(cors({
     credentials: true,
-    origin: process.env.DASHBOARD_ORIGIN
+    origin: process.env.DASHBOARD_ORIGIN,
 }))
 
 // Use sessions.

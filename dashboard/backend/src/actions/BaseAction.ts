@@ -1,5 +1,5 @@
 import prompts from "prompts";
-import { NamedEntity, BaseService } from "../services/BaseService";
+import { BaseService, NamedEntity } from "../services/BaseService";
 import { promptList, promptName, unanswered } from "./actions-utils";
 
 /**
@@ -93,7 +93,7 @@ export abstract class BaseAction<T extends NamedEntity> {
     async actionCreate(): Promise<void> {
         const questions = [
             promptName(this._nameLimit, (name: string): Promise<boolean> => this._service.doesNameExist(name)), 
-            ...this.createPrompts()
+            ...this.createPrompts(),
         ];
         const response = await prompts(questions);
         // Check if we need to return early.

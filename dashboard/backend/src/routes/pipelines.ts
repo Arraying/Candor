@@ -92,7 +92,7 @@ interface PipelineStageEntry {
 export async function listPipelines(req: Request, res: Response) {
     const repository = AppDataSource.manager.getRepository(Pipeline);
     const allPipelines = await repository.find({
-        relations: ["assignees"]
+        relations: ["assignees"],
     });
     // Obtain the pipelines.
     const pipelinesRaw = allPipelines

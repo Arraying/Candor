@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, AfterLoad } from "typeorm";
+import { AfterLoad, Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./User";
 
 /**
@@ -38,7 +38,7 @@ export class Pipeline {
     @JoinTable({
         name: "assignments", 
         joinColumn: {name: "pipeline", referencedColumnName: "id"}, 
-        inverseJoinColumn: {name: "user", referencedColumnName: "id"}
+        inverseJoinColumn: {name: "user", referencedColumnName: "id"},
     })
     assignees!: User[];
 

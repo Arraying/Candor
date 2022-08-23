@@ -54,7 +54,7 @@ export function promptList(question: string, names: string[]): prompts.PromptObj
         choices: names.map((name: string): prompts.Choice => {
             return {
                 title: name,
-                value: name
+                value: name,
             };
         }),
     };
