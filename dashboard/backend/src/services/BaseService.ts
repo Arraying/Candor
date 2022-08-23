@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { FindOptionsOrder, FindOptionsWhere, Repository } from "typeorm";
 import { logger } from "../logger";
 
 /**
@@ -49,10 +49,9 @@ export abstract class BaseService<T extends NamedEntity> {
         try {
             const entities = await this.getRepository().find({ 
                 relations: this.getRelations(),
-                // @ts-ignore Currently typechecking with NamedEntity does not work.
                 order: {
                     name: "ASC",
-                },
+                } as FindOptionsOrder<T>,
             });
             return entities == null ? [] : entities;
         } catch (error) {
@@ -70,10 +69,9 @@ export abstract class BaseService<T extends NamedEntity> {
         try {
             const find = await this.getRepository().findOne({
                 relations: this.getRelations(),
-                // @ts-ignore Currently typechecking with NamedEntity does not work.
                 where: {
                     name: name,
-                },
+                } as FindOptionsWhere<T>,
             });
             // If find is empty, then we can just create it instead.
             return find == null ? this.makeEmpty() : find;
@@ -90,8 +88,7 @@ export abstract class BaseService<T extends NamedEntity> {
      */
     async doesNameExist(name: string): Promise<boolean> {
         try {
-            // @ts-ignore Currently typechecking with NamedEntity does not work.
-            const find = await this.getRepository().findOneBy({ name: name });
+            const find = await this.getRepository().findOneBy({ name: name } as FindOptionsWhere<T>);
             return find != null;
         } catch (error) {
             return false;
@@ -135,8 +132,7 @@ export abstract class BaseService<T extends NamedEntity> {
      */
     async delete(name: string): Promise<GenericStatus> {
         try {
-            // @ts-ignore Currently typechecking with NamedEntity does not work.
-            await this.getRepository().delete({ name: name });
+            await this.getRepository().delete({ name: name } as FindOptionsWhere<T>);
             return "success";
         } catch (error) {
             logger.error(error);

@@ -1,12 +1,13 @@
+import "reflect-metadata";
+import { Assignment } from "./entities/Assignment";
+import { DataSource } from "typeorm";
 import dotenv from "dotenv";
 import path from "path";
-import "reflect-metadata";
-import { DataSource } from "typeorm";
-import { Assignment } from "./entities/Assignment";
 import { Pipeline } from "./entities/Pipeline";
 import { Run } from "./entities/Run";
 import { Runner } from "./entities/Runner";
 import { User } from "./entities/User";
+
 
 // Load the environment variables.
 dotenv.config();

@@ -1,7 +1,7 @@
+import { PipelineAction } from "./actions/PipelineActions";
 import prompts from "prompts";
 import { RunnerAction } from "./actions/RunnerAction";
 import { UserAction } from "./actions/UserAction";
-import { PipelineAction } from "./actions/PipelineActions";
 
 const pipeline = new PipelineAction();
 const user = new UserAction();
@@ -14,7 +14,7 @@ export async function mainMenuLoop() {
     // Print the main menu.
     console.log("\nCandor by @Arraying");
     console.log("Licensed under the MIT license.");
-    while (true) {
+    for (;;) {
         if (await mainMenu()) {
             break;
         }

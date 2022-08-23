@@ -1,6 +1,6 @@
-import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
+import bcrypt from "bcrypt";
 import { User } from "../entities/User";
 
 /**
@@ -69,7 +69,7 @@ export function logout(req: Request, res: Response) {
  * @param user The user.
  * @returns A stripped down user info.
  */
-function getUserInfo(user: User): any {
+function getUserInfo(user: User): { id: number, name: string } {
     return {
         id: user.id,
         name: user.name,

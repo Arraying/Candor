@@ -1,7 +1,7 @@
-import { Repository } from "typeorm";
 import { AppDataSource } from "../data-source";
-import { User } from "../entities/User";
 import { BaseService } from "./BaseService";
+import { Repository } from "typeorm";
+import { User } from "../entities/User";
 
 export class UserService extends BaseService<User> {
 

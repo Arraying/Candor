@@ -23,7 +23,7 @@ export class Pipeline {
      * The plan (JSON).
      */
     @Column({type: "json"})
-    plan!: Object;
+    plan!: Record<string, unknown>;
 
     /**
      * If the pipeline is public.

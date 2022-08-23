@@ -50,5 +50,6 @@ export class Run {
      * The runner's response.
      */
     @Column({type: "json"})
+    // eslint-disable-next-line
     outcome!: any;
 }

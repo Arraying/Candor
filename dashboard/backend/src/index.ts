@@ -1,7 +1,7 @@
 import app from "./app";
-import { mainMenuLoop } from "./menu";
 import { AppDataSource } from "./data-source";
 import { logger } from "./logger";
+import { mainMenuLoop } from "./menu";
 
 // Make it possible to not run the CLI i.e. for development purposes.
 const WEB_ONLY = process.env.WEB_ONLY || false;
@@ -12,7 +12,7 @@ AppDataSource.initialize()
         // Serve the web server.
         const server = app.listen(parseInt(process.env.DASHBOARD_PORT || "3000"));
         // Run the command-line tool.
-        if (WEB_ONLY != "true") {
+        if (WEB_ONLY !== "true") {
             mainMenuLoop()
                 // When this exits, the server should be killed too.
                 .then(() => {

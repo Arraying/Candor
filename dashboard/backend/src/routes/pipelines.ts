@@ -1,12 +1,13 @@
+import { log, running } from "../running";
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
+import { isConfigValid } from "../validation";
 import { logger } from "../logger";
 import { Pipeline } from "../entities/Pipeline";
 import { Run } from "../entities/Run";
 import { Runner } from "../entities/Runner";
 import { User } from "../entities/User";
-import { log, running } from "../running";
-import { isConfigValid } from "../validation";
+
 
 /**
  * An object that represents the summary of a pipeline in a tabular format.
@@ -129,7 +130,7 @@ export async function listPipelines(req: Request, res: Response) {
         const lastRun = runs[0];
         const lastSuccess = runs.find((run: Run): boolean => run.outcome.status === "Passed");
         const lastFailure = runs.find((run: Run): boolean => run.outcome.status === "Failed");
-        const lastStages = lastRun?.outcome.stages ? lastRun.outcome.stages.map((stage: any): string => stage.status) : undefined;
+        const lastStages = lastRun?.outcome.stages ? lastRun.outcome.stages.map((stage: Record<string, string>): string => stage.status) : undefined;
         return {
             // Basic information.
             id: pipeline.id,
@@ -179,7 +180,7 @@ export async function getPipeline(req: Request, res: Response) {
         return;
     }
     // Extract the required parameters.
-    const parameterObject = (queriedPipeline.plan as any)?.parameters;
+    const parameterObject = (queriedPipeline.plan).parameters as Record<string, string>;
     const parameters = parameterObject ? Object.keys(parameterObject) : [];
     // Get the last few runs.
     const runsRaw = await AppDataSource.getRepository(Run).find({
@@ -225,6 +226,7 @@ export async function getPipeline(req: Request, res: Response) {
  * @param res The response.
  */
 export async function getPipelineConfig(req: Request, res: Response) {
+    // eslint-disable-next-line
     const queriedPipeline = req.pipeline!;
     // Return the config.
     res.send(queriedPipeline.plan);
@@ -237,6 +239,7 @@ export async function getPipelineConfig(req: Request, res: Response) {
  */
 export async function setPipelineConfig(req: Request, res: Response) {
     const repository = AppDataSource.getRepository(Pipeline);
+    // eslint-disable-next-line
     const queriedPipeline = req.pipeline!;
     const newPlan = req.body;
     // Make sure it is valid first!

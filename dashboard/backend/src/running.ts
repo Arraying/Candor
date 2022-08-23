@@ -1,12 +1,20 @@
 import axios, { AxiosResponse } from "axios";
+import { AppDataSource } from "./data-source";
 import crypto from "crypto";
 import jspath from "jspath";
-import { Request } from "express";
-import { AppDataSource } from "./data-source";
 import { logger } from "./logger";
 import { Pipeline } from "./entities/Pipeline";
+import { Request } from "express";
 import { Run } from "./entities/Run";
 import { Runner } from "./entities/Runner";
+
+/**
+ * Represents a partial config that can be used for a plan too.
+ */
+type PartialConfig = {
+    parameters: Record<string, string> | undefined
+    stages: Record<string, unknown>[]
+}
 
 /**
  * Contains all pipeline IDs of pipelines currently in progress.
@@ -24,23 +32,33 @@ export async function canRun(req: Request): Promise<boolean> {
     return req.pipeline != null && !running.has(req.pipeline.id);
 }
 
-
+/**
+ * Whether or not the constraints are met.
+ * @param req The request.
+ * @returns True if they are, false otherwise.
+ */
 export async function constraintsMet(req: Request): Promise<boolean> {
     // This should never be the case.
     if (!req.pipeline) {
         return false;
     }
     // Defines the variables.
-    const plan = req.pipeline.plan as any;
-    const headers = plan.constrainHeaders || {};
-    const body = plan.constrainBody || {};
+    const plan = req.pipeline.plan;
+    const headers = plan.constrainHeaders as Record<string, string | string[]> || {};
+    const body = plan.constrainBody as Record<string, string[]> || {};
     // See if header constraints are met.
     for (const required in headers) {
         const compare = headers[required];
         const actual = req.headers[required.toLowerCase()];
         const expected = Array.isArray(compare) ? compare : [compare];
         // If it's not met, reject.
-        if (!expected.includes(actual)) {
+        if (!actual) {
+            return false;
+        }
+        // Array handling.
+        if (Array.isArray(actual) && !actual.find((actualSingle: string): boolean => expected.includes(actualSingle))) {
+            return false;
+        } else if(!Array.isArray(actual) && !expected.includes(actual)) {
             return false;
         }
     }
@@ -74,8 +92,9 @@ export async function run(req: Request): Promise<void> {
     if (!req.pipeline) {
         return;
     }
+    // eslint-disable-next-line
     const pipeline = req.pipeline!;
-    const parameters = extractJSPathParameters(pipeline.plan, req.body);
+    const parameters = extractJSPathParameters(pipeline.plan as PartialConfig, req.body);
     // Overwrite the parameters with any querystrings.
     Object.assign(parameters, req.query);
     // Create the run ID.
@@ -121,7 +140,7 @@ export function log(runner: Runner, runId: string): Promise<AxiosResponse> {
  * @param parameters The parameters to use.
  * @returns A promise of a run object.
  */
-async function performRun(runId: string, pipeline: Pipeline, parameters: any): Promise<Run> {
+async function performRun(runId: string, pipeline: Pipeline, parameters: Record<string, string>): Promise<Run> {
     const pipelineId = pipeline.id;
     // Get a compatible runner, if possible.
     const runner = await getCompatibleRunner();
@@ -130,7 +149,7 @@ async function performRun(runId: string, pipeline: Pipeline, parameters: any): P
         return makeFailedRun(pipelineId, runId, "Get Runner");
     }
     // Get the plan.
-    const plan = await generateRequestData(runId, pipeline.plan, parameters);
+    const plan = await generateRequestData(runId, pipeline.plan as PartialConfig, parameters);
     // Wrap communicating with the runner in a try/catch, you never know.
     let runnerResponse;
     const start = Date.now();
@@ -199,7 +218,9 @@ async function getCompatibleRunner(): Promise<Runner | undefined> {
                 }
                 // Seems to be online.
                 return runner;
-            } catch { } // Ignore errors.
+            } catch {
+                // eslint-disable-next-line
+            }
         }
         // At this point, no runners are available.
         return undefined;
@@ -217,34 +238,34 @@ async function getCompatibleRunner(): Promise<Runner | undefined> {
  * @param parameters The run parameters,
  * @returns A pipeline plan.
  */
-async function generateRequestData(runId: string, config: any, parameters: any) {
+async function generateRequestData(runId: string, config: PartialConfig, parameters: Record<string, string>) {
     // Make a quick helper function.
-    const replacer = (input?: string): string | undefined => {
+    const replacer = (input: string | undefined): string | undefined => {
         // If the input does not exist, ignore it.
         if (!input) {
             return input;
         }
-        // 
         Object.keys(parameters).forEach((parameter: string) => {
+            // eslint-disable-next-line
             input = input!.replaceAll(`%${parameter}%`, parameters[parameter]);
         });
         return input;
     }
     // Here, the JSON is guaranteed to be valid.
-    config.stages.forEach((stage: any) => {
+    config.stages.forEach((stage: Record<string, unknown>) => {
         // Replace every parameter.
-        stage.name = replacer(stage.name);
-        stage.image = replacer(stage.image);
-        stage.runtime = replacer(stage.runtime);
+        stage.name = replacer(stage.name as string);
+        stage.image = replacer(stage.image as string);
+        stage.runtime = replacer(stage.runtime as string);
         // If the environment exists, replace.
-        const environments = stage.environment || [];
+        const environments = stage.environment as (string | undefined)[] || [];
         for (const [i, environment] of environments.entries()) {
-            stage.environment[i] = replacer(environment);
+            environments[i] = replacer(environment);
         }
         // If the script exists, replace
-        const scripts = stage.script || [];
+        const scripts = stage.script as (string | undefined)[] || [];
         for (const [i, script] of scripts.entries()) {
-            stage.script[i] = replacer(script);
+            scripts[i] = replacer(script);
         }
     });
     return {
@@ -284,7 +305,7 @@ function makeFailedRun(pipelineId: number, runId: string, whatFailed: string): R
  * @param body The request body.
  * @returns An object of all the parameters.
  */
-function extractJSPathParameters(plan: any, body: any): any {
+function extractJSPathParameters(plan: PartialConfig, body: Record<string, unknown>): Record<string, string> {
     // If none are specified, that's fine too.
     if (!plan.parameters) {
         return {};
@@ -304,7 +325,6 @@ function extractJSPathParameters(plan: any, body: any): any {
             map.set(parameter, result ? result[0].toString() : undefined);
         } catch (error) {
             logger.warn(`[JSPath]: ${parameter} raised exception`);
-            return false;
         }
     }
     // Return the result.
