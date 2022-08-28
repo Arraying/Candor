@@ -48,7 +48,9 @@
                 <td>
                     <div class="tags">
                         {#each run.archived as archived}
-                            <a href="/api/runs/{pipelineId}/${run.id}/archived" download="{pipelineId}-{run.id}-archive.tar.gz" class="tag is-link is-light">{archived}</a>
+                            <a href="CANDOR_BASE_URL/api/runs/{pipelineId}/{run.id}/archived?file={encodeURIComponent(archived)}&mode=file" download="{archived}" class="tag is-link is-light">
+                                {archived}
+                            </a>
                         {/each}
                     </div>
                 </td>

@@ -1,11 +1,14 @@
+import { downloadFile, downloadStream } from "../s3";
 import { log, running } from "../running";
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { isConfigValid } from "../validation";
 import { logger } from "../logger";
+import path from "path";
 import { Pipeline } from "../entities/Pipeline";
 import { Run } from "../entities/Run";
 import { Runner } from "../entities/Runner";
+import tmp from "tmp";
 import { User } from "../entities/User";
 
 
@@ -253,10 +256,68 @@ export async function setPipelineConfig(req: Request, res: Response) {
     res.send({ valid: true });
 }
 
+/**
+ * Gets a file that was archived as a stream.
+ * @param req The request.
+ * @param res The response.
+ * @returns A stream or 400/404.
+ */
 export async function getPipelineArchive(req: Request, res: Response) {
-    // TODO: Implement.
-    // TODO: Permissions.
-    res.download(__filename);
+    // Constants.
+    const fileNameRaw = req.query.file;
+    const mode = req.query.mode || "stream";
+    const pipelineId = req.pipeline?.id;
+    const runId = req.params.runId;
+    if (!fileNameRaw || typeof fileNameRaw !== "string") {
+        res.sendStatus(400);
+        return;
+    }
+    const fileName = decodeURIComponent(fileNameRaw);
+    try {
+        // See if the run actually exists.
+        const run = await getRunFromRunId(pipelineId, runId);
+        // If not, error.
+        if (run == null) {
+            throw new Error("Run does not exist");
+        }
+        // Download according to mode.
+        switch (mode) {
+            case "stream": {
+                // Get the file and stream it.
+                const stream = await downloadStream(run.run_id, fileName);
+                stream.pipe(res);
+                break;
+            }
+            case "file": {
+                const { name, removeCallback } = tmp.dirSync({ unsafeCleanup: true });
+                try {
+                    // Download to file.
+                    const diskPath = path.join(name, fileName);
+                    await downloadFile(run.run_id, fileName, diskPath);
+                    // Download.
+                    res.download(diskPath, (error: Error | undefined) => {
+                        // Error handling if we can.
+                        if (error && !res.headersSent) {
+                            res.sendStatus(500);
+                            logger.error(error);
+                        }
+                        // Clean up the mess.
+                        removeCallback();
+                    });
+                } catch (error) {
+                    // Only remove it in catch, finally won't work since download is async.
+                    // In good cases, the res.download callback will remove the folder.
+                    removeCallback();
+                }
+                break;
+            }
+            default:
+                res.sendStatus(400);
+        }
+    } catch (error) {
+        logger.warn(`[${runId}] ${error}`);
+        res.status(404).send("No archive could be found");
+    }
 }
 
 /**
@@ -306,7 +367,7 @@ export async function getPipelineLog(req: Request, res: Response) {
 
     } catch (error) {
         logger.warn(`[${runId}] ${error}`);
-        res.status(400).send("No log could be found");
+        res.status(404).send("No log could be found");
     }
 }
 
