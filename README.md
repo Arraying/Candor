@@ -47,6 +47,7 @@ The current development roadmap is as follows:
 - [💾] The ability to use state of previous pipelines as base images.
 - [🔌] A plugin system such that common pipeline steps such as Git clones can be abbreviated.
 - [🔧] A fully-fledged web dashboard replacing the CLI.
+- [📡] Updates and logs in real time.
 
 Please note that this roadmap will most likely change as priorities shift or new ideas arise.
 
