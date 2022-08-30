@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/dashboard/backend/"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "[Backend Production]"
+      prefix-development: "[Backend Development]"
+      include: "scope"
+  - package-ecosystem: "npm"
+    directory: "/dashboard/frontend"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "[Frontend Production]"
+      prefix-development: "[Frontend Development]"
+      include: "scope"
+  - package-ecosystem: "npm"
+    directory: "/runner"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "[Runner Production]"
+      prefix-development: "[Runner Development]"
+      include: "scope"
