@@ -4,6 +4,7 @@
   "description": "Candor CI backend",
   "main": "build/main.js",
   "dependencies": {
+    "@types/jest": "^29.0.0",
     "ajv": "^8.11.0",
     "axios": "^0.27.2",
     "bcrypt": "^5.0.1",
@@ -42,6 +43,7 @@
     "@typescript-eslint/eslint-plugin": "^5.34.0",
     "@typescript-eslint/parser": "^5.34.0",
     "eslint": "^8.22.0",
+    "ts-jest": "^28.0.8",
     "ts-node": "^10.8.1",
     "typescript": "^4.7.3"
   },

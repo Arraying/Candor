@@ -15,7 +15,6 @@ export async function pipelineInspect(req: Request, res: Response, next: () => v
     // If the pipeline does not exist, error.
     if (!queriedPipeline) {
         res.sendStatus(404);
-        console.error("aaaaa");
         return;
     }
     // See if the user is assigned.
