@@ -1,7 +1,9 @@
-import { getPipeline, getPipelineArchive, getPipelineConfig, getPipelineLog, listPipelines, setPipelineConfig } from "./routes/pipelines";
+import { getPipeline, listPipelines } from "./routes/pipeline-read";
+import { getPipelineArchive, getPipelineLog } from "./routes/pipeline-runs";
+import { getPipelineConfig, setPipelineConfig } from "./routes/pipeline-config";
 import { login, logout, me } from "./routes/auth";
 import { pipelineInspect, pipelineInteract } from "./middleware/security";
-import { trigger, triggerWithGitHub } from "./routes/trigger";
+import { trigger, triggerWithGitHub } from "./routes/pipeline-trigger";
 import connectPgSimple from "connect-pg-simple";
 import cors from "cors";
 import express from "express";
