@@ -78,6 +78,7 @@ app.get("/logs/:runId", async (req: Request, res: Response) => {
 
 // Listen on the correct port.
 const server = app.listen(process.env.RUNNER_PORT);
+console.log(`Started runner (build ${process.env.CANDOR_VERSION || "developer"})`);
 
 // Handle ^C and SIGTERM properly.
 const shutdown = () => {
