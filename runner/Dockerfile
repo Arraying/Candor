@@ -18,7 +18,7 @@ RUN npm ci --only=production
 FROM node:16-alpine
 WORKDIR /opt/runner
 COPY --from=cleaner /opt/runner ./
-RUN mv ./build ./server
+RUN mv ./build ./server && mkdir -p /var/log/candor/
 ARG CANDOR_BUILD_VERSION=developer
 ENV CANDOR_VERSION=$CANDOR_BUILD_VERSION
 ENV RUNNER_PORT=3001
