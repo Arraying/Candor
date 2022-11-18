@@ -2,5 +2,6 @@
 **/node_modules/
 **/coverage/
 backend/archive/
+candor_cloudserver_config.json
 logs/
 .env
