@@ -1,0 +1,5 @@
+*/__tests__
+*/build
+*/node_modules
+*/public/build
+*/.env

@@ -12,7 +12,7 @@ const runner = new RunnerAction();
  */
 export async function mainMenuLoop() {
     // Print the main menu.
-    console.log("\nCandor by @Arraying");
+    console.log(`\nCandor (build ${process.env.CANDOR_VERSION || "developer"}) by @Arraying`);
     console.log("Licensed under the MIT license.");
     for (;;) {
         if (await mainMenu()) {

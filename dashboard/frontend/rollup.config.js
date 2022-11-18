@@ -59,6 +59,7 @@ export default {
 		}),
 		commonjs(),
 		replace({
+			'CANDOR_VERSION': process.env.CANDOR_VERSION || 'development',
 			'CANDOR_BASE_URL': production ? '' : 'http://localhost:3000',
 		}),
 
