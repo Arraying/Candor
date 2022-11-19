@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
 import { pipelineInspectBuilder, pipelineInteractBuilder } from "../src/middleware/security";
+import { Request, Response } from "express";
 import { Pipeline } from "../src/entities/Pipeline";
 import { User } from "../src/entities/User";
 
@@ -12,13 +12,13 @@ describe("Inspecting the pipeline", () => {
         pipeline.public = true;
         pipeline.assignees = [];
         pipeline.token = "token";
-        const extractor = (_: Request): Promise<Pipeline | null> => Promise.resolve(pipeline);
-        const [req, res, next, _] = variables();
+        const extractor = (): Promise<Pipeline | null> => Promise.resolve(pipeline);
+        const [req, res, next] = variables();
         await pipelineInspectBuilder(extractor)(req, res, next);
         expect(next).toBeCalled();
     });
     test("Rejects a nonexistent pipeline", async () => {
-        const extractor = (_: Request): Promise<Pipeline | null> => Promise.resolve(null);
+        const extractor = (): Promise<Pipeline | null> => Promise.resolve(null);
         const [req, res, next, sendStatus] = variables();
         await pipelineInspectBuilder(extractor)(req, res, next);
         expect(next).not.toBeCalled();
@@ -34,8 +34,8 @@ describe("Inspecting the pipeline", () => {
         pipeline.public = false;
         pipeline.assignees = [user];
         pipeline.token = "token";
-        const extractor = (_: Request): Promise<Pipeline | null> => Promise.resolve(pipeline);
-        const [req, res, next, _] = variables(user);
+        const extractor = (): Promise<Pipeline | null> => Promise.resolve(pipeline);
+        const [req, res, next] = variables(user);
         await pipelineInspectBuilder(extractor)(req, res, next);
         expect(next).toBeCalled();
     });
@@ -47,7 +47,7 @@ describe("Inspecting the pipeline", () => {
         pipeline.public = false;
         pipeline.assignees = [];
         pipeline.token = "token";
-        const extractor = (_: Request): Promise<Pipeline | null> => Promise.resolve(pipeline);
+        const extractor = (): Promise<Pipeline | null> => Promise.resolve(pipeline);
         const [req, res, next, sendStatus] = variables();
         await pipelineInspectBuilder(extractor)(req, res, next);
         expect(next).not.toBeCalled();
@@ -65,7 +65,7 @@ describe("Inspecting the pipeline", () => {
         pipeline.public = false;
         pipeline.assignees = [user1];
         pipeline.token = "token";
-        const extractor = (_: Request): Promise<Pipeline | null> => Promise.resolve(pipeline);
+        const extractor = (): Promise<Pipeline | null> => Promise.resolve(pipeline);
         const [req, res, next, sendStatus] = variables(user2);
         await pipelineInspectBuilder(extractor)(req, res, next);
         expect(next).not.toBeCalled();
@@ -84,13 +84,13 @@ describe("Interacting with a pipeline", () => {
         pipeline.public = false;
         pipeline.assignees = [user];
         pipeline.token = "token";
-        const extractor = (_: Request): Promise<Pipeline | null> => Promise.resolve(pipeline);
-        const [req, res, next, _] = variables(user);
+        const extractor = (): Promise<Pipeline | null> => Promise.resolve(pipeline);
+        const [req, res, next] = variables(user);
         await pipelineInteractBuilder(extractor)(req, res, next);
         expect(next).toBeCalled();
     });
     test("Rejects a nonexistant pipeline", async () => {
-        const extractor = (_: Request): Promise<Pipeline | null> => Promise.resolve(null);
+        const extractor = (): Promise<Pipeline | null> => Promise.resolve(null);
         const [req, res, next, sendStatus] = variables();
         await pipelineInteractBuilder(extractor)(req, res, next);
         expect(next).not.toBeCalled();
@@ -104,7 +104,7 @@ describe("Interacting with a pipeline", () => {
         pipeline.public = false;
         pipeline.assignees = [];
         pipeline.token = "token";
-        const extractor = (_: Request): Promise<Pipeline | null> => Promise.resolve(pipeline);
+        const extractor = (): Promise<Pipeline | null> => Promise.resolve(pipeline);
         const [req, res, next, sendStatus] = variables();
         await pipelineInteractBuilder(extractor)(req, res, next);
         expect(next).not.toBeCalled();
@@ -122,7 +122,7 @@ describe("Interacting with a pipeline", () => {
         pipeline.public = false;
         pipeline.assignees = [user1];
         pipeline.token = "token";
-        const extractor = (_: Request): Promise<Pipeline | null> => Promise.resolve(pipeline);
+        const extractor = (): Promise<Pipeline | null> => Promise.resolve(pipeline);
         const [req, res, next, sendStatus] = variables(user2);
         await pipelineInteractBuilder(extractor)(req, res, next);
         expect(next).not.toBeCalled();
@@ -136,7 +136,7 @@ function variables(user?: User): [Request, Response, jest.Mock<any, any>, jest.M
     const req = {
         session: {
             user: user,
-        }
+        },
     } as Request;
     const res = {
         sendStatus: status,
