@@ -31,7 +31,7 @@
     "build": "tsc -p .",
     "lint": "eslint . --fix",
     "lint:nofix": "eslint .",
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "dev": "ts-node src/index.ts"
   },
   "author": "",
