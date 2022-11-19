@@ -1,0 +1,22 @@
+name: Code Quality
+on: [push]
+jobs:
+  setup:
+    name: Setup Environment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v3
+      - name: Install NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+  install:
+    name: Install Dependencies
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: { project: ['dashboard/frontend', 'dashboard/backend', 'runner'] }
+    steps:
+      - name: Clean Install
+        run: npm ci
+        working-directory: ${{ matrix.project }}
