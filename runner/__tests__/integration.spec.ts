@@ -83,7 +83,13 @@ describe("Bad weather recovery tests", () => {
         logDirCleaner = tempLogDir.removeCallback;
     });
     afterEach(() => {
-        logDirCleaner();
+        // https://github.com/raszi/node-tmp/issues/274
+        try {
+            logDirCleaner();
+        } catch (error) {
+            // This should not fail the second time... usually.
+            logDirCleaner();
+        }
         process.env = env;
     });
     test("Recovery when image creation fails", async () => {
@@ -304,7 +310,13 @@ describe("Bad weather behaviour tests", () => {
         logDirCleaner = tempLogDir.removeCallback;
     });
     afterEach(() => {
-        logDirCleaner();
+        // https://github.com/raszi/node-tmp/issues/274
+        try {
+            logDirCleaner();
+        } catch (error) {
+            // This should not fail the second time... usually.
+            logDirCleaner();
+        }
         process.env = env;
     });
     test("Fails when the runtime is unavailable", async () => {
@@ -417,7 +429,13 @@ describe("Timeout tests", () => {
         logDirCleaner = tempLogDir.removeCallback;
     });
     afterEach(() => {
-        logDirCleaner();
+        // https://github.com/raszi/node-tmp/issues/274
+        try {
+            logDirCleaner();
+        } catch (error) {
+            // This should not fail the second time... usually.
+            logDirCleaner();
+        }
         process.env = env;
     });
     // Implicitly also a good weather test.
