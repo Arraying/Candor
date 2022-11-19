@@ -1,8 +1,8 @@
-import { Server } from "http";
 import app from "./app";
 import { AppDataSource } from "./data-source";
 import { logger } from "./logger";
 import { mainMenuLoop } from "./menu";
+import { Server } from "http";
 
 // Make it possible to not run the CLI i.e. for development purposes.
 const WEB_ONLY = process.env.WEB_ONLY || false;
