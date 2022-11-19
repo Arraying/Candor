@@ -501,7 +501,7 @@ describe("Timeout tests", () => {
         const mockedVolume = mockVolume();
         const mockedImage = mockImage();
         const mockedContainer = mockContainer(() => 0, () => {
-            return 1001;
+            return 3000;
         });
         createVolume.mockImplementation(async () => {
             const volume: unknown = {
