@@ -17,5 +17,5 @@ jobs:
         run: npm ci
         working-directory: ${{ matrix.project }}
       - name: Lint
-        run: npm run lint
+        run: npm run lint:nofix
         working-directory: ${{ matrix.project }}
