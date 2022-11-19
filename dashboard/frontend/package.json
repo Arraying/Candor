@@ -1,6 +1,5 @@
 {
   "name": "candor-frontend",
-  "version": "0.1.0",
   "description": "Candor CI frontend",
   "dependencies": {
     "sirv-cli": "^2.0.0"

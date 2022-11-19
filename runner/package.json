@@ -1,6 +1,5 @@
 {
   "name": "candor-runner",
-  "version": "0.1.0",
   "description": "Candor CI runner",
   "main": "build/main.js",
   "dependencies": {

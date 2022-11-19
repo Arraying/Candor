@@ -1,6 +1,5 @@
 {
   "name": "candor-backend",
-  "version": "0.1.0",
   "description": "Candor CI backend",
   "main": "build/main.js",
   "dependencies": {
