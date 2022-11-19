@@ -49,6 +49,7 @@
   "scripts": {
     "build": "tsc -p .",
     "lint": "eslint . --fix",
+    "lint:nofix": "eslint .",
     "test": "jest",
     "dev": "ts-node src/index.ts",
     "typeorm": "./node_modules/.bin/typeorm-ts-node-esm",

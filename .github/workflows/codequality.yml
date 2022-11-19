@@ -16,3 +16,6 @@ jobs:
       - name: Clean Install
         run: npm ci
         working-directory: ${{ matrix.project }}
+      - name: Lint
+        run: npm run lint
+        working-directory: ${{ matrix.project }}
