@@ -2,7 +2,7 @@ import { getPipeline, listPipelines } from "./routes/pipeline-read";
 import { getPipelineArchive, getPipelineLog } from "./routes/pipeline-runs";
 import { getPipelineConfig, setPipelineConfig } from "./routes/pipeline-config";
 import { login, logout, me } from "./routes/auth";
-import { pipelineInspect, pipelineInteract } from "./middleware/security";
+import { pipelineInspectBuilder, pipelineInteractBuilder, getPipelineFromRequest } from "./middleware/security";
 import { trigger, triggerWithGitHub } from "./routes/pipeline-trigger";
 import connectPgSimple from "connect-pg-simple";
 import cors from "cors";
@@ -74,15 +74,15 @@ app.post("/logout", logout);
 // Pipeline routes.
 app.get("/api/pipelines", listPipelines);
 app.get("/api/pipelines/:pipelineId", getPipeline);
-app.get("/api/pipelines/:pipelineId/config", pipelineInteract, getPipelineConfig);
-app.post("/api/pipelines/:pipelineId/config", pipelineInteract, setPipelineConfig);
+app.get("/api/pipelines/:pipelineId/config", pipelineInteractBuilder(getPipelineFromRequest), getPipelineConfig);
+app.post("/api/pipelines/:pipelineId/config", pipelineInteractBuilder(getPipelineFromRequest), setPipelineConfig);
 
 // Build routes.
-app.get("/api/runs/:pipelineId/:runId/log", pipelineInspect, getPipelineLog);
-app.get("/api/runs/:pipelineId/:runId/archived", pipelineInspect, getPipelineArchive);
+app.get("/api/runs/:pipelineId/:runId/log", pipelineInspectBuilder(getPipelineFromRequest), getPipelineLog);
+app.get("/api/runs/:pipelineId/:runId/archived", pipelineInspectBuilder(getPipelineFromRequest), getPipelineArchive);
 
 // Trigger routes.
-app.post("/trigger/:token", pipelineInteract, trigger);
-app.post("/trigger/:token/github", pipelineInteract, triggerWithGitHub);
+app.post("/trigger/:token", pipelineInteractBuilder(getPipelineFromRequest), trigger);
+app.post("/trigger/:token/github", pipelineInteractBuilder(getPipelineFromRequest), triggerWithGitHub);
 
 export default app;
