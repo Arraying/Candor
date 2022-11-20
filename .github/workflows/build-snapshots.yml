@@ -5,7 +5,7 @@ on:
 jobs:
   build:
     name: Build and Publish Docker Image
-    runs-on: ubuntu-lates
+    runs-on: ubuntu-latest
     strategy:
       matrix: { project: ['dashboard', 'runner'] }
     steps:
@@ -25,4 +25,6 @@ jobs:
         with:
           context: ${{ matrix.project }}
           tags: ${{ secrets.DOCKERHUB_USERNAME }}-${{ matrix.project }}:${SHORT_SHA}
+          build-args: |
+            CANDOR_BUILD_VERSION=${SHORT_SHA}
           push: false
