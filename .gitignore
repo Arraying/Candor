@@ -1,6 +1,7 @@
 **/build/
 **/node_modules/
 **/coverage/
+**/dashboard.log
 backend/archive/
 candor_cloudserver_config.json
 logs/

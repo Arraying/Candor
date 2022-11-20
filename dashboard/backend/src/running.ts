@@ -12,7 +12,7 @@ import { Runner } from "./entities/Runner";
  * Represents a partial config that can be used for a plan too.
  */
 type PartialConfig = {
-    parameters: Record<string, string> | undefined
+    parameters: Record<string, string | null | undefined> | undefined
     stages: Record<string, unknown>[]
 }
 
@@ -46,6 +46,16 @@ export async function constraintsMet(req: Request): Promise<boolean> {
     const plan = req.pipeline.plan;
     const headers = plan.constrainHeaders as Record<string, string | string[]> || {};
     const body = plan.constrainBody as Record<string, string[]> || {};
+    return (await constraintsMetHeader(req, headers)) && (await constraintsMetBody(req, body));
+}
+
+/**
+ * Ensures header constraints are met.
+ * @param req The request.
+ * @param headers The header constraints.
+ * @returns True iff the header constraints are met.
+ */
+export async function constraintsMetHeader(req: Request, headers: Record<string, string | string[]>): Promise<boolean> {
     // See if header constraints are met.
     for (const required in headers) {
         const compare = headers[required];
@@ -58,17 +68,27 @@ export async function constraintsMet(req: Request): Promise<boolean> {
         // Array handling.
         if (Array.isArray(actual) && !actual.find((actualSingle: string): boolean => expected.includes(actualSingle))) {
             return false;
-        } else if(!Array.isArray(actual) && !expected.includes(actual)) {
+        } else if (!Array.isArray(actual) && !expected.includes(actual)) {
             return false;
         }
     }
+    return true;
+}
+
+/**
+ * Ensures body constraints are met.
+ * @param req The request.
+ * @param body The body constraints.
+ * @returns True iff the body constraints are met.
+ */
+export async function constraintsMetBody(req: Request, body: Record<string, string[]>): Promise<boolean> {
     // See if the body constraints are met.
     for (const required in body) {
         const expected = body[required];
         try {
             const actual = jspath.apply(required, req.body);
             // If it's not met, reject.
-            if (actual !== expected) {
+            if (JSON.stringify(actual) !== JSON.stringify(expected)) {
                 return false;
             }
         } catch (error) {
@@ -76,8 +96,6 @@ export async function constraintsMet(req: Request): Promise<boolean> {
             return false;
         }
     }
-    // See if the body constraints are met.
-    // No problem.
     return true;
 }
 
@@ -146,7 +164,7 @@ async function performRun(runId: string, pipeline: Pipeline, parameters: Record<
     const runner = await getCompatibleRunner();
     if (!runner) {
         // Delegate failure.
-        return makeFailedRun(pipelineId, runId, "Get Runner");
+        return makeFailedRun(pipelineId, runId, "Get Runner", Date.now());
     }
     // Get the plan.
     const plan = await generateRequestData(runId, pipeline.plan as PartialConfig, parameters);
@@ -163,7 +181,7 @@ async function performRun(runId: string, pipeline: Pipeline, parameters: Record<
     } catch (error) {
         // Wrap the error and delegate it again.
         console.error(error);
-        return makeFailedRun(pipelineId, runId, "Connect Runner");
+        return makeFailedRun(pipelineId, runId, "Connect Runner", Date.now());
     }
     const finish = Date.now();
     // Status code 400 means the token or plan is invalid.
@@ -171,12 +189,12 @@ async function performRun(runId: string, pipeline: Pipeline, parameters: Record<
     if (runnerResponse.status === 400) {
         logger.error(runnerResponse);
         // Delegate.
-        return makeFailedRun(pipelineId, runId, `Error ${runnerResponse.status}`);
+        return makeFailedRun(pipelineId, runId, `Error ${runnerResponse.status}`, Date.now());
     }
     // Status code 401 means the token is incorrect.
     if (runnerResponse.status === 401) {
         // Delegate.
-        return makeFailedRun(pipelineId, runId, "Auth Runner");
+        return makeFailedRun(pipelineId, runId, "Auth Runner", Date.now());
     }
     const outcome = runnerResponse.data;
     // Turn this outcome into a real run.
@@ -196,7 +214,7 @@ async function performRun(runId: string, pipeline: Pipeline, parameters: Record<
  * Then in a random order, it will take the first runner where the healthcheck returns 200 OK.
  * @returns A runner, or undefined.
  */
-async function getCompatibleRunner(): Promise<Runner | undefined> {
+export async function getCompatibleRunner(): Promise<Runner | undefined> {
     try {
         // Attempts to get the runner from the repository.
         const repository = AppDataSource.getRepository(Runner);
@@ -238,7 +256,7 @@ async function getCompatibleRunner(): Promise<Runner | undefined> {
  * @param parameters The run parameters,
  * @returns A pipeline plan.
  */
-async function generateRequestData(runId: string, config: PartialConfig, parameters: Record<string, string>) {
+export async function generateRequestData(runId: string, config: PartialConfig, parameters: Record<string, string>) {
     // Make a quick helper function.
     const replacer = (input: string | undefined): string | undefined => {
         // If the input does not exist, ignore it.
@@ -279,13 +297,14 @@ async function generateRequestData(runId: string, config: PartialConfig, paramet
  * @param pipelineId The pipeline ID.
  * @param runId The run ID.
  * @param whatFailed A short description of what failed, this will become a stage.
+ * @param whenFailed When the pipeline failed.
  * @returns A run.
  */
-function makeFailedRun(pipelineId: number, runId: string, whatFailed: string): Run {
+export function makeFailedRun(pipelineId: number, runId: string, whatFailed: string, whenFailed: number): Run {
     const run = new Run();
     run.pipeline = pipelineId;
     run.run_id = runId;
-    const time = Date.now().toString();
+    const time = whenFailed.toString();
     run.start = time;
     run.finish = time;
     run.outcome = {
@@ -305,7 +324,7 @@ function makeFailedRun(pipelineId: number, runId: string, whatFailed: string): R
  * @param body The request body.
  * @returns An object of all the parameters.
  */
-function extractJSPathParameters(plan: PartialConfig, body: Record<string, unknown>): Record<string, string> {
+export function extractJSPathParameters(plan: PartialConfig, body: Record<string, unknown>): Record<string, string> {
     // If none are specified, that's fine too.
     if (!plan.parameters) {
         return {};
@@ -337,6 +356,6 @@ function extractJSPathParameters(plan: PartialConfig, body: Record<string, unkno
  * @param endpoint The API endpoint.
  * @returns A correctly formatted endpoint.
  */
-function getRunnerEndpoint(runner: Runner, endpoint: string): string {
+export function getRunnerEndpoint(runner: Runner, endpoint: string): string {
     return `${runner.hostname}${endpoint}`;
 }
