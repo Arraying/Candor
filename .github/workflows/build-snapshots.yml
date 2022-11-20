@@ -28,4 +28,4 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}-${{ matrix.project }}:${{ steps.commit.outputs.short }}
           build-args: |
             CANDOR_BUILD_VERSION=${{ steps.commit.outputs.short }}
-          push: false
+          push: true
