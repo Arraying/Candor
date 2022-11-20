@@ -25,7 +25,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ${{ matrix.project }}
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}-${{ matrix.project }}:${{ steps.commit.outputs.short }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/candor-${{ matrix.project }}:${{ steps.commit.outputs.short }}
           build-args: |
             CANDOR_BUILD_VERSION=${{ steps.commit.outputs.short }}
           push: true
