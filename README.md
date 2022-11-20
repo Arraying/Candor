@@ -53,7 +53,30 @@ Please note that this roadmap will most likely change as priorities shift or new
 
 # Contributing
 
-Coming soon.
+Contributors are awesome!
+Many contribution types are accepted, from feature implementations to bug bug reports/fixes, or even discussing the state of the codebase.
+
+## Contribution Flow
+
+1. All contributions should start off as an issue.
+Then, if necessary, the proposed contribution will be discussed.
+2. For code contributions, please fork the project's `main` branch, since this is where everything comes together.
+3. If your contributions are testable within reason (the final judgement of this is up to the maintainers), please write or edit some tests.
+All tests must pass before the contribution can be accepted, and there must not be any linter errors or warnings.
+4. If applicable, create a pull-request, where your contribution will be reviewed.
+5. Propose any changes to documentation in the wiki or even pull-request itself. 
+6. Once the pull-request or change is accepted, the issue will be closed, and you are officially a contributor!
+
+## Further Notes
+
+When contributing, please keep the following in mind:
+- Bug reports should be descriptive and reproducible, the more information the better (including version)!
+- Follow the preexisting coding style of the project.
+Indent using spaces, not tabs.
+- Embrace documentation! 
+Not only will users be able to understand how to use the software, it also explains it to other developers and yourself later down the road.
+- By contributing code, you agree to release your code under the same license as the project.
+
 
 # Attribution
 
