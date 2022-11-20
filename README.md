@@ -55,6 +55,10 @@ Please note that this roadmap will most likely change as priorities shift or new
 
 Coming soon.
 
+# Attribution
+
+The favicon was designed by [OpenMoji](https://openmoji.org/) – the open-source emoji and icon project. It is licensed under the [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/#) license.
+
 # License
 
 Copyright (c) 2022 Paul Huebner
