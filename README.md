@@ -12,7 +12,7 @@
 - [🎨] Fast, responsive, modern design. Every piece of information is hand-selected and placed with purpose.
 - [🖥️] Management performed through an elegant CLI, day-to-day business served through the web.
 
-Convinced already? [Click me to get started]().
+Convinced already? [Click me to get started](https://github.com/Arraying/Candor/wiki/Installation).
 
 # Showcase
 
