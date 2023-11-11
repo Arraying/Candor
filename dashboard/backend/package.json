@@ -5,7 +5,7 @@
   "dependencies": {
     "@types/jest": "^29.0.0",
     "ajv": "^8.11.0",
-    "axios": "^0.27.2",
+    "axios": "^1.6.0",
     "bcrypt": "^5.0.1",
     "connect-pg-simple": "^7.0.0",
     "cors": "^2.8.5",
